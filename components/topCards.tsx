@@ -28,10 +28,10 @@ export default function TopCards() {
         <CardFooter className="flex-col gap-2">
           <Button asChild variant="outline" className="w-full">
             <Link
-              href={pathname === "/invoices" ? "/" : "/invoices"}
+              href={pathname === "/invoices" ? "/invoices" : "/invoices"}
               className="flex items-center gap-2"
             >
-              <FileText /> {pathname === "/invoices" ? "Voltar" : "Faturas"}
+              <FileText /> {pathname === "/invoices" ? "Faturas" : "Faturas"}
             </Link>
           </Button>
         </CardFooter>
@@ -46,10 +46,10 @@ export default function TopCards() {
         <CardFooter className="flex-col gap-2">
           <Button asChild variant="outline" className="w-full">
             <Link
-              href={pathname === "/customers" ? "/" : "/customers"}
+              href={pathname === "/customers" ? "/customers" : "/customers"}
               className="flex items-center gap-2"
             >
-              <Users /> {pathname === "/customers" ? "Voltar" : "Clientes"}
+              <Users /> {pathname === "/customers" ? "Clientes" : "Clientes"}
             </Link>
           </Button>
         </CardFooter>
@@ -64,11 +64,11 @@ export default function TopCards() {
         <CardFooter className="flex-col gap-2">
           <Button asChild variant="outline" className="w-full">
             <Link
-              href={pathname === "/products" ? "/" : "/products"}
+              href={pathname === "/products" ? "/products" : "/products"}
               className="flex items-center gap-2"
             >
               <ShoppingCart />
-              {pathname === "/products" ? "Voltar" : "Produtos"}
+              {pathname === "/products" ? "Produtos" : "Produtos"}
             </Link>
           </Button>
         </CardFooter>

@@ -18,4 +18,10 @@ export const columnsConfig: Record<string, TableColumns> = {
     col3: "Pendente",
     col4: "Total mês",
   },
+  "/products": {
+    col1: "Nome",
+    col2: "Preço",
+    col3: "Estoque",
+    col4: "Valor",
+  },
 };

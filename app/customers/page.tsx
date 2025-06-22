@@ -1,12 +1,17 @@
 import AllInOneTable from "@/components/allInOneTable";
 import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
-import { Invoice } from "@/types/invoice";
-import { SummaryCustomer } from "@/types/summaryCustomer";
-import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { CustomerTableData } from "@/types/customerTableData";
+import { TableData } from "@/types/tableData";
+import { endOfMonth, startOfMonth } from "date-fns";
+import { Metadata } from "next";
+import { formatTableData } from "@/utils/formatTableData";
 
-export default async function Customers() {
+export const metadata: Metadata = {
+  title: "Clientes",
+};
+
+const Customers = async () => {
   const customers = await prisma.customer.findMany();
 
   const now = new Date();
@@ -29,7 +34,7 @@ export default async function Customers() {
     },
   });
 
-  const summaryCustomer: SummaryCustomer[] = customers.map((customer) => {
+  const summaryCustomer: CustomerTableData[] = customers.map((customer) => {
     const filteredInvoices = invoices.filter(
       (inv) => inv.customerId === customer.id,
     );
@@ -52,12 +57,15 @@ export default async function Customers() {
       monthlyInvoiceCount: monthlyInvoices.length,
     };
   });
-  console.log(summaryCustomer);
+
+  const tableData = formatTableData(summaryCustomer);
 
   return (
     <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[95%]">
       <TopCards />
-      <AllInOneTable customers={summaryCustomer} />
+      <AllInOneTable tableData={tableData} />
     </div>
   );
-}
+};
+
+export default Customers;

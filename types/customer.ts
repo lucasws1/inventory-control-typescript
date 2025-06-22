@@ -7,5 +7,5 @@ export type Customer = {
   phone?: string;
   createdAt: Date;
   updatedAt: Date;
-  Invoice: Invoice[];
+  Invoice?: Invoice[];
 };

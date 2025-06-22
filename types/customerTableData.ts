@@ -1,4 +1,4 @@
-export type SummaryCustomer = {
+export type CustomerTableData = {
   id: number;
   name: string;
   email?: string | null;

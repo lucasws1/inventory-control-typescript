@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SummaryCustomer } from "@/types/summaryCustomer";
+import { TableData } from "@/types/tableData";
 import { columnsConfig, TableColumns } from "@/utils/columnsConfig";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import { ChevronDown } from "lucide-react";
@@ -23,11 +23,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
-export default function AllInOneTable({
-  customers,
-}: {
-  customers: SummaryCustomer[];
-}) {
+const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
   const pathname = usePathname();
 
   const columns: TableColumns = columnsConfig[pathname];
@@ -46,7 +42,7 @@ export default function AllInOneTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {customers.map((customer) => (
+        {tableData.map((customer) => (
           <TableRow key={customer.id}>
             <TableCell className="font-medium">
               <Popover>
@@ -55,7 +51,7 @@ export default function AllInOneTable({
                     className="inline-flex items-center gap-2 font-medium"
                     href="#"
                   >
-                    {customer.name}
+                    {customer.col1}
                     <ChevronDown className="text-muted-foreground h-4 w-4" />
                   </Link>
                 </PopoverTrigger>
@@ -77,10 +73,16 @@ export default function AllInOneTable({
                 </PopoverContent>
               </Popover>
             </TableCell>
-            <TableCell>{customer.monthlyInvoiceCount}</TableCell>
-            <TableCell>{formatCurrencyBRL(customer.pendingAmount)}</TableCell>
+            <TableCell>{customer.col2}</TableCell>
+            <TableCell>
+              {typeof customer.col3 === "number"
+                ? formatCurrencyBRL(customer.col3)
+                : customer.col3}
+            </TableCell>
             <TableCell className="text-right">
-              {formatCurrencyBRL(customer.monthAmount)}
+              {typeof customer.col4 === "number"
+                ? formatCurrencyBRL(customer.col4)
+                : customer.col4}
             </TableCell>
           </TableRow>
         ))}
@@ -91,10 +93,16 @@ export default function AllInOneTable({
           <TableCell></TableCell>
           <TableCell></TableCell>
           <TableCell className="text-right">
-            {customers.reduce((sum, c) => sum + c.monthAmount, 0)}
+            {typeof tableData[0].col4 === "number"
+              ? formatCurrencyBRL(
+                  tableData.reduce((sum, c) => sum + Number(c.col4), 0),
+                )
+              : "0"}
           </TableCell>
         </TableRow>
       </TableFooter>
     </Table>
   );
-}
+};
+
+export default AllInOneTable;
