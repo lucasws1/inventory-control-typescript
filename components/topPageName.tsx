@@ -17,13 +17,13 @@ export default function TopPageName() {
   };
 
   const title = titles[pathname as Path] || {
-    label: "Hello, world",
+    label: "Título",
     icon: <User />,
   };
 
   return (
     <div className="flex items-center justify-center font-[family-name:var(--font-geist-sans)]">
-      <div className="flex items-center gap-2 text-3xl">
+      <div className="flex items-center gap-4 text-3xl">
         <Button asChild variant="outline" size="icon" className="">
           <Link href="/">{title.icon}</Link>
         </Button>

@@ -14,7 +14,7 @@ export const columnsConfig: Record<string, TableColumns> = {
   },
   "/customers": {
     col1: "Nome",
-    col2: "Faturas",
+    col2: "Vendas",
     col3: "Pendente",
     col4: "Total mês",
   },

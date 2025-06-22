@@ -37,10 +37,12 @@ export default function AllInOneTable({
       <TableCaption>Lista de Clientes</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>{columns.col1}</TableHead>
-          <TableHead>{columns.col2}</TableHead>
-          <TableHead>{columns.col3}</TableHead>
-          <TableHead className="text-right">{columns.col4}</TableHead>
+          <TableHead className="text-zinc-400">{columns.col1}</TableHead>
+          <TableHead className="text-zinc-400">{columns.col2}</TableHead>
+          <TableHead className="text-zinc-400">{columns.col3}</TableHead>
+          <TableHead className="text-right text-zinc-400">
+            {columns.col4}
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
