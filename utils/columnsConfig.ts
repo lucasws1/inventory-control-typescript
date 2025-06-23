@@ -12,6 +12,12 @@ export const columnsConfig: Record<string, TableColumns> = {
     col3: "Item",
     col4: "Valor",
   },
+  "/invoices": {
+    col1: "Data",
+    col2: "Nome",
+    col3: "Item",
+    col4: "Valor",
+  },
   "/customers": {
     col1: "Nome",
     col2: "Vendas",
@@ -23,5 +29,11 @@ export const columnsConfig: Record<string, TableColumns> = {
     col2: "Preço",
     col3: "Estoque",
     col4: "Valor",
+  },
+  "/stock-movement": {
+    col1: "Data",
+    col2: "Nome",
+    col3: "Motivo",
+    col4: "Qtd",
   },
 };

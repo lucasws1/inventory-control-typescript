@@ -1,9 +1,12 @@
 import AllInOneTable from "@/components/allInOneTable";
 import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
-import { formatTableData } from "@/utils/formatTableData";
-import { Prisma } from "../generated/prisma";
 import { ProductsTableData } from "@/types/productsTableData";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Produtos",
+};
 
 const Products = async () => {
   const products: ProductsTableData[] = await prisma.product.findMany({

@@ -1,22 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Path } from "@/types/path";
 import { TitleInfo } from "@/types/titleInfo";
 import {
   ChartNoAxesCombined,
   CircleUser,
+  FileText,
   Menu,
   Package,
   ShoppingCart,
@@ -31,8 +21,9 @@ export default function TopPageName() {
   const titles: Record<Path, TitleInfo> = {
     [Path.Home]: { label: "Painel", icon: <ChartNoAxesCombined /> },
     [Path.Customers]: { label: "Clientes", icon: <CircleUser /> },
-    [Path.Products]: { label: "Produtos", icon: <Package /> },
-    [Path.Invoices]: { label: "Faturas", icon: <ShoppingCart /> },
+    [Path.Products]: { label: "Produtos", icon: <ShoppingCart /> },
+    [Path.Invoices]: { label: "Vendas", icon: <FileText /> },
+    [Path.StockMovement]: { label: "Estoque", icon: <Package /> },
   };
 
   let title: TitleInfo | undefined;
@@ -52,7 +43,7 @@ export default function TopPageName() {
   }
 
   return (
-    <div className="mx-auto flex max-w-[95%] grid-cols-2 justify-between">
+    <div className="flex items-center justify-center md:mx-auto md:max-w-[95%]">
       <div className="items-center">
         <div className="flex items-center gap-2 text-neutral-400">
           {title.icon}
@@ -60,55 +51,6 @@ export default function TopPageName() {
             {title.label}
           </h1>
         </div>
-      </div>
-      <div className="items-center">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {/* <Button variant="outline">{title.icon}</Button> */}
-            <Button variant="outline">
-              <Menu /> Menu
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Opções</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Clientes</DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem>Listar</DropdownMenuItem>
-                  <DropdownMenuItem>Adicionar</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Mais...</DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Produtos</DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem>Listar</DropdownMenuItem>
-                  <DropdownMenuItem>Adicionar</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Mais...</DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Faturas</DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem>Listar</DropdownMenuItem>
-                  <DropdownMenuItem>Adicionar</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Mais...</DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-
-            <DropdownMenuItem>Home</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </div>
   );

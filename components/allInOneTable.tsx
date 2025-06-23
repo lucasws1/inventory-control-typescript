@@ -42,8 +42,8 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {tableData.map((customer) => (
-          <TableRow key={customer.id}>
+        {tableData.map((item) => (
+          <TableRow key={item.id}>
             <TableCell className="font-medium">
               <Popover>
                 <PopoverTrigger asChild>
@@ -51,21 +51,29 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                     className="inline-flex items-center gap-2 font-medium"
                     href="#"
                   >
-                    {customer.col1}
+                    {item.col1}
                     <ChevronDown className="text-muted-foreground h-4 w-4" />
                   </Link>
                 </PopoverTrigger>
                 <PopoverContent
                   side="bottom"
                   align="start"
-                  className="flex w-full flex-col p-1"
+                  className="flex w-full flex-col p-0"
                 >
-                  <Button className="w-full" asChild variant="link">
-                    <Link href={`/customers/${customer.id}`}>Editar</Link>
+                  <Button className="w-full" asChild variant="ghost">
+                    <Link
+                      href={
+                        pathname === "/customers"
+                          ? `/customers/${item.id}`
+                          : `/products/${item.id}`
+                      }
+                    >
+                      Editar
+                    </Link>
                   </Button>
                   <Button
                     className="w-full cursor-pointer justify-start"
-                    variant="destructive"
+                    variant="ghost"
                     size="sm"
                   >
                     Remover
@@ -73,16 +81,22 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                 </PopoverContent>
               </Popover>
             </TableCell>
-            <TableCell>{customer.col2}</TableCell>
             <TableCell>
-              {typeof customer.col3 === "number"
-                ? formatCurrencyBRL(customer.col3)
-                : customer.col3}
+              {pathname === "/customers" || pathname === "/products"
+                ? formatCurrencyBRL(item.col2 as number)
+                : item.col2}
+            </TableCell>
+            <TableCell>
+              {pathname === "/customers"
+                ? formatCurrencyBRL(item.col3 as number)
+                : item.col3}
             </TableCell>
             <TableCell className="text-right">
-              {typeof customer.col4 === "number"
-                ? formatCurrencyBRL(customer.col4)
-                : customer.col4}
+              {pathname === "/customers" ||
+              pathname === "/invoices" ||
+              pathname === "/products"
+                ? formatCurrencyBRL(item.col4 as number)
+                : item.col4}
             </TableCell>
           </TableRow>
         ))}
@@ -94,9 +108,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
           <TableCell></TableCell>
           <TableCell className="text-right">
             {typeof tableData[0].col4 === "number"
-              ? formatCurrencyBRL(
-                  tableData.reduce((sum, c) => sum + Number(c.col4), 0),
-                )
+              ? tableData.reduce((sum, c) => sum + Number(c.col4), 0)
               : "0"}
           </TableCell>
         </TableRow>

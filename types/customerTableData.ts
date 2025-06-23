@@ -1,11 +1,14 @@
-export type CustomerTableData = {
-  id: number;
-  name: string;
-  email?: string | null;
-  phone?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  pendingAmount: number;
-  monthAmount: number;
-  monthlyInvoiceCount: number;
-};
+import { Prisma } from "@/app/generated/prisma";
+
+export type CustomerTableData = Prisma.CustomerGetPayload<{
+  include: {
+    Invoice: {
+      select: {
+        amount: true;
+        pending: true;
+        purchaseDate: true;
+        customerId: true;
+      };
+    };
+  };
+}>;
