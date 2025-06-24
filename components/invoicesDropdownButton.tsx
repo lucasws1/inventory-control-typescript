@@ -26,7 +26,12 @@ const InvoicesDropdownButton = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Plus /> Adicionar
+            <Link
+              href="/invoices/new-invoice"
+              className="flex items-center gap-2"
+            >
+              <Plus /> Adicionar
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
