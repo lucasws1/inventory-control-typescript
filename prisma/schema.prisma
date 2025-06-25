@@ -27,7 +27,7 @@ model Customer {
 model Invoice {
   id           Int           @id @default(autoincrement())
   amount       Float
-  pending      Boolean @default(true)
+  pending      Boolean       @default(true)
   purchaseDate DateTime
   customerId   Int
   customer     Customer      @relation(fields: [customerId], references: [id])
@@ -41,7 +41,7 @@ model InvoiceItem {
   productId Int
   Product   Product @relation(fields: [productId], references: [id])
   invoiceId Int
-  Invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  Invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model Product {

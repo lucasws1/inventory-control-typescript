@@ -1,7 +1,6 @@
 "use client";
 
 import { Path } from "@/types/path";
-import { TitleInfo } from "@/types/titleInfo";
 import {
   ChartNoAxesCombined,
   CircleUser,

@@ -11,6 +11,9 @@ export const metadata: Metadata = {
 
 const Invoices = async () => {
   const invoices: InvoicesTableData[] = await prisma.invoice.findMany({
+    orderBy: {
+      purchaseDate: "desc",
+    },
     include: {
       customer: true,
       InvoiceItem: {

@@ -1,6 +1,4 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -9,17 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileText, ShoppingCart, Users } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import InvoicesDropdownButton from "./invoicesDropdownButton";
-import StockMovementDropdownButton from "./stockMovementDropDownButton";
-import ProductsDropdownButton from "./productsDropdownButton";
 import CustomersDropdownButton from "./customersDropdownButton";
+import InvoicesDropdownButton from "./invoicesDropdownButton";
+import ProductsDropdownButton from "./productsDropdownButton";
+import StockMovementDropdownButton from "./stockMovementDropDownButton";
 
 export default function TopCards() {
-  const pathname = usePathname();
-
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
       <Card>
