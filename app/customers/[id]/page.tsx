@@ -30,19 +30,19 @@ export default async function CustomerPage({ params }: { params: PageProps }) {
   });
 
   return (
-    <div className="mx-2 flex justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Alterar dados</CardTitle>
-          <CardDescription>
-            Alterado em {customer?.updatedAt?.toLocaleDateString("pt-BR")}
-          </CardDescription>
-          <CardAction>
-            <Button variant={"link"}>Ver faturas</Button>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <form action={updateCustomer}>
+    <form action={updateCustomer}>
+      <div className="mx-2 flex justify-center">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Alterar dados</CardTitle>
+            <CardDescription>
+              Alterado em {customer?.updatedAt?.toLocaleDateString("pt-BR")}
+            </CardDescription>
+            <CardAction>
+              <Button variant={"link"}>Ver faturas</Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Input type="hidden" name="id" value={customer?.id} />
@@ -76,18 +76,18 @@ export default async function CustomerPage({ params }: { params: PageProps }) {
                 />
               </div>
             </div>
-          </form>
-        </CardContent>
+          </CardContent>
 
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
-            Enviar
-          </Button>
-          <Button variant="outline" className="w-full">
-            <Link href="/customers">Retornar para Clientes</Link>
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          <CardFooter className="flex-col gap-2">
+            <Button type="submit" className="w-full">
+              Enviar
+            </Button>
+            <Button variant="outline" className="w-full">
+              <Link href="/customers">Retornar para Clientes</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </form>
   );
 }

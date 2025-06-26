@@ -30,7 +30,7 @@ model Invoice {
   pending      Boolean       @default(true)
   purchaseDate DateTime
   customerId   Int
-  customer     Customer      @relation(fields: [customerId], references: [id])
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   InvoiceItem  InvoiceItem[]
 }
 
@@ -39,7 +39,7 @@ model InvoiceItem {
   quantity  Int
   unitPrice Float
   productId Int
-  Product   Product @relation(fields: [productId], references: [id])
+  Product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   invoiceId Int
   Invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
@@ -63,7 +63,7 @@ enum StockReason {
 model StockMovement {
   id        Int         @id @default(autoincrement())
   productId Int
-  Product   Product     @relation(fields: [productId], references: [id])
+  Product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int
   date      DateTime
   reason    StockReason

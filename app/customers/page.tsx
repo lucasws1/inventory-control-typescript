@@ -35,24 +35,6 @@ const Customers = async () => {
     },
   });
 
-  // const summaryCustomer: CustomerTableData[] = customers.map((customer) => {
-  //   const pending = customer.Invoice.filter((inv) => inv.pending).reduce(
-  //     (sum, inv) => sum + inv.amount,
-  //     0,
-  //   );
-  //   const month = customer.Invoice.filter(
-  //     (inv) => inv.purchaseDate >= firstDay && inv.purchaseDate <= lastDay,
-  //   );
-  //   const monthAmount = month.reduce((s, m) => s + m.amount, 0);
-  //   const monthlyInvoiceCount = month.length;
-  //   return {
-  //     ...customer,
-  //     pending,
-  //     monthAmount,
-  //     monthlyInvoiceCount,
-  //   };
-  // });
-
   const tableData = formatTableData(customers, "customer");
 
   return (

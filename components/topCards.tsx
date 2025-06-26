@@ -1,4 +1,3 @@
-"use client";
 import {
   Card,
   CardAction,
@@ -11,15 +10,40 @@ import CustomersDropdownButton from "./customersDropdownButton";
 import InvoicesDropdownButton from "./invoicesDropdownButton";
 import ProductsDropdownButton from "./productsDropdownButton";
 import StockMovementDropdownButton from "./stockMovementDropDownButton";
+import prisma from "@/lib/prisma";
+import { endOfMonth } from "date-fns/endOfMonth";
+import { startOfMonth } from "date-fns/startOfMonth";
 
-export default function TopCards() {
+const now = new Date();
+const firstDay = startOfMonth(now);
+const lastDay = endOfMonth(now);
+const currentMonth = now.toLocaleString("pt-BR", {
+  month: "long",
+  year: "numeric",
+});
+
+export default async function TopCards() {
+  const [customers, invoices, products, stockMovements] = await Promise.all([
+    prisma.customer.findMany(),
+    prisma.invoice.findMany({
+      where: {
+        purchaseDate: {
+          gte: firstDay,
+          lt: lastDay,
+        },
+      },
+    }),
+    prisma.product.findMany(),
+    prisma.stockMovement.findMany(),
+  ]);
+
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
       <Card>
         <CardHeader>
           <CardTitle>Vendas</CardTitle>
-          <CardDescription>Junho de 2025</CardDescription>
-          <CardAction>R$ 12.345,00</CardAction>
+          <CardDescription>Em {currentMonth}</CardDescription>
+          <CardAction>{invoices.length} vendas</CardAction>
         </CardHeader>
 
         <CardFooter className="flex justify-center">
@@ -30,8 +54,8 @@ export default function TopCards() {
       <Card>
         <CardHeader>
           <CardTitle>Clientes</CardTitle>
-          <CardDescription>Valor Pendente</CardDescription>
-          <CardAction>R$ 18.325,00</CardAction>
+          <CardDescription>Clientes cadastrados</CardDescription>
+          <CardAction>{customers.length} clientes</CardAction>
         </CardHeader>
         <CardFooter className="flex-col gap-2">
           <CustomersDropdownButton />
@@ -42,7 +66,7 @@ export default function TopCards() {
         <CardHeader>
           <CardTitle>Produtos</CardTitle>
           <CardDescription>Itens cadastrados</CardDescription>
-          <CardAction>8 itens</CardAction>
+          <CardAction>{products.length} itens</CardAction>
         </CardHeader>
         <CardFooter className="flex-col gap-2">
           <ProductsDropdownButton />
@@ -51,8 +75,8 @@ export default function TopCards() {
       <Card>
         <CardHeader>
           <CardTitle>Estoque</CardTitle>
-          <CardDescription>R$ 58.350,00</CardDescription>
-          <CardAction>220 unidades</CardAction>
+          <CardDescription>Andamentos registrados</CardDescription>
+          <CardAction>{stockMovements.length} andamentos</CardAction>
         </CardHeader>
         <CardFooter className="flex-col gap-2">
           <StockMovementDropdownButton />

@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  deleteCustomer,
+  deleteInvoice,
+  deleteProduct,
+} from "@/app/lib/actions";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -31,23 +36,28 @@ import { columnsConfig, TableColumns } from "@/utils/columnsConfig";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
-import { Button } from "./ui/button";
-import { deleteInvoice } from "@/app/lib/actions";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Button } from "./ui/button";
 
 const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
   const [openRemoveAlert, setOpenRemoveAlert] = useState(false);
   const [loadingRemoveAlert, setLoadingRemoveAlert] = useState(false);
   const pathname = usePathname();
 
-  const handleDeleteInvoice = async (item: any) => {
+  const handleDelete = async (item: any) => {
     setLoadingRemoveAlert(true);
-    const res = await deleteInvoice(item);
-    if (res.success) {
-      console.log("sucesso: " + res.message);
-    } else {
-      console.log("falhou: " + res.message);
+    if (pathname === "/invoices") {
+      const res = await deleteInvoice(item);
+      if (res.success) {
+        console.log("Sucesso ao deletar a fatura.");
+      } else {
+        console.log("Falha ao deletar a fatura.");
+      }
+    } else if (pathname === "/customers") {
+      await deleteCustomer(item);
+    } else if (pathname === "/products") {
+      await deleteProduct(item);
     }
     setLoadingRemoveAlert(false);
     setOpenRemoveAlert(false);
@@ -94,7 +104,9 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                         Editar
                       </Link>
                     </Button>
-                    {pathname === "/invoices" ? (
+                    {pathname === "/invoices" ||
+                    pathname === "/customers" ||
+                    pathname === "/products" ? (
                       <AlertDialog
                         open={openRemoveAlert}
                         onOpenChange={setOpenRemoveAlert}
@@ -110,11 +122,16 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Remover venda? Data: {item.col1}
+                              Remover{" "}
+                              {pathname === "/invoices"
+                                ? "esta venda"
+                                : pathname === "/customers"
+                                  ? "este cliente"
+                                  : "este produto"}
+                              ?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              Esta ação não poderá ser desfeita. Cliente:{" "}
-                              {item.col2}
+                              Este item será removido permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -122,7 +139,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                               Cancelar
                             </AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleDeleteInvoice(item.id)}
+                              onClick={() => handleDelete(item.id)}
                               disabled={loadingRemoveAlert}
                             >
                               {loadingRemoveAlert
@@ -134,7 +151,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                       </AlertDialog>
                     ) : (
                       <Button
-                        onClick={() => handleDeleteInvoice(item.id)}
+                        onClick={() => handleDelete(item.id)}
                         className="w-full cursor-pointer justify-start"
                         variant="ghost"
                         size="sm"
@@ -146,7 +163,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                 </Popover>
               </TableCell>
               <TableCell>
-                {pathname === "/customers" || pathname === "/products"
+                {pathname === "/products"
                   ? formatCurrencyBRL(item.col2 as number)
                   : item.col2}
               </TableCell>

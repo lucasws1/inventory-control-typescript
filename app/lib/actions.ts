@@ -1,11 +1,50 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export async function updateCustomer(formData: FormData) {
-  const data = {};
+  try {
+    await prisma.customer.update({
+      where: { id: Number(formData.get("id")) },
+      data: {
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string,
+      },
+    });
+  } catch (error) {
+    console.log("erro ao atualizar", error);
+    throw new Error("Erro ao atualizar o cliente.");
+  } finally {
+    redirect("/customers");
+  }
 }
+
+export const deleteCustomer = async (customerId: any) => {
+  try {
+    await prisma.customer.delete({
+      where: { id: Number(customerId) },
+    });
+  } catch (error) {
+    throw new Error("Erro ao deletar o cliente.");
+  } finally {
+    revalidatePath("/customers");
+  }
+};
+
+export const deleteProduct = async (productId: any) => {
+  try {
+    await prisma.product.delete({
+      where: { id: Number(productId) },
+    });
+  } catch (error) {
+    throw new Error("Erro ao deletar o produto.");
+  } finally {
+    revalidatePath("/products");
+  }
+};
 
 export const deleteInvoice = async (invoiceId: number) => {
   try {

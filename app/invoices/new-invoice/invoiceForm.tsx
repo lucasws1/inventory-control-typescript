@@ -1,4 +1,5 @@
 "use client";
+
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,8 @@ import {
   CheckCircle2Icon,
   ChevronDownIcon,
 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 
 export type InvoiceItem = {
   productId: number;
@@ -81,6 +84,9 @@ const InvoiceForm = ({
     reason: string;
   };
   const [stockMovement, setStockMovement] = useState<StockMovement[]>([]);
+  const [openNewInvoiceItemProductList, setOpenNewInvoiceItemProductList] =
+    useState(false);
+  const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
 
   const handleCloseDialog = () => {
     setProductId("");
@@ -94,10 +100,18 @@ const InvoiceForm = ({
       (inv) => inv.productId === Number(productId),
     )?.unitPrice;
     setUnitPrice(up !== undefined ? up.toString() : "");
-  }, [productId, invoiceItems]);
+  }, [productId]);
 
   const handleAddProduct = () => {
     if (!productId || !productQuantity || !unitPrice) return;
+    if (newInvoiceItems.find((item) => item.productId === Number(productId))) {
+      setProductQuantity(1);
+
+      setOpen(false);
+
+      setProductAlreadyAdded(true);
+      return;
+    }
 
     setNewInvoiceItems((items) => [
       ...items,
@@ -116,8 +130,9 @@ const InvoiceForm = ({
         reason: "VENDA",
       },
     ]);
-
     setOpen(false);
+    setProductQuantity(1);
+    setUnitPrice("");
   };
 
   const newInvoiceSubmit = async () => {
@@ -140,14 +155,84 @@ const InvoiceForm = ({
     }
   };
 
+  const handleDeleteNewInvoiceItemProduct = (
+    newInvoiceItemProductId: number,
+  ) => {
+    setNewInvoiceItems((items) =>
+      items.filter((item) => item.productId !== newInvoiceItemProductId),
+    );
+
+    setOpenNewInvoiceItemProductList(false);
+  };
+
   return (
-    <div className="mx-2 flex justify-center">
+    <div className="mx-2 flex justify-center font-[family-name:var(--font-geist-sans)]">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Nova venda</CardTitle>
           <CardDescription>Insira os dados e clique em Enviar</CardDescription>
           <CardAction>
-            <Button variant="link">Ver itens</Button>
+            <Popover
+              open={openNewInvoiceItemProductList}
+              onOpenChange={setOpenNewInvoiceItemProductList}
+            >
+              <PopoverTrigger className="cursor-pointer">
+                Itens ({newInvoiceItems.length})
+              </PopoverTrigger>
+              <PopoverContent className="w-auto">
+                {newInvoiceItems.length === 0 ? (
+                  "Nenhum item adicionado"
+                ) : (
+                  <div>
+                    <div>
+                      {newInvoiceItems.map((item) => (
+                        <div key={item.productId}>
+                          <div className="grid w-auto grid-cols-[auto_auto_auto_1fr] gap-2 truncate">
+                            <div className="w-24 text-start font-bold">
+                              {
+                                products.find((p) => p.id === item.productId)
+                                  ?.name
+                              }
+                            </div>
+                            <div className="w-12 text-start">
+                              {item.quantity}
+                            </div>
+                            <div className="w-28 text-start">{`${formatCurrencyBRL(item.unitPrice)}`}</div>
+
+                            <div>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => {
+                                  handleDeleteNewInvoiceItemProduct(
+                                    item.productId,
+                                  );
+                                }}
+                                className="h-fit w-auto cursor-pointer justify-self-center"
+                              >
+                                Deletar
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="grid grid-cols-4">
+                        <span className="col-span-2 text-start">Total: </span>
+                        <span className="col-span-2 text-end">
+                          {formatCurrencyBRL(
+                            newInvoiceItems.reduce(
+                              (acc, item) =>
+                                acc + item.quantity * item.unitPrice,
+                              0,
+                            ),
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
           </CardAction>
         </CardHeader>
         <form action={newInvoiceSubmit}>
@@ -181,7 +266,12 @@ const InvoiceForm = ({
                   <Label>Produto</Label>
                   <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                      <Button variant="outline">Adicionar produto</Button>
+                      <Button
+                        onClick={() => setProductAlreadyAdded(false)}
+                        variant="outline"
+                      >
+                        Adicionar produto
+                      </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-sm">
                       <DialogHeader>
@@ -199,7 +289,7 @@ const InvoiceForm = ({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
-                                <SelectLabel>Produts</SelectLabel>
+                                <SelectLabel>Products</SelectLabel>
                                 {products.map((product) => (
                                   <SelectItem
                                     key={product.id}
@@ -334,6 +424,22 @@ const InvoiceForm = ({
             <Button variant="outline" className="w-full">
               <Link href="/invoices">Retornar para Vendas</Link>
             </Button>
+            {productAlreadyAdded && (
+              <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertTitle className="align-center">
+                  Esse item já foi selecionado
+                </AlertTitle>
+                <AlertDescription>
+                  <p>Suas alternativas são:</p>
+                  <ul className="list-inside list-disc text-sm">
+                    <li>Alterar a quantidade do item</li>
+                    <li>Selecionar outro item</li>
+                    <li>Lançar a venda no banco de dados</li>
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
           </CardFooter>
         </form>
       </Card>
