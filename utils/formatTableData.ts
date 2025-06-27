@@ -17,7 +17,7 @@ export function formatTableData<T extends TableDataType>(
   if (items.length === 0) return [];
 
   if (type === "customer") {
-    // Compute derived fields for customers
+    // CUSTOMER
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -46,7 +46,7 @@ export function formatTableData<T extends TableDataType>(
       };
     });
   } else if (type === "product") {
-    // Compute derived fields for products
+    // PRODUCT
     return (items as any[]).map((prod) => {
       const quantityInStock = prod.StockMovement
         ? prod.StockMovement.reduce((acc: number, sm: any) => {
@@ -58,7 +58,6 @@ export function formatTableData<T extends TableDataType>(
             return acc;
           }, 0)
         : 0;
-
       return {
         id: prod.id,
         col1: prod.name,
@@ -68,6 +67,7 @@ export function formatTableData<T extends TableDataType>(
       };
     });
   } else if (type === "invoice") {
+    // INVOICE
     return (items as any[]).map((invoice) => ({
       id: invoice.id,
       col1: invoice.purchaseDate.toLocaleDateString("pt-BR"),

@@ -2,6 +2,7 @@ import AllInOneTable from "@/components/allInOneTable";
 import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
 import { ProductsTableData } from "@/types/productsTableData";
+import { formatTableData } from "@/utils/formatTableData";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,24 +16,7 @@ const Products = async () => {
     },
   });
 
-  const tableData = products.map((prod) => {
-    const quantityInStock = prod.StockMovement.reduce((acc, sm) => {
-      if (sm.reason === "COMPRA") {
-        return acc + sm.quantity;
-      } else if (sm.reason === "VENDA") {
-        return acc - sm.quantity;
-      }
-      return acc;
-    }, 0);
-
-    return {
-      id: prod.id,
-      col1: prod.name,
-      col2: prod.price,
-      col3: quantityInStock,
-      col4: quantityInStock * prod.price,
-    };
-  });
+  const tableData = formatTableData(products, "product");
 
   return (
     <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[95%]">

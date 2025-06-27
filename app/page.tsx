@@ -1,10 +1,6 @@
 "use server";
 
-import AllInOneTable from "@/components/allInOneTable";
 import TopCards from "@/components/topCards";
-import prisma from "@/lib/prisma";
-import { InvoicesTableData } from "@/types/invoicesTableData";
-import { formatTableData } from "@/utils/formatTableData";
 import { redirect } from "next/navigation";
 
 const Home = async () => {

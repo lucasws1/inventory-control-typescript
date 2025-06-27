@@ -13,20 +13,28 @@ const ProductsDropdownButton = () => {
     <div className="w-full items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex w-full">
+          <Button variant="outline" className="flex w-full cursor-pointer">
             <ShoppingCart />
             Produtos
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>
-            <Link href="/products" className="flex items-center gap-2">
+            <Link
+              href="/products"
+              className="flex cursor-pointer items-center gap-2"
+            >
               <ListOrdered />
               Listar
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Plus /> Adicionar
+            <Link
+              href="/products/new-product"
+              className="flex cursor-pointer items-center gap-2"
+            >
+              <Plus /> Adicionar
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

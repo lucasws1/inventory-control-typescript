@@ -1,5 +1,4 @@
 "use client";
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,13 +43,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
   ChevronDownIcon,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
+import { useRouter } from "next/navigation";
+import OverlaySpinner from "@/components/overlaySpinner";
 
 export type InvoiceItem = {
   productId: number;
@@ -58,7 +59,14 @@ export type InvoiceItem = {
   unitPrice: number;
 };
 
-const InvoiceForm = ({
+type StockMovement = {
+  productId: number;
+  quantity: number;
+  date: Date | undefined;
+  reason: string;
+};
+
+export default function InvoiceForm({
   customers,
   products,
   invoiceItems,
@@ -66,7 +74,7 @@ const InvoiceForm = ({
   customers: Customer[];
   products: Product[];
   invoiceItems: InvoiceItem[];
-}) => {
+}) {
   const [customerId, setCustomerId] = useState("1");
   const [productQuantity, setProductQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState("");
@@ -77,16 +85,19 @@ const InvoiceForm = ({
   const [openDate, setOpenDate] = useState(false);
   const [productId, setProductId] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "idle">("idle");
-  type StockMovement = {
-    productId: number;
-    quantity: number;
-    date: Date | undefined;
-    reason: string;
-  };
+
   const [stockMovement, setStockMovement] = useState<StockMovement[]>([]);
   const [openNewInvoiceItemProductList, setOpenNewInvoiceItemProductList] =
     useState(false);
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleReturn = () => {
+    setLoading(true);
+
+    setTimeout(() => router.push("/invoices"), 1);
+  };
 
   const handleCloseDialog = () => {
     setProductId("");
@@ -106,9 +117,8 @@ const InvoiceForm = ({
     if (!productId || !productQuantity || !unitPrice) return;
     if (newInvoiceItems.find((item) => item.productId === Number(productId))) {
       setProductQuantity(1);
-
       setOpen(false);
-
+      setUnitPrice("");
       setProductAlreadyAdded(true);
       return;
     }
@@ -187,8 +197,8 @@ const InvoiceForm = ({
                     <div>
                       {newInvoiceItems.map((item) => (
                         <div key={item.productId}>
-                          <div className="grid w-auto grid-cols-[auto_auto_auto_1fr] gap-2 truncate">
-                            <div className="w-24 text-start font-bold">
+                          <div className="grid w-auto grid-cols-[auto_auto_auto_auto] gap-2 truncate">
+                            <div className="w-28 truncate text-start font-bold">
                               {
                                 products.find((p) => p.id === item.productId)
                                   ?.name
@@ -214,11 +224,14 @@ const InvoiceForm = ({
                               </Button>
                             </div>
                           </div>
+                          <Separator className="my-3" />
                         </div>
                       ))}
                       <div className="grid grid-cols-4">
-                        <span className="col-span-2 text-start">Total: </span>
-                        <span className="col-span-2 text-end">
+                        <span className="col-span-1 justify-self-start">
+                          Total:
+                        </span>
+                        <span className="col-span-3 justify-self-end">
                           {formatCurrencyBRL(
                             newInvoiceItems.reduce(
                               (acc, item) =>
@@ -421,8 +434,14 @@ const InvoiceForm = ({
                 </Alert>
               )}
             </div>
-            <Button variant="outline" className="w-full">
-              <Link href="/invoices">Retornar para Vendas</Link>
+            {loading && <OverlaySpinner />}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full cursor-pointer"
+              onClick={() => handleReturn()}
+            >
+              Retornar para Vendas
             </Button>
             {productAlreadyAdded && (
               <Alert variant="destructive">
@@ -445,6 +464,4 @@ const InvoiceForm = ({
       </Card>
     </div>
   );
-};
-
-export default InvoiceForm;
+}

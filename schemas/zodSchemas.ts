@@ -27,6 +27,13 @@ export const InvoiceItemSchema = z.object({
   Invoice: z.lazy((): z.ZodTypeAny => InvoiceSchema),
 });
 
+export const CustomerUpdateSchema = z.object({
+  id: z.number().min(1),
+  name: z.string().min(2, "Nome obrigatório!"),
+  email: z.string().email("Email inválido!").optional().or(z.literal("")),
+  phone: z.string().optional(),
+});
+
 export const CustomerSchema = z.object({
   id: z.number(),
   name: z.string(),

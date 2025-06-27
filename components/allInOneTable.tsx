@@ -4,6 +4,7 @@ import {
   deleteCustomer,
   deleteInvoice,
   deleteProduct,
+  deleteStockMovement,
 } from "@/app/lib/actions";
 import {
   AlertDialog,
@@ -58,6 +59,8 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
       await deleteCustomer(item);
     } else if (pathname === "/products") {
       await deleteProduct(item);
+    } else if (pathname === "/stock-movement") {
+      await deleteStockMovement(item);
     }
     setLoadingRemoveAlert(false);
     setOpenRemoveAlert(false);
@@ -84,7 +87,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
             <TableRow key={item.id}>
               <TableCell className="font-medium">
                 <Popover>
-                  <PopoverTrigger className="inline-flex items-center gap-2 font-medium">
+                  <PopoverTrigger className="inline-flex cursor-pointer items-center gap-2 font-medium">
                     {item.col1}
                     <ChevronDown className="text-muted-foreground h-4 w-4" />
                   </PopoverTrigger>
@@ -104,61 +107,47 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                         Editar
                       </Link>
                     </Button>
-                    {pathname === "/invoices" ||
-                    pathname === "/customers" ||
-                    pathname === "/products" ? (
-                      <AlertDialog
-                        open={openRemoveAlert}
-                        onOpenChange={setOpenRemoveAlert}
-                      >
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            className="w-full cursor-pointer justify-start"
-                            variant="ghost"
+
+                    <AlertDialog
+                      open={openRemoveAlert}
+                      onOpenChange={setOpenRemoveAlert}
+                    >
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="w-full cursor-pointer justify-start"
+                          variant="ghost"
+                        >
+                          Remover
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Remover{" "}
+                            {pathname === "/invoices"
+                              ? "esta venda"
+                              : pathname === "/customers"
+                                ? "este cliente"
+                                : "este produto"}
+                            ?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Este item será removido permanentemente.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={loadingRemoveAlert}>
+                            Cancelar
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(item.id)}
+                            disabled={loadingRemoveAlert}
                           >
-                            Remover
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Remover{" "}
-                              {pathname === "/invoices"
-                                ? "esta venda"
-                                : pathname === "/customers"
-                                  ? "este cliente"
-                                  : "este produto"}
-                              ?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Este item será removido permanentemente.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel disabled={loadingRemoveAlert}>
-                              Cancelar
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(item.id)}
-                              disabled={loadingRemoveAlert}
-                            >
-                              {loadingRemoveAlert
-                                ? "Deletando..."
-                                : "Confirmar"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    ) : (
-                      <Button
-                        onClick={() => handleDelete(item.id)}
-                        className="w-full cursor-pointer justify-start"
-                        variant="ghost"
-                        size="sm"
-                      >
-                        Remover
-                      </Button>
-                    )}
+                            {loadingRemoveAlert ? "Deletando..." : "Confirmar"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </PopoverContent>
                 </Popover>
               </TableCell>

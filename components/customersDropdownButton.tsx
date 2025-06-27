@@ -13,7 +13,7 @@ const CustomersDropdownButton = () => {
     <div className="w-full items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex w-full">
+          <Button variant="outline" className="flex w-full cursor-pointer">
             <UserCircle />
             Clientes
           </Button>
@@ -26,7 +26,13 @@ const CustomersDropdownButton = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Plus /> Adicionar
+            <Plus />{" "}
+            <Link
+              href="/customers/new-customer"
+              className="flex items-center gap-2"
+            >
+              Adicionar
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

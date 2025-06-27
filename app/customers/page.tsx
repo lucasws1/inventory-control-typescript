@@ -1,11 +1,9 @@
 import AllInOneTable from "@/components/allInOneTable";
 import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
-import { CustomerTableData } from "@/types/customerTableData";
-import { TableData } from "@/types/tableData";
+import { formatTableData } from "@/utils/formatTableData";
 import { endOfMonth, startOfMonth } from "date-fns";
 import { Metadata } from "next";
-import { formatTableData } from "@/utils/formatTableData";
 
 export const metadata: Metadata = {
   title: "Clientes",
