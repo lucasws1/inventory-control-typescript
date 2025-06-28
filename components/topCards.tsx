@@ -1,18 +1,7 @@
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import CustomersDropdownButton from "./customersDropdownButton";
-import InvoicesDropdownButton from "./invoicesDropdownButton";
-import ProductsDropdownButton from "./productsDropdownButton";
-import StockMovementDropdownButton from "./stockMovementDropDownButton";
 import prisma from "@/lib/prisma";
 import { endOfMonth } from "date-fns/endOfMonth";
 import { startOfMonth } from "date-fns/startOfMonth";
+import CardFromTopCards from "./cardFromTopCards";
 
 const now = new Date();
 const firstDay = startOfMonth(now);
@@ -39,49 +28,28 @@ export default async function TopCards() {
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Vendas</CardTitle>
-          <CardDescription>Em {currentMonth}</CardDescription>
-          <CardAction>{invoices.length} vendas</CardAction>
-        </CardHeader>
+      <CardFromTopCards
+        title={"Vendas"}
+        info={`${invoices.length} vendas`}
+        subtitle={"Neste mês"}
+      />
 
-        <CardFooter className="flex justify-center">
-          <InvoicesDropdownButton />
-        </CardFooter>
-      </Card>
+      <CardFromTopCards
+        title={"Clientes"}
+        info={`${customers.length} clientes`}
+        subtitle={"Clientes cadastrados"}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Clientes</CardTitle>
-          <CardDescription>Clientes cadastrados</CardDescription>
-          <CardAction>{customers.length} clientes</CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col gap-2">
-          <CustomersDropdownButton />
-        </CardFooter>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Produtos</CardTitle>
-          <CardDescription>Itens cadastrados</CardDescription>
-          <CardAction>{products.length} itens</CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col gap-2">
-          <ProductsDropdownButton />
-        </CardFooter>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Estoque</CardTitle>
-          <CardDescription>Andamentos registrados</CardDescription>
-          <CardAction>{stockMovements.length} andamentos</CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col gap-2">
-          <StockMovementDropdownButton />
-        </CardFooter>
-      </Card>
+      <CardFromTopCards
+        title={"Produtos"}
+        info={`${products.length} itens`}
+        subtitle={"Itens cadastrados"}
+      />
+      <CardFromTopCards
+        title={"Estoque"}
+        info={`${stockMovements.length} andamentos`}
+        subtitle={"Movimentações"}
+      />
     </div>
   );
 }

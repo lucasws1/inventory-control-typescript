@@ -85,7 +85,7 @@ export default function CustomerEditForm({ customer }: { customer: Customer }) {
               </Button>
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full cursor-pointer"
                 onClick={handleReturn}
               >
                 Retornar para Clientes

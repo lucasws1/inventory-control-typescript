@@ -32,7 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} dark mt-2 space-y-2 antialiased`}
       >
-        <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[90%]">
+        <div className="mx-2 space-y-6 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[85%]">
           <TopPageName />
           <TopCards />
           {children}

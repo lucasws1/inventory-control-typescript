@@ -67,132 +67,136 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
   };
 
   const columns: TableColumns = columnsConfig[pathname];
-
+  // shadow-[0_4px_24px_0_rgba(0,0,0,0.30)]
   return (
-    <div>
-      <Table>
-        <TableCaption>Tabela de {pathname}</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-zinc-400">{columns.col1}</TableHead>
-            <TableHead className="text-zinc-400">{columns.col2}</TableHead>
-            <TableHead className="text-zinc-400">{columns.col3}</TableHead>
-            <TableHead className="text-right text-zinc-400">
-              {columns.col4}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tableData.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell className="font-medium">
-                <Popover>
-                  <PopoverTrigger className="inline-flex cursor-pointer items-center gap-2 font-medium">
-                    {item.col1}
-                    <ChevronDown className="text-muted-foreground h-4 w-4" />
-                  </PopoverTrigger>
-                  <PopoverContent
-                    side="bottom"
-                    align="start"
-                    className="flex w-full flex-col p-0"
-                  >
-                    <Button className="w-full" asChild variant="ghost">
-                      <Link
-                        href={
-                          pathname === "/customers"
-                            ? `/customers/${item.id}`
-                            : pathname === "/products"
-                              ? `/products/${item.id}`
-                              : pathname === "/stock-movement"
-                                ? `/stock-movement/${item.id}` // ainda não implementado
-                                : "" // invoices não implementado
-                        }
-                      >
-                        Editar
-                      </Link>
-                    </Button>
-
-                    <AlertDialog
-                    // open={openRemoveAlert}
-                    // onOpenChange={setOpenRemoveAlert}
+    <div className="">
+      <div className="rounded-2xl bg-[#2c2825] p-6 shadow-[var(--shadow-xl)]">
+        <Table>
+          {/* <TableCaption>Tabela de {pathname}</TableCaption> */}
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-zinc-400">{columns.col1}</TableHead>
+              <TableHead className="text-zinc-400">{columns.col2}</TableHead>
+              <TableHead className="text-zinc-400">{columns.col3}</TableHead>
+              <TableHead className="text-right text-zinc-400">
+                {columns.col4}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">
+                  <Popover>
+                    <PopoverTrigger className="inline-flex cursor-pointer items-center gap-2 font-medium">
+                      {item.col1}
+                      <ChevronDown className="text-muted-foreground h-4 w-4" />
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="bottom"
+                      align="start"
+                      className="flex w-full flex-col p-0"
                     >
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          className="w-full cursor-pointer justify-start"
-                          variant="ghost"
+                      <Button className="w-full" asChild variant="ghost">
+                        <Link
+                          href={
+                            pathname === "/customers"
+                              ? `/customers/${item.id}`
+                              : pathname === "/products"
+                                ? `/products/${item.id}`
+                                : pathname === "/stock-movement"
+                                  ? `/stock-movement/${item.id}` // ainda não implementado
+                                  : "" // invoices não implementado
+                          }
                         >
-                          Remover
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Remover{" "}
-                            {pathname === "/invoices"
-                              ? "esta venda"
-                              : pathname === "/customers"
-                                ? "este cliente"
-                                : "este produto"}
-                            ?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Este item será removido permanentemente.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel disabled={loadingRemoveAlert}>
-                            Cancelar
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDelete(item.id)}
-                            disabled={loadingRemoveAlert}
+                          Editar
+                        </Link>
+                      </Button>
+
+                      <AlertDialog
+                      // open={openRemoveAlert}
+                      // onOpenChange={setOpenRemoveAlert}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full cursor-pointer justify-start"
+                            variant="ghost"
                           >
-                            {loadingRemoveAlert ? "Deletando..." : "Confirmar"}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </PopoverContent>
-                </Popover>
-              </TableCell>
-              <TableCell>
-                {pathname === "/products"
-                  ? formatCurrencyBRL(item.col2 as number)
-                  : item.col2}
-              </TableCell>
-              <TableCell>
-                {pathname === "/customers"
-                  ? formatCurrencyBRL(item.col3 as number)
-                  : item.col3}
-              </TableCell>
+                            Remover
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Remover{" "}
+                              {pathname === "/invoices"
+                                ? "esta venda"
+                                : pathname === "/customers"
+                                  ? "este cliente"
+                                  : "este produto"}
+                              ?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Este item será removido permanentemente.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={loadingRemoveAlert}>
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(item.id)}
+                              disabled={loadingRemoveAlert}
+                            >
+                              {loadingRemoveAlert
+                                ? "Deletando..."
+                                : "Confirmar"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </PopoverContent>
+                  </Popover>
+                </TableCell>
+                <TableCell>
+                  {pathname === "/products"
+                    ? formatCurrencyBRL(item.col2 as number)
+                    : item.col2}
+                </TableCell>
+                <TableCell>
+                  {pathname === "/customers"
+                    ? formatCurrencyBRL(item.col3 as number)
+                    : item.col3}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pathname === "/customers" ||
+                  pathname === "/invoices" ||
+                  pathname === "/products"
+                    ? formatCurrencyBRL(item.col4 as number)
+                    : item.col4}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell className="font-medium">Total</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
               <TableCell className="text-right">
-                {pathname === "/customers" ||
-                pathname === "/invoices" ||
-                pathname === "/products"
-                  ? formatCurrencyBRL(item.col4 as number)
-                  : item.col4}
+                {typeof tableData[0].col4 === "undefined"
+                  ? "0"
+                  : typeof tableData[0].col4 === "number" &&
+                      pathname === "/invoices"
+                    ? formatCurrencyBRL(
+                        tableData.reduce((sum, c) => sum + Number(c.col4), 0),
+                      )
+                    : "0"}
               </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TableCell className="font-medium">Total</TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
-            <TableCell className="text-right">
-              {typeof tableData[0].col4 === "undefined"
-                ? "0"
-                : typeof tableData[0].col4 === "number" &&
-                    pathname === "/invoices"
-                  ? formatCurrencyBRL(
-                      tableData.reduce((sum, c) => sum + Number(c.col4), 0),
-                    )
-                  : "0"}
-            </TableCell>
-          </TableRow>
-        </TableFooter>
-      </Table>
+          </TableFooter>
+        </Table>
+      </div>
     </div>
   );
 };
