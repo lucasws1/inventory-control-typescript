@@ -1,9 +1,13 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import {
+  CustomerSchema,
+  CustomerUpdateSchema,
+  StockMovementUpdateSchema,
+} from "@/schemas/zodSchemas";
 import { revalidatePath } from "next/cache";
-import { CustomerUpdateSchema } from "@/schemas/zodSchemas";
+import { redirect } from "next/navigation";
 
 export async function createProduct(prevState: any, formData: FormData) {
   try {
@@ -29,6 +33,60 @@ export async function createProduct(prevState: any, formData: FormData) {
   }
 }
 
+export async function createStockMovement(prevState: any, formData: FormData) {
+  try {
+    await prisma.stockMovement.create({
+      data: {
+        quantity: Number(formData.get("quantity")),
+        date: new Date(formData.get("dateValue") as string),
+        reason: formData.get("reason") as
+          | "COMPRA"
+          | "VENDA"
+          | "AJUSTE_POSITIVO"
+          | "AJUSTE_NEGATIVO",
+        Product: {
+          connect: { id: Number(formData.get("product")) },
+        },
+      },
+    });
+    console.log("sucesso");
+  } catch (error) {
+    console.log(error);
+
+    throw new Error("Erro ao criar cliente.");
+  } finally {
+    redirect("/stock-movement");
+  }
+}
+
+export async function updateStockMovement(prevState: any, formData: FormData) {
+  try {
+    const data = {
+      quantity: Number(formData.get("quantity")) as number,
+      date: new Date(formData.get("dateValue") as string),
+      reason: formData.get("reason") as
+        | "COMPRA"
+        | "VENDA"
+        | "AJUSTE_POSITIVO"
+        | "AJUSTE_NEGATIVO",
+    };
+
+    const parseResult = StockMovementUpdateSchema.safeParse(data);
+    if (!parseResult.success) {
+      throw new Error("Dados inválidos. Verifique os campos.");
+    }
+
+    await prisma.stockMovement.update({
+      where: { id: Number(formData.get("id")) },
+      data: data,
+    });
+  } catch (error) {
+    throw new Error("Erro ao atualizar o cliente.");
+  } finally {
+    redirect("/stock-movement");
+  }
+}
+
 export const deleteProduct = async (productId: number) => {
   try {
     await prisma.product.delete({
@@ -43,6 +101,17 @@ export const deleteProduct = async (productId: number) => {
 
 export const createCustomer = async (prevState: any, formData: FormData) => {
   try {
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+    };
+
+    const parseResult = CustomerSchema.safeParse(data);
+    if (!parseResult.success) {
+      throw new Error("Dados inválidos. Verifique os campos.");
+    }
+
     await prisma.customer.create({
       data: {
         name: formData.get("name") as string,
@@ -75,16 +144,39 @@ export async function updateCustomer(prevState: any, formData: FormData) {
 
     await prisma.customer.update({
       where: { id: Number(formData.get("id")) },
-      data: {
-        name: formData.get("name") as string,
-        email: emailValue,
-        phone: formData.get("phone") as string,
-      },
+      data: { ...data, email: emailValue },
+      // data: {
+      //   name: formData.get("name") as string,
+      //   email: emailValue,
+      //   phone: formData.get("phone") as string,
+      // },
     });
   } catch (error) {
     throw new Error("Erro ao atualizar o cliente.");
   } finally {
     redirect("/customers");
+  }
+}
+
+export async function updateProduct(prevState: any, formData: FormData) {
+  try {
+    const data = {
+      id: Number(formData.get("id")),
+      name: formData.get("name") as string,
+      price: Number(formData.get("price")),
+    };
+
+    await prisma.product.update({
+      where: { id: data.id },
+      data: {
+        name: data.name,
+        price: data.price,
+      },
+    });
+  } catch (error) {
+    throw new Error("Erro ao atualizar o produto.");
+  } finally {
+    redirect("/products");
   }
 }
 

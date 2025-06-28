@@ -101,7 +101,11 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                         href={
                           pathname === "/customers"
                             ? `/customers/${item.id}`
-                            : `/products/${item.id}`
+                            : pathname === "/products"
+                              ? `/products/${item.id}`
+                              : pathname === "/stock-movement"
+                                ? `/stock-movement/${item.id}` // ainda não implementado
+                                : "" // invoices não implementado
                         }
                       >
                         Editar
@@ -109,8 +113,8 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                     </Button>
 
                     <AlertDialog
-                      open={openRemoveAlert}
-                      onOpenChange={setOpenRemoveAlert}
+                    // open={openRemoveAlert}
+                    // onOpenChange={setOpenRemoveAlert}
                     >
                       <AlertDialogTrigger asChild>
                         <Button
@@ -177,11 +181,14 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
             <TableCell></TableCell>
             <TableCell></TableCell>
             <TableCell className="text-right">
-              {typeof tableData[0].col4 === "number" && pathname === "/invoices"
-                ? formatCurrencyBRL(
-                    tableData.reduce((sum, c) => sum + Number(c.col4), 0),
-                  )
-                : "0"}
+              {typeof tableData[0].col4 === "undefined"
+                ? "0"
+                : typeof tableData[0].col4 === "number" &&
+                    pathname === "/invoices"
+                  ? formatCurrencyBRL(
+                      tableData.reduce((sum, c) => sum + Number(c.col4), 0),
+                    )
+                  : "0"}
             </TableCell>
           </TableRow>
         </TableFooter>

@@ -19,8 +19,8 @@ const Products = async () => {
   const tableData = formatTableData(products, "product");
 
   return (
-    <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[95%]">
-      <TopCards />
+    <div>
+      {/* <TopCards /> */}
       <AllInOneTable tableData={tableData} />
     </div>
   );

@@ -12,10 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Form from "next/form";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { useState } from "react";
 
 export default function NewCustomer() {
   const [state, formAction, pending] = useActionState(createCustomer, null);
@@ -24,14 +22,12 @@ export default function NewCustomer() {
 
   const handleReturn = () => {
     setLoading(true);
-    // Pequeno delay para mostrar o spinner antes de navegar
-    setTimeout(() => {
-      router.push("/customers");
-    }, 1);
+    router.push("/customers");
   };
 
   return (
     <>
+      {loading ? <OverlaySpinner /> : ""}
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <CardTitle>Cadastrar novo cliente</CardTitle>
@@ -63,7 +59,6 @@ export default function NewCustomer() {
                 />
               </div>
               <div className="relative flex flex-col gap-2">
-                {pending || loading ? <OverlaySpinner /> : ""}
                 <Button type="submit" className="w-full cursor-pointer">
                   Cadastrar
                 </Button>
@@ -72,7 +67,6 @@ export default function NewCustomer() {
                   variant="outline"
                   className="w-full cursor-pointer"
                   onClick={handleReturn}
-                  disabled={loading}
                 >
                   Retornar à lista de clientes
                 </Button>

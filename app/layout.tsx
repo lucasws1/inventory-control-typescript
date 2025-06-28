@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopPageName from "@/components/topPageName";
+import TopCards from "@/components/topCards";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,8 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} dark mt-2 space-y-2 antialiased`}
       >
-        <TopPageName />
-        {children}
+        <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[90%]">
+          <TopPageName />
+          <TopCards />
+          {children}
+        </div>
       </body>
     </html>
   );

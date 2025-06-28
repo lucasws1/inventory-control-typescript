@@ -1,5 +1,5 @@
 "use client";
-import { updateCustomer } from "@/app/lib/actions";
+import { updateProduct } from "@/app/lib/actions";
 import OverlaySpinner from "@/components/overlaySpinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,37 +12,30 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Customer } from "@/types/customer";
-import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
-export default function CustomerEditForm({ customer }: { customer: Customer }) {
-  const [state, formAction, pending] = useActionState(updateCustomer, null);
+export default function ProductEditForm({
+  product,
+}: {
+  product: { id: number; name: string; price: number } | null;
+}) {
+  const [state, formAction, pending] = useActionState(updateProduct, null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const handleReturn = () => {
-    setLoading(true);
-    router.push("/customers");
-  };
 
   return (
     <div>
-      {loading && <OverlaySpinner />}
+      {loading ? <OverlaySpinner /> : ""}
       <form action={formAction}>
         <div className="mx-2 flex justify-center">
           <Card className="w-full max-w-sm">
             <CardHeader>
-              <CardTitle>Alterar dados de {customer?.name}</CardTitle>
-              <CardDescription>
-                Última edição em{" "}
-                {customer?.updatedAt?.toLocaleDateString("pt-BR")}
-              </CardDescription>
+              <CardTitle>Alterar dados de {product?.name}</CardTitle>
+              <CardDescription>Produto id n. {product?.id}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
-                  <Input type="hidden" name="id" value={customer?.id} />
+                  <Input type="hidden" name="id" value={product?.id} />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome</Label>
@@ -50,26 +43,17 @@ export default function CustomerEditForm({ customer }: { customer: Customer }) {
                     id="name"
                     name="name"
                     type="text"
-                    defaultValue={customer?.name as string}
+                    defaultValue={product?.name as string}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Preço</Label>
                   <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    defaultValue={customer?.email as string}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="phone"
-                    defaultValue={customer?.phone as string}
+                    id="price"
+                    name="price"
+                    type="text"
+                    defaultValue={product?.price as number}
                   />
                 </div>
               </div>
@@ -79,16 +63,16 @@ export default function CustomerEditForm({ customer }: { customer: Customer }) {
               <Button
                 type="submit"
                 className="w-full cursor-pointer"
-                onClick={handleReturn}
+                onClick={() => setLoading(true)}
               >
-                Enviar
+                Salvar Alterações
               </Button>
               <Button
                 variant="outline"
-                className="w-full"
-                onClick={handleReturn}
+                className="w-full cursor-pointer"
+                onClick={() => setLoading(true)}
               >
-                Retornar para Clientes
+                Retornar para produtos
               </Button>
             </CardFooter>
           </Card>

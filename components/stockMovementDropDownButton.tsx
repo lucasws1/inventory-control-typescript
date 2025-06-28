@@ -20,13 +20,21 @@ const StockMovementDropdownButton = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>
-            <Link href="/stock-movement" className="flex items-center gap-2">
+            <Link
+              href="/stock-movement"
+              className="flex cursor-pointer items-center gap-2"
+            >
               <ListOrdered />
               Listar
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Plus /> Adicionar
+            <Link
+              href="/stock-movement/new-stock-movement"
+              className="flex cursor-pointer items-center gap-2"
+            >
+              <Plus /> Adicionar
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

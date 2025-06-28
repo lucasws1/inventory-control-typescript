@@ -50,9 +50,12 @@ export function formatTableData<T extends TableDataType>(
     return (items as any[]).map((prod) => {
       const quantityInStock = prod.StockMovement
         ? prod.StockMovement.reduce((acc: number, sm: any) => {
-            if (sm.reason === "COMPRA") {
+            if (sm.reason === "COMPRA" || sm.reason === "AJUSTE_POSITIVO") {
               return acc + sm.quantity;
-            } else if (sm.reason === "VENDA") {
+            } else if (
+              sm.reason === "VENDA" ||
+              sm.reason === "AJUSTE_NEGATIVO"
+            ) {
               return acc - sm.quantity;
             }
             return acc;

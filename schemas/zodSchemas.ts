@@ -34,14 +34,20 @@ export const CustomerUpdateSchema = z.object({
   phone: z.string().optional(),
 });
 
+// export const CustomerSchema = z.object({
+//   id: z.number(),
+//   name: z.string(),
+//   email: z.string(),
+//   phone: z.string(),
+//   createdAt: z.coerce.date(),
+//   updatedAt: z.coerce.date(),
+//   Invoice: z.lazy((): z.ZodTypeAny => z.array(InvoiceSchema)),
+// });
+
 export const CustomerSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  Invoice: z.lazy((): z.ZodTypeAny => z.array(InvoiceSchema)),
+  name: z.string().min(2, "Nome obrigatório!"),
+  email: z.string().email("Email inválido!").optional().or(z.literal("")),
+  phone: z.string().optional().or(z.literal("")),
 });
 
 export const InvoiceSchema = z.object({
@@ -62,6 +68,13 @@ export const UpdateCustomerSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   Invoice: z.lazy(() => z.array(InvoiceSchema)),
+});
+
+export const StockMovementUpdateSchema = z.object({
+  id: z.number().min(1),
+  quantity: z.number().min(1, "Quantidade deve ser maior que zero!"),
+  date: z.coerce.date(),
+  reason: StockReasonSchema,
 });
 
 export const StockMovementSchema = z.object({

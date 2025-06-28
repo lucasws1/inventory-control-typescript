@@ -33,10 +33,10 @@ import {
 } from "@/components/ui/select";
 import { Customer } from "@/types/customer";
 import { Product } from "@/types/product";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { handleInvoiceSubmit } from "@/app/lib/actions";
+import OverlaySpinner from "@/components/overlaySpinner";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -51,7 +51,6 @@ import {
   ChevronDownIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import OverlaySpinner from "@/components/overlaySpinner";
 
 export type InvoiceItem = {
   productId: number;
@@ -95,8 +94,7 @@ export default function InvoiceForm({
 
   const handleReturn = () => {
     setLoading(true);
-
-    setTimeout(() => router.push("/invoices"), 1);
+    router.push("/invoices");
   };
 
   const handleCloseDialog = () => {
@@ -176,292 +174,302 @@ export default function InvoiceForm({
   };
 
   return (
-    <div className="mx-2 flex justify-center font-[family-name:var(--font-geist-sans)]">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Nova venda</CardTitle>
-          <CardDescription>Insira os dados e clique em Enviar</CardDescription>
-          <CardAction>
-            <Popover
-              open={openNewInvoiceItemProductList}
-              onOpenChange={setOpenNewInvoiceItemProductList}
-            >
-              <PopoverTrigger className="cursor-pointer">
-                Itens ({newInvoiceItems.length})
-              </PopoverTrigger>
-              <PopoverContent className="w-auto">
-                {newInvoiceItems.length === 0 ? (
-                  "Nenhum item adicionado"
-                ) : (
-                  <div>
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+      <div className="mx-2 flex justify-center font-[family-name:var(--font-geist-sans)]">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Nova venda</CardTitle>
+            <CardDescription>
+              Insira os dados e clique em Enviar
+            </CardDescription>
+            <CardAction>
+              <Popover
+                open={openNewInvoiceItemProductList}
+                onOpenChange={setOpenNewInvoiceItemProductList}
+              >
+                <PopoverTrigger className="cursor-pointer">
+                  Itens ({newInvoiceItems.length})
+                </PopoverTrigger>
+                <PopoverContent className="w-auto">
+                  {newInvoiceItems.length === 0 ? (
+                    "Nenhum item adicionado"
+                  ) : (
                     <div>
-                      {newInvoiceItems.map((item) => (
-                        <div key={item.productId}>
-                          <div className="grid w-auto grid-cols-[auto_auto_auto_auto] gap-2 truncate">
-                            <div className="w-28 truncate text-start font-bold">
-                              {
-                                products.find((p) => p.id === item.productId)
-                                  ?.name
-                              }
-                            </div>
-                            <div className="w-12 text-start">
-                              {item.quantity}
-                            </div>
-                            <div className="w-28 text-start">{`${formatCurrencyBRL(item.unitPrice)}`}</div>
+                      <div>
+                        {newInvoiceItems.map((item) => (
+                          <div key={item.productId}>
+                            <div className="grid w-auto grid-cols-[auto_auto_auto_auto] gap-2 truncate">
+                              <div className="w-28 truncate text-start font-bold">
+                                {
+                                  products.find((p) => p.id === item.productId)
+                                    ?.name
+                                }
+                              </div>
+                              <div className="w-12 text-start">
+                                {item.quantity}
+                              </div>
+                              <div className="w-28 text-start">{`${formatCurrencyBRL(item.unitPrice)}`}</div>
 
-                            <div>
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => {
-                                  handleDeleteNewInvoiceItemProduct(
-                                    item.productId,
-                                  );
-                                }}
-                                className="h-fit w-auto cursor-pointer justify-self-center"
-                              >
-                                Deletar
-                              </Button>
+                              <div>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => {
+                                    handleDeleteNewInvoiceItemProduct(
+                                      item.productId,
+                                    );
+                                  }}
+                                  className="h-fit w-auto cursor-pointer justify-self-center"
+                                >
+                                  Deletar
+                                </Button>
+                              </div>
                             </div>
+                            <Separator className="my-3" />
                           </div>
-                          <Separator className="my-3" />
+                        ))}
+                        <div className="grid grid-cols-4">
+                          <span className="col-span-1 justify-self-start">
+                            Total:
+                          </span>
+                          <span className="col-span-3 justify-self-end">
+                            {formatCurrencyBRL(
+                              newInvoiceItems.reduce(
+                                (acc, item) =>
+                                  acc + item.quantity * item.unitPrice,
+                                0,
+                              ),
+                            )}
+                          </span>
                         </div>
-                      ))}
-                      <div className="grid grid-cols-4">
-                        <span className="col-span-1 justify-self-start">
-                          Total:
-                        </span>
-                        <span className="col-span-3 justify-self-end">
-                          {formatCurrencyBRL(
-                            newInvoiceItems.reduce(
-                              (acc, item) =>
-                                acc + item.quantity * item.unitPrice,
-                              0,
-                            ),
-                          )}
-                        </span>
                       </div>
                     </div>
-                  </div>
-                )}
-              </PopoverContent>
-            </Popover>
-          </CardAction>
-        </CardHeader>
-        <form action={newInvoiceSubmit}>
-          <CardContent>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2"></div>
-              <div className="grid gap-2">
-                <Label htmlFor="customer">Cliente</Label>
-                <Select onValueChange={setCustomerId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione um cliente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Clientes</SelectLabel>
-                      {customers.map((customer) => (
-                        <SelectItem
-                          key={customer.id}
-                          value={customer.id.toString()}
+                  )}
+                </PopoverContent>
+              </Popover>
+            </CardAction>
+          </CardHeader>
+          <form action={newInvoiceSubmit}>
+            <CardContent>
+              <div className="flex flex-col gap-6">
+                <div className="grid gap-2"></div>
+                <div className="grid gap-2">
+                  <Label htmlFor="customer">Cliente</Label>
+                  <Select onValueChange={setCustomerId}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecione um cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Clientes</SelectLabel>
+                        {customers.map((customer) => (
+                          <SelectItem
+                            key={customer.id}
+                            value={customer.id.toString()}
+                          >
+                            {customer.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {/* <input type="hidden" name="customer" value={customerId} /> */}
+                </div>
+                <div>
+                  <div className="flex flex-col gap-2">
+                    <Label>Produto</Label>
+                    <Dialog open={open} onOpenChange={setOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={() => setProductAlreadyAdded(false)}
+                          variant="outline"
                         >
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                {/* <input type="hidden" name="customer" value={customerId} /> */}
-              </div>
-              <div>
-                <div className="flex flex-col gap-2">
-                  <Label>Produto</Label>
-                  <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        onClick={() => setProductAlreadyAdded(false)}
-                        variant="outline"
-                      >
-                        Adicionar produto
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-sm">
-                      <DialogHeader>
-                        <DialogTitle>Dados do item</DialogTitle>
-                        <DialogDescription>
-                          Preencha os dados do item vendido
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4">
-                        <div className="grid gap-3">
-                          <Label htmlFor="product">Produto</Label>
-                          <Select onValueChange={setProductId}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Selecione um produto" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>Products</SelectLabel>
-                                {products.map((product) => (
-                                  <SelectItem
-                                    key={product.id}
-                                    value={product.id.toString()}
-                                  >
-                                    {product.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="grid gap-3">
-                          <Label htmlFor="quantidade">Quantidade</Label>
-                          <Input
-                            id="productQuantity"
-                            name="productQuantity"
-                            onChange={(e) =>
-                              setProductQuantity(Number(e.target.value))
-                            }
-                            value={productQuantity}
-                          />
-                        </div>
-                        <div className="grid gap-3">
-                          <Label htmlFor="unitPrice">Preço unitário</Label>
-                          <Input
-                            onChange={(e) => setUnitPrice(e.target.value)}
-                            placeholder="360,00"
-                            id="unitPrice"
-                            name="unitPrice"
-                            value={unitPrice}
-                          />
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button onClick={handleCloseDialog} variant="outline">
-                            Cancelar
-                          </Button>
-                        </DialogClose>
-                        <Button type="button" onClick={handleAddProduct}>
-                          Adicionar
+                          Adicionar produto
                         </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-sm">
+                        <DialogHeader>
+                          <DialogTitle>Dados do item</DialogTitle>
+                          <DialogDescription>
+                            Preencha os dados do item vendido
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4">
+                          <div className="grid gap-3">
+                            <Label htmlFor="product">Produto</Label>
+                            <Select onValueChange={setProductId}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Selecione um produto" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Products</SelectLabel>
+                                  {products.map((product) => (
+                                    <SelectItem
+                                      key={product.id}
+                                      value={product.id.toString()}
+                                    >
+                                      {product.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="grid gap-3">
+                            <Label htmlFor="quantidade">Quantidade</Label>
+                            <Input
+                              id="productQuantity"
+                              name="productQuantity"
+                              onChange={(e) =>
+                                setProductQuantity(Number(e.target.value))
+                              }
+                              value={productQuantity}
+                            />
+                          </div>
+                          <div className="grid gap-3">
+                            <Label htmlFor="unitPrice">Preço unitário</Label>
+                            <Input
+                              onChange={(e) => setUnitPrice(e.target.value)}
+                              placeholder="360,00"
+                              id="unitPrice"
+                              name="unitPrice"
+                              value={unitPrice}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button
+                              onClick={handleCloseDialog}
+                              variant="outline"
+                            >
+                              Cancelar
+                            </Button>
+                          </DialogClose>
+                          <Button type="button" onClick={handleAddProduct}>
+                            Adicionar
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="">Pendente</Label>
+                  <Select value={pendingValue} onValueChange={setPendingValue}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Pendente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value="true">Pendente</SelectItem>
+                        <SelectItem value="false">Pago</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Label htmlFor="date" className="px-1">
+                    Data
+                  </Label>
+                  <Popover open={openDate} onOpenChange={setOpenDate}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        id="date"
+                        className="w-full justify-between font-normal"
+                      >
+                        {date
+                          ? date.toLocaleDateString("pt-BR")
+                          : "Select date"}
+                        <ChevronDownIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          setDate(date);
+                          setOpen(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
+            </CardContent>
 
-              <div className="grid gap-2">
-                <Label htmlFor="">Pendente</Label>
-                <Select value={pendingValue} onValueChange={setPendingValue}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Pendente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Status</SelectLabel>
-                      <SelectItem value="true">Pendente</SelectItem>
-                      <SelectItem value="false">Pago</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            <CardFooter className="mt-6 flex-col gap-2">
+              <Button type="submit" className="w-full">
+                Enviar
+              </Button>
+              <div className="grid w-full max-w-xl items-start gap-4">
+                {status === "success" && (
+                  <Alert>
+                    <CheckCircle2Icon />
+                    <AlertTitle>Successo!</AlertTitle>
+                    <AlertDescription>
+                      A venda foi lançada com sucesso. Clique abaixo para
+                      retornar.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {status === "error" && (
+                  <Alert variant="destructive">
+                    <AlertCircleIcon />
+                    <AlertTitle>Erro.</AlertTitle>
+                    <AlertDescription>
+                      <p>
+                        Houve um erro na hora de lançar a venda. Tente novamente
+                        mais tarde.
+                      </p>
+                      <ul className="list-inside list-disc text-sm">
+                        <li>Check your card details</li>
+                        <li>Ensure sufficient funds</li>
+                        <li>Verify billing address</li>
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="date" className="px-1">
-                  Data
-                </Label>
-                <Popover open={openDate} onOpenChange={setOpenDate}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      id="date"
-                      className="w-full justify-between font-normal"
-                    >
-                      {date ? date.toLocaleDateString("pt-BR") : "Select date"}
-                      <ChevronDownIcon />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto overflow-hidden p-0"
-                    align="start"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      captionLayout="dropdown"
-                      onSelect={(date) => {
-                        setDate(date);
-                        setOpen(false);
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-          </CardContent>
 
-          <CardFooter className="mt-6 flex-col gap-2">
-            <Button type="submit" className="w-full">
-              Enviar
-            </Button>
-            <div className="grid w-full max-w-xl items-start gap-4">
-              {status === "success" && (
-                <Alert>
-                  <CheckCircle2Icon />
-                  <AlertTitle>Successo!</AlertTitle>
-                  <AlertDescription>
-                    A venda foi lançada com sucesso. Clique abaixo para
-                    retornar.
-                  </AlertDescription>
-                </Alert>
-              )}
-              {status === "error" && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full cursor-pointer"
+                onClick={() => handleReturn()}
+              >
+                Retornar para Vendas
+              </Button>
+              {productAlreadyAdded && (
                 <Alert variant="destructive">
                   <AlertCircleIcon />
-                  <AlertTitle>Erro.</AlertTitle>
+                  <AlertTitle className="align-center">
+                    Esse item já foi selecionado
+                  </AlertTitle>
                   <AlertDescription>
-                    <p>
-                      Houve um erro na hora de lançar a venda. Tente novamente
-                      mais tarde.
-                    </p>
+                    <p>Suas alternativas são:</p>
                     <ul className="list-inside list-disc text-sm">
-                      <li>Check your card details</li>
-                      <li>Ensure sufficient funds</li>
-                      <li>Verify billing address</li>
+                      <li>Alterar a quantidade do item</li>
+                      <li>Selecionar outro item</li>
+                      <li>Lançar a venda no banco de dados</li>
                     </ul>
                   </AlertDescription>
                 </Alert>
               )}
-            </div>
-            {loading && <OverlaySpinner />}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full cursor-pointer"
-              onClick={() => handleReturn()}
-            >
-              Retornar para Vendas
-            </Button>
-            {productAlreadyAdded && (
-              <Alert variant="destructive">
-                <AlertCircleIcon />
-                <AlertTitle className="align-center">
-                  Esse item já foi selecionado
-                </AlertTitle>
-                <AlertDescription>
-                  <p>Suas alternativas são:</p>
-                  <ul className="list-inside list-disc text-sm">
-                    <li>Alterar a quantidade do item</li>
-                    <li>Selecionar outro item</li>
-                    <li>Lançar a venda no banco de dados</li>
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </>
   );
 }

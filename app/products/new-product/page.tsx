@@ -25,19 +25,19 @@ import { useRouter } from "next/navigation";
 
 export default function NewProduct() {
   const [state, formAction, pending] = useActionState(createProduct, null);
-  const [openDate, setOpenDate] = useState(false);
   const [dateValue, setDateValue] = useState(new Date());
+  const [openDate, setOpenDate] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleReturn = () => {
     setLoading(true);
-    setTimeout(() => router.push("/products"), 1);
+    router.push("/products");
   };
 
   return (
     <>
-      {pending ? <OverlaySpinner /> : ""}
+      {loading ? <OverlaySpinner /> : ""}
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <CardTitle>Cadastrar novo produto</CardTitle>
@@ -110,9 +110,9 @@ export default function NewProduct() {
                 <Button type="submit" className="w-full cursor-pointer">
                   Cadastrar
                 </Button>
-                {loading && <OverlaySpinner />}
+
                 <Button
-                  onClick={() => handleReturn()}
+                  onClick={handleReturn}
                   type="button"
                   variant="outline"
                   className="w-full cursor-pointer"

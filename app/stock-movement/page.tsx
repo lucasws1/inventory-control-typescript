@@ -15,6 +15,9 @@ export const metadata: Metadata = {
 const StockMovement = async () => {
   const stockMovement: StockMovementTableData[] =
     await prisma.stockMovement.findMany({
+      orderBy: {
+        date: "desc",
+      },
       include: {
         Product: true,
       },
@@ -23,9 +26,7 @@ const StockMovement = async () => {
   const tableData = formatTableData(stockMovement, "stockMovement");
 
   return (
-    <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[95%]">
-      <TopCards />
-
+    <div>
       <AllInOneTable tableData={tableData} />
     </div>
   );

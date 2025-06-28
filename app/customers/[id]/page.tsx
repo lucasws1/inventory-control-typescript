@@ -1,94 +1,20 @@
 import prisma from "@/lib/prisma";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { updateCustomer } from "@/app/lib/actions";
-import { Button } from "@/components/ui/button";
-import { Metadata } from "next";
-import Link from "next/link";
-import CustomerEditForm from "./CustomerEditForm";
 import { Customer } from "@/types/customer";
-
-type PageProps = {
-  id: string;
-};
+import { Metadata } from "next";
+import CustomerEditForm from "./CustomerEditForm";
 
 export const metadata: Metadata = {
   title: "Editar Cliente",
 };
 
-export default async function CustomerPage({ params }: { params: PageProps }) {
+export default async function CustomerPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const { id } = await params;
   const customer = await prisma.customer.findUnique({
     where: { id: Number(id) },
   });
   return <CustomerEditForm customer={customer as Customer} />;
-
-  // return (
-  //   <form action={updateCustomer}>
-  //     <div className="mx-2 flex justify-center">
-  //       <Card className="w-full max-w-sm">
-  //         <CardHeader>
-  //           <CardTitle>Alterar dados de {customer?.name}</CardTitle>
-  //           <CardDescription>
-  //             Última edição em{" "}
-  //             {customer?.updatedAt?.toLocaleDateString("pt-BR")}
-  //           </CardDescription>
-  //         </CardHeader>
-  //         <CardContent>
-  //           <div className="flex flex-col gap-6">
-  //             <div className="grid gap-2">
-  //               <Input type="hidden" name="id" value={customer?.id} />
-  //             </div>
-  //             <div className="grid gap-2">
-  //               <Label htmlFor="name">Nome</Label>
-  //               <Input
-  //                 id="name"
-  //                 name="name"
-  //                 type="text"
-  //                 defaultValue={customer?.name as string}
-  //                 required
-  //               />
-  //             </div>
-  //             <div className="grid gap-2">
-  //               <Label htmlFor="email">Email</Label>
-  //               <Input
-  //                 id="email"
-  //                 name="email"
-  //                 type="email"
-  //                 defaultValue={customer?.email as string}
-  //               />
-  //             </div>
-  //             <div className="grid gap-2">
-  //               <Label htmlFor="phone">Telefone</Label>
-  //               <Input
-  //                 id="phone"
-  //                 name="phone"
-  //                 type="phone"
-  //                 defaultValue={customer?.phone as string}
-  //               />
-  //             </div>
-  //           </div>
-  //         </CardContent>
-
-  //         <CardFooter className="flex-col gap-2">
-  //           <Button type="submit" className="w-full cursor-pointer">
-  //             Enviar
-  //           </Button>
-  //           <Button variant="outline" className="w-full">
-  //             <Link href="/customers">Retornar para Clientes</Link>
-  //           </Button>
-  //         </CardFooter>
-  //       </Card>
-  //     </div>
-  //   </form>
-  // );
 }

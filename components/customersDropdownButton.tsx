@@ -20,16 +20,19 @@ const CustomersDropdownButton = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>
-            <Link href="/customers" className="flex items-center gap-2">
+            <Link
+              href="/customers"
+              className="flex cursor-pointer items-center gap-2"
+            >
               <ListOrdered />
               Listar
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Plus />{" "}
+            <Plus />
             <Link
               href="/customers/new-customer"
-              className="flex items-center gap-2"
+              className="flex cursor-pointer items-center gap-2"
             >
               Adicionar
             </Link>
