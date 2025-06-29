@@ -1,6 +1,9 @@
 "use client";
+import { updateInvoice } from "@/app/lib/actions";
+import OverlaySpinner from "@/components/overlaySpinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardAction,
@@ -23,6 +26,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -31,19 +39,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Customer } from "@/types/customer";
-import { Product } from "@/types/product";
-import { useActionState, useEffect, useState } from "react";
-
-import { createInvoice } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Invoice } from "@/types/invoice";
+import { Product } from "@/types/product";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import {
   AlertCircleIcon,
@@ -52,6 +50,7 @@ import {
 } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
 
 export type InvoiceItem = {
   productId: number;
@@ -66,23 +65,23 @@ type StockMovement = {
   reason: string;
 };
 
-export default function InvoiceForm({
-  customers,
+export default function InvoiceEditForm({
+  invoice,
   products,
-  invoiceItems,
 }: {
-  customers: Customer[];
+  invoice: Invoice;
   products: Product[];
-  invoiceItems: InvoiceItem[];
 }) {
-  const [state, formAction, pending] = useActionState(createInvoice, null);
-  const [customerId, setCustomerId] = useState("1");
+  const [state, formAction, pending] = useActionState(updateInvoice, null);
+  // const [customerId, setCustomerId] = useState(invoice.customerId + "");
   const [productQuantity, setProductQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState("");
-  const [newInvoiceItems, setNewInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [newInvoiceItems, setNewInvoiceItems] = useState<InvoiceItem[]>(
+    invoice.InvoiceItem,
+  );
   const [open, setOpen] = useState(false);
-  const [pendingValue, setPendingValue] = useState("true");
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [pendingValue, setPendingValue] = useState(invoice.pending.toString());
+  const [date, setDate] = useState<Date | undefined>(invoice.purchaseDate);
   const [openDate, setOpenDate] = useState(false);
   const [productId, setProductId] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "idle">("idle");
@@ -107,8 +106,8 @@ export default function InvoiceForm({
 
   useEffect(() => {
     if (!productId) return;
-    const up = invoiceItems.find(
-      (inv) => inv.productId === Number(productId),
+    const up = invoice.InvoiceItem.find(
+      (inv) => inv.Product.id === Number(productId),
     )?.unitPrice;
     setUnitPrice(up !== undefined ? up.toString() : "");
   }, [productId]);
@@ -158,10 +157,11 @@ export default function InvoiceForm({
   return (
     <>
       {loading ? <OverlaySpinner /> : ""}
+
       <div className="mx-2 flex justify-center font-sans">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Nova venda</CardTitle>
+            <CardTitle>Editar Venda</CardTitle>
             <CardDescription>
               Insira os dados e clique em Enviar
             </CardDescription>
@@ -171,7 +171,7 @@ export default function InvoiceForm({
                 onOpenChange={setOpenNewInvoiceItemProductList}
               >
                 <PopoverTrigger className="cursor-pointer">
-                  Itens ({newInvoiceItems.length})
+                  Lista de Itens ({newInvoiceItems.length})
                 </PopoverTrigger>
                 <PopoverContent className="w-auto">
                   {newInvoiceItems.length === 0 ? (
@@ -184,8 +184,9 @@ export default function InvoiceForm({
                             <div className="grid w-auto grid-cols-[auto_auto_auto_auto] gap-2 truncate">
                               <div className="w-28 truncate text-start font-bold">
                                 {
-                                  products.find((p) => p.id === item.productId)
-                                    ?.name
+                                  products.find(
+                                    (prod) => prod.id === item.productId,
+                                  )?.name
                                 }
                               </div>
                               <div className="w-12 text-start">
@@ -233,30 +234,18 @@ export default function InvoiceForm({
             </CardAction>
           </CardHeader>
           <Form action={formAction}>
+            <Input type="hidden" name="id" value={invoice.id} />
             <CardContent>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2"></div>
                 <div className="grid gap-2">
                   <Label htmlFor="customer">Cliente</Label>
-                  <Select onValueChange={setCustomerId}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione um cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Clientes</SelectLabel>
-                        {customers.map((customer) => (
-                          <SelectItem
-                            key={customer.id}
-                            value={customer.id.toString()}
-                          >
-                            {customer.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <input type="hidden" name="customer" value={customerId} />
+                  <Input type="text" disabled value={invoice.customer.name} />
+                  <input
+                    type="hidden"
+                    name="customer"
+                    value={invoice.customerId}
+                  />
                 </div>
                 <div>
                   <div className="flex flex-col gap-2">

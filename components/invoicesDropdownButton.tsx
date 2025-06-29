@@ -13,7 +13,7 @@ const InvoicesDropdownButton = () => {
     <div className="w-full items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex w-full cursor-pointer">
+          <Button className="flex w-full cursor-pointer">
             <FileText />
             Vendas
           </Button>

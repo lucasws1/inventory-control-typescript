@@ -50,6 +50,22 @@ export const CustomerSchema = z.object({
   phone: z.string().optional().or(z.literal("")),
 });
 
+export const CreateInvoiceSchema = z.object({
+  amount: z.number().min(0, "Valor deve ser maior que zero!"),
+  pending: z.boolean().default(true),
+  purchaseDate: z.coerce.date(),
+  customerId: z.number().min(1, "Selecione um cliente!"),
+  invoiceItems: z
+    .array(
+      z.object({
+        productId: z.number().min(1, "Selecione um produto!"),
+        quantity: z.number().min(1, "Quantidade deve ser maior que zero!"),
+        unitPrice: z.number().min(0, "Preço unitário deve ser maior que zero!"),
+      }),
+    )
+    .min(1, "Adicione pelo menos um item à fatura!"),
+});
+
 export const InvoiceSchema = z.object({
   id: z.number(),
   amount: z.number(),
@@ -68,6 +84,15 @@ export const UpdateCustomerSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   Invoice: z.lazy(() => z.array(InvoiceSchema)),
+});
+
+export const UpdateInvoiceSchema = z.object({
+  id: z.number(),
+  amount: z.number(),
+  pending: z.boolean(),
+  purchaseDate: z.coerce.date(),
+  customerId: z.number(),
+  InvoiceItem: z.lazy(() => InvoiceItemSchema),
 });
 
 export const StockMovementUpdateSchema = z.object({

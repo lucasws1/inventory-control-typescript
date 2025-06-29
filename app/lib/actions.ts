@@ -2,10 +2,13 @@
 
 import prisma from "@/lib/prisma";
 import {
+  CreateInvoiceSchema,
   CustomerSchema,
   CustomerUpdateSchema,
+  InvoiceSchema,
   StockMovementUpdateSchema,
 } from "@/schemas/zodSchemas";
+import { InvoiceItem } from "@/types/invoiceItem";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -145,16 +148,62 @@ export async function updateCustomer(prevState: any, formData: FormData) {
     await prisma.customer.update({
       where: { id: Number(formData.get("id")) },
       data: { ...data, email: emailValue },
-      // data: {
-      //   name: formData.get("name") as string,
-      //   email: emailValue,
-      //   phone: formData.get("phone") as string,
-      // },
     });
   } catch (error) {
     throw new Error("Erro ao atualizar o cliente.");
   } finally {
     redirect("/customers");
+  }
+}
+
+export async function updateInvoice(prevState: any, formData: FormData) {
+  const invoiceItems: InvoiceItem[] = JSON.parse(
+    formData.get("invoiceItems") as string,
+  );
+
+  const amount = invoiceItems.reduce(
+    (acc: number, invItem: InvoiceItem) =>
+      acc + invItem.quantity * invItem.unitPrice,
+    0,
+  );
+
+  const data = {
+    id: Number(formData.get("id")),
+    amount,
+    pending: formData.get("pending") === "true",
+    purchaseDate: new Date(formData.get("date") as string),
+    customerId: Number(formData.get("customer")),
+    invoiceItems,
+  };
+  console.log(data);
+
+  const parseResult = CreateInvoiceSchema.safeParse(data);
+  if (!parseResult.success) {
+    throw new Error("Dados inválidos. Verifique os campos.", parseResult.error);
+  }
+
+  try {
+    const invoiceUpdate = await prisma.invoice.update({
+      where: { id: data.id },
+      data: {
+        amount: data.amount,
+        pending: data.pending,
+        purchaseDate: data.purchaseDate,
+        customerId: data.customerId,
+        InvoiceItem: {
+          deleteMany: {}, // Remove todos os itens existentes da invoice
+          create: data.invoiceItems.map((item: any) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+        },
+      },
+    });
+  } catch (error) {
+    throw new Error("Erro ao atualizar invoice.");
+  } finally {
+    redirect("/invoices");
   }
 }
 
@@ -204,42 +253,63 @@ export const deleteStockMovement = async (stockMovementId: number) => {
   }
 };
 
-export const handleInvoiceSubmit = async (newInvoice: any) => {
+export const createInvoice = async (prevState: any, formData: FormData) => {
   try {
-    const invoice = await prisma.invoice.create({
+    const invoiceItems = JSON.parse(formData.get("invoiceItems") as string);
+    const stockMovement = JSON.parse(formData.get("stockMovement") as string);
+
+    const amount = invoiceItems.reduce((acc: number, item: any) => {
+      return acc + item.quantity * item.unitPrice;
+    }, 0);
+
+    const data = {
+      amount,
+      pending: formData.get("pending") === "true",
+      purchaseDate: new Date(formData.get("date") as string),
+      customerId: Number(formData.get("customer")),
+      invoiceItems,
+    };
+
+    const parseResult = CreateInvoiceSchema.safeParse(data);
+    if (!parseResult.success) {
+      throw new Error(
+        "Dados inválidos. Verifique os campos.",
+        parseResult.error,
+      );
+    }
+
+    const newInvoice = await prisma.invoice.create({
       data: {
-        amount: newInvoice.amount,
-        pending: newInvoice.pending,
-        purchaseDate: newInvoice.purchaseDate,
-        customerId: newInvoice.customerId,
+        amount: data.amount,
+        pending: data.pending,
+        purchaseDate: data.purchaseDate,
+        customerId: data.customerId,
         InvoiceItem: {
-          create: newInvoice.newInvoiceItems.map((item: any) => ({
+          create: data.invoiceItems.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
           })),
         },
       },
-      include: { InvoiceItem: true },
     });
-    let newStockMovement = null;
-    if (newInvoice.stockMovement && newInvoice.stockMovement.length > 0) {
-      newStockMovement = await prisma.stockMovement.createMany({
-        data: newInvoice.stockMovement.map((item: any) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          date: item.date,
-          reason: item.reason,
-        })),
-      });
-    }
+
+    const newStockMovement = await prisma.stockMovement.createMany({
+      data: stockMovement.map((item: any) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        date: item.date,
+        reason: item.reason,
+      })),
+    });
     return {
       success: true,
       message: "Venda lançada com sucesso!",
-      invoice,
+      invoice: newInvoice,
       newStockMovement,
     };
   } catch (error) {
+    console.error("Error creating invoice:", error);
     return {
       success: false,
       message: "Erro ao lançar a venda.",
@@ -248,6 +318,8 @@ export const handleInvoiceSubmit = async (newInvoice: any) => {
           ? (error as { message: string }).message
           : String(error),
     };
+  } finally {
+    redirect("/invoices");
   }
 };
 

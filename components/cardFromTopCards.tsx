@@ -22,13 +22,14 @@ export default function CardFromTopCards({
 }) {
   return (
     <div>
-      <Card className="flex h-full flex-col justify-between">
+      <Card className="flex h-full flex-col justify-between truncate font-sans">
         <CardHeader className="w-full">
           <div className="flex flex-col">
-            <CardTitle>{title}</CardTitle>
-            <CardDescription>{subtitle}</CardDescription>
+            <CardDescription className="">{subtitle}</CardDescription>
+            <CardTitle className="text-xl">{title}</CardTitle>
+            {/* <CardDescription className="font-sans">{info}</CardDescription> */}
           </div>
-          <CardAction className="w-fit">{info}</CardAction>
+          <CardAction className="font-bold">{info}</CardAction>
         </CardHeader>
         <CardFooter className="flex w-full">
           {title === "Produtos" ? (

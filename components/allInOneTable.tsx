@@ -69,8 +69,8 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
   const columns: TableColumns = columnsConfig[pathname];
   // shadow-[0_4px_24px_0_rgba(0,0,0,0.30)]
   return (
-    <div className="">
-      <div className="rounded-2xl bg-[#2c2825] p-6 shadow-[var(--shadow-xl)]">
+    <div>
+      <div className="bg-card rounded-md border p-4">
         <Table>
           {/* <TableCaption>Tabela de {pathname}</TableCaption> */}
           <TableHeader>
@@ -106,7 +106,7 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                                 ? `/products/${item.id}`
                                 : pathname === "/stock-movement"
                                   ? `/stock-movement/${item.id}` // ainda não implementado
-                                  : "" // invoices não implementado
+                                  : `/invoices/${item.id}`
                           }
                         >
                           Editar
@@ -141,10 +141,14 @@ const AllInOneTable = ({ tableData }: { tableData: TableData[] }) => {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel disabled={loadingRemoveAlert}>
+                            <AlertDialogCancel
+                              className="cursor-pointer"
+                              disabled={loadingRemoveAlert}
+                            >
                               Cancelar
                             </AlertDialogCancel>
                             <AlertDialogAction
+                              className="cursor-pointer"
                               onClick={() => handleDelete(item.id)}
                               disabled={loadingRemoveAlert}
                             >

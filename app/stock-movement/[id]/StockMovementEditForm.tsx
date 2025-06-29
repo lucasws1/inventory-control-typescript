@@ -50,7 +50,6 @@ export default function StockMovementEditForm({
   const [stockReason, setStockReason] = useState(
     stockMovement.reason as string,
   );
-  console.log(dateValue);
 
   const stockReasons: string[] = [
     "COMPRA",

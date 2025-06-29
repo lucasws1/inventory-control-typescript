@@ -30,25 +30,25 @@ export default async function TopCards() {
     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
       <CardFromTopCards
         title={"Vendas"}
-        info={`${invoices.length} vendas`}
-        subtitle={"Neste mês"}
+        info={`${invoices.length}`}
+        subtitle={"Número mensal de"}
       />
 
       <CardFromTopCards
         title={"Clientes"}
-        info={`${customers.length} clientes`}
-        subtitle={"Clientes cadastrados"}
+        info={`${customers.length}`}
+        subtitle={"Cadastros de"}
       />
 
       <CardFromTopCards
         title={"Produtos"}
-        info={`${products.length} itens`}
-        subtitle={"Itens cadastrados"}
+        info={`${products.length}`}
+        subtitle={"Cadastros de"}
       />
       <CardFromTopCards
         title={"Estoque"}
-        info={`${stockMovements.length} andamentos`}
-        subtitle={"Movimentações"}
+        info={`${stockMovements.length}`}
+        subtitle={"Movimentações de"}
       />
     </div>
   );

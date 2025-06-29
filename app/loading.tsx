@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const Loading = () => {
   return (
-    <div className="mx-2 space-y-4 font-[family-name:var(--font-geist-sans)] md:mx-auto">
+    <div className="mx-2 space-y-4 font-sans md:mx-auto">
       {/* TopCards Skeleton - 4 cards específicos da página de faturas */}
 
       {/* Table Skeleton - específico para tabela de faturas */}

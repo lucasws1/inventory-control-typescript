@@ -6,7 +6,7 @@ const OverlaySpinner = () => {
   return (
     <div className="fixed inset-0 z-50 bg-[#0a0a0a] backdrop-blur-[2px]">
       {/* TopCards Skeleton - 4 cards específicos da página de faturas */}
-      <div className="mx-auto mt-15 max-w-[95%] space-y-4 font-[family-name:var(--font-geist-sans)]">
+      <div className="mx-auto mt-15 max-w-[95%] space-y-4 font-sans">
         <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
           {/* Card Vendas */}
           <Card className="h-40">

@@ -30,9 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} dark mt-2 space-y-2 antialiased`}
+        // className={`${geistSans.variable} ${geistMono.variable} dark mt-2 space-y-2 antialiased`}
+        className="dark mt-2 space-y-2 font-sans antialiased"
       >
-        <div className="mx-2 space-y-6 font-[family-name:var(--font-geist-sans)] md:mx-auto md:max-w-[85%]">
+        <div className="mx-2 space-y-6 font-sans md:mx-auto md:max-w-5xl">
           <TopPageName />
           <TopCards />
           {children}
