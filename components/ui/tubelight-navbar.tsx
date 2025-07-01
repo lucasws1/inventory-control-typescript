@@ -33,10 +33,7 @@ export function NavBar({ items, className }: NavBarProps) {
 
   return (
     <div
-      className={cn(
-        "fixed bottom-0 left-1/2 z-50 mb-6 -translate-x-1/2 sm:bottom-3 sm:pt-6",
-        className,
-      )}
+      className={cn("fixed top-4 left-1/2 z-50 -translate-x-1/2", className)}
     >
       <div className="bg-background/5 border-border flex items-center gap-3 rounded-full border px-1 py-1 shadow-lg backdrop-blur-lg">
         {items.map((item) => {

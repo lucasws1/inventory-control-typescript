@@ -31,13 +31,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="dark">
-        <div className="mx-2 mt-2 space-y-4 lg:mx-auto lg:max-w-5xl">
-          <NavigationBar />
-          {/* <TopPageName /> */}
-          <TopCards />
-          {children}
-        </div>
+        <div>{children}</div>
       </body>
     </html>
+    // <html lang="en">
+    //   <body className="dark">
+    //     <div className="mx-2 mt-2 space-y-4 lg:mx-auto lg:max-w-5xl">
+    //       <NavigationBar />
+    //       {/* <TopPageName /> */}
+    //       <TopCards />
+    //       {children}
+    //     </div>
+    //   </body>
+    // </html>
   );
 }

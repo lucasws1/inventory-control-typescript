@@ -3,8 +3,28 @@
 import { Button } from "@/components/ui/button";
 
 import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -30,7 +50,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useId } from "react";
 import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/Pagination";
 import {
@@ -42,6 +62,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  IconChevronsLeft,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsRight,
+  IconGripVertical,
+} from "@tabler/icons-react";
+
+// Create a separate component for the drag handle
+export function DragHandle({ id }: { id: number }) {
+  const { attributes, listeners } = useSortable({
+    id,
+  });
+
+  return (
+    <Button
+      {...attributes}
+      {...listeners}
+      variant="ghost"
+      size="icon"
+      className="text-muted-foreground size-7 hover:bg-transparent"
+    >
+      <IconGripVertical className="text-muted-foreground size-3" />
+      <span className="sr-only">Drag to reorder</span>
+    </Button>
+  );
+}
 
 // Mapeamento de traduções para os nomes das colunas
 const columnTranslations: Record<string, string> = {
@@ -57,19 +105,60 @@ const columnTranslations: Record<string, string> = {
   purchaseDate: "Data",
 };
 
-interface DataTableProps<TData, TValue> {
+// Ensure table rows carry a unique identifier
+type RowWithId = { id: UniqueIdentifier };
+
+interface DataTableProps<TData extends RowWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+function DraggableRow<TData extends RowWithId>({ row }: { row: Row<TData> }) {
+  const { transform, transition, setNodeRef, isDragging } = useSortable({
+    id: row.original.id,
+  });
+
+  return (
+    <TableRow
+      data-state={row.getIsSelected() && "selected"}
+      data-dragging={isDragging}
+      ref={setNodeRef}
+      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition: transition,
+      }}
+    >
+      {row.getVisibleCells().map((cell) => (
+        <TableCell key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
+export function DataTable<TData extends RowWithId, TValue>({
   columns,
-  data,
+  data: initialData,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [data, setData] = useState(() => initialData);
+
+  const sortableId = useId();
+  const sensors = useSensors(
+    useSensor(MouseSensor, {}),
+    useSensor(TouchSensor, {}),
+    useSensor(KeyboardSensor, {}),
+  );
+
+  const dataIds = useMemo<UniqueIdentifier[]>(
+    () => data?.map(({ id }) => id) || [],
+    [data],
+  );
 
   const table = useReactTable({
     data,
@@ -90,6 +179,16 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   });
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (active && over && active.id !== over.id) {
+      setData((data) => {
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
+    }
+  }
 
   const [selectedColumn, setSelectedColumn] = useState<string>(
     table.getAllColumns()[1]?.id || "",
@@ -107,6 +206,11 @@ export function DataTable<TData, TValue>({
     const num = Number(input);
     return [num, num];
   };
+
+  console.log(table.getAllColumns()[0]?.getCanFilter());
+  console.log(
+    table.getAllColumns().find((column) => column.getCanFilter())?.id,
+  );
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -164,7 +268,7 @@ export function DataTable<TData, TValue>({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns
+              Colunas
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -188,72 +292,161 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="mx-auto w-full overflow-x-auto rounded-md border-2 border-neutral-900">
-        <Table className="w-full">
-          <TableHeader className="bg-card">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
+      <div className="mx-auto w-full overflow-x-auto rounded-lg border-2 border-neutral-900">
+        <div className="overflow-hidden rounded-lg border">
+          <DndContext
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            onDragEnd={handleDragEnd}
+            sensors={sensors}
+            id={sortableId}
+          >
+            <Table className="w-full">
+              <TableHeader className="bg-neutral-800">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  <SortableContext
+                    items={dataIds}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {table.getRowModel().rows.map((row) => (
+                      <DraggableRow key={row.id} row={row} />
+                    ))}
+                  </SortableContext>
+                ) : (
+                  // <TableRow
+                  //   key={row.id}
+                  //   data-state={row.getIsSelected() && "selected"}
+                  // >
+                  //   {row.getVisibleCells().map((cell) => (
+                  //     <TableCell
+                  //       key={cell.id}
+                  //       className="justify-center align-middle"
+                  //     >
+                  //       {flexRender(
+                  //         cell.column.columnDef.cell,
+                  //         cell.getContext(),
+                  //       )}
+                  //     </TableCell>
+                  //   ))}
+                  // </TableRow>
+                  // ))
+                  // ) : (
+                  <TableRow>
                     <TableCell
-                      key={cell.id}
-                      className="justify-center align-middle"
+                      colSpan={columns.length}
+                      className="h-24 text-center"
                     >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                      Não foram encontrados resultados.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Não foram encontrados resultados.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </DndContext>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center justify-between space-x-2 py-4">
+          <div className="text-muted-foreground flex-1 text-sm">
+            {table.getFilteredSelectedRowModel().rows.length} de{" "}
+            {table.getFilteredRowModel().rows.length} linhas selecionadas.
+          </div>
+          {/* <div className="flex items-center">
           <Pagination
             currentPage={table.getState().pagination.pageIndex + 1}
             totalPages={table.getPageCount() || 1}
             onPageChange={(page) => table.setPageIndex(page - 1)}
           />
-        </div>
-        {/* <div className="flex items-center space-x-2">
+        </div> */}
+
+          <div className="flex w-full items-center gap-8 lg:w-fit">
+            <div className="hidden items-center gap-2 lg:flex">
+              <Label htmlFor="rows-per-page" className="text-sm font-medium">
+                Linhas por página:
+              </Label>
+              <Select
+                value={`${table.getState().pagination.pageSize}`}
+                onValueChange={(value) => {
+                  table.setPageSize(Number(value));
+                }}
+              >
+                <SelectTrigger size="sm" className="w-20" id="rows-per-page">
+                  <SelectValue
+                    placeholder={table.getState().pagination.pageSize}
+                  />
+                </SelectTrigger>
+                <SelectContent side="top">
+                  {[10, 20, 30, 40, 50].map((pageSize) => (
+                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                      {pageSize}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex w-fit items-center justify-center text-sm font-medium">
+              Página {table.getState().pagination.pageIndex + 1} de{" "}
+              {table.getPageCount()}
+            </div>
+            <div className="ml-auto flex items-center gap-2 lg:ml-0">
+              <Button
+                variant="outline"
+                className="hidden h-8 w-8 p-0 lg:flex"
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <span className="sr-only">Go to first page</span>
+                <IconChevronsLeft />
+              </Button>
+              <Button
+                variant="outline"
+                className="size-8"
+                size="icon"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <span className="sr-only">Go to previous page</span>
+                <IconChevronLeft />
+              </Button>
+              <Button
+                variant="outline"
+                className="size-8"
+                size="icon"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <span className="sr-only">Go to next page</span>
+                <IconChevronRight />
+              </Button>
+              <Button
+                variant="outline"
+                className="hidden size-8 lg:flex"
+                size="icon"
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+              >
+                <span className="sr-only">Go to last page</span>
+                <IconChevronsRight />
+              </Button>
+            </div>
+          </div>
+          {/* <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
@@ -278,6 +471,7 @@ export function DataTable<TData, TValue>({
             Próximo <ChevronRightIcon className="h-4 w-4" />
           </Button>
         </div> */}
+        </div>
       </div>
     </div>
   );

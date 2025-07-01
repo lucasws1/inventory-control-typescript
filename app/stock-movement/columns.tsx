@@ -17,8 +17,14 @@ import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { redirect } from "next/navigation";
 import { deleteStockMovement } from "../lib/actions";
+import { DragHandle } from "../dataTable/data-table";
 
 export const columns: ColumnDef<StockMovementTableData>[] = [
+  {
+    id: "drag",
+    header: () => null,
+    cell: ({ row }) => <DragHandle id={row.original.id} />,
+  },
   {
     id: "select",
     header: ({ table }) => (
@@ -40,6 +46,7 @@ export const columns: ColumnDef<StockMovementTableData>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableColumnFilter: false,
   },
   {
     accessorKey: "date",
