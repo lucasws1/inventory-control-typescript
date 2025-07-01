@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 import { endOfMonth } from "date-fns/endOfMonth";
 import { startOfMonth } from "date-fns/startOfMonth";
 import CardFromTopCards from "./cardFromTopCards";
+import { CardBody, CardWithGridEllipsis } from "./cardWithGridEllipsis";
+import { Card } from "./ui/card";
+import { Button } from "./ui/button";
 
 const now = new Date();
 const firstDay = startOfMonth(now);
@@ -26,29 +29,34 @@ export default async function TopCards() {
     prisma.stockMovement.findMany(),
   ]);
 
+  const cardContent = {
+    title: "Vendas",
+    description: "Número mensal de vendas:",
+  };
+
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
       <CardFromTopCards
         title={"Vendas"}
         info={`${invoices.length}`}
-        subtitle={"Número mensal de"}
+        subtitle={"No mês"}
       />
 
       <CardFromTopCards
         title={"Clientes"}
         info={`${customers.length}`}
-        subtitle={"Cadastros de"}
+        subtitle={"Cadastrados"}
       />
 
       <CardFromTopCards
         title={"Produtos"}
         info={`${products.length}`}
-        subtitle={"Cadastros de"}
+        subtitle={"Cadastrados"}
       />
       <CardFromTopCards
         title={"Estoque"}
         info={`${stockMovements.length}`}
-        subtitle={"Movimentações de"}
+        subtitle={"Movimentações"}
       />
     </div>
   );

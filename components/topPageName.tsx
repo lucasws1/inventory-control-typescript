@@ -30,13 +30,14 @@ export default function TopPageName() {
       ) ?? { path: Path.Home, label: "Home", icon: <ChartNoAxesCombined /> };
 
   return (
-    <div className="flex items-center justify-center font-sans md:mx-auto md:max-w-[95%]">
+    <div className="flex items-center justify-center font-sans md:mx-auto">
       <div className="text-foreground items-center">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-neutral-400">
           {currentTitle.icon}
-
-          {/* <h1 className="bg-gradient-to-l from-zinc-600 via-stone-500 to-neutral-400 bg-clip-text text-3xl text-transparent"> */}
-          <h1 className="text-3xl">{currentTitle.label}</h1>
+          <h1 className="bg-gradient-to-l from-zinc-600 via-stone-500 to-neutral-400 bg-clip-text text-3xl text-transparent">
+            {currentTitle.label}
+          </h1>
+          {/* <h1 className="text-2xl">{currentTitle.label}</h1> */}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { columns, Invoice, Payment } from "./columns";
+import { columns, Invoice } from "./columns";
 import { DataTable } from "./data-table";
 
 async function getData(): Promise<Invoice[]> {
@@ -10,7 +10,7 @@ async function getData(): Promise<Invoice[]> {
       customer: "João",
       products: "caixa, papel",
       amount: 12000,
-      status: "pending",
+      pending: true,
       email: "joao@example.com",
     },
     {
@@ -19,7 +19,7 @@ async function getData(): Promise<Invoice[]> {
       customer: "João Paulo",
       products: "caixa, papel, tomate",
       amount: 15000,
-      status: "pending",
+      pending: false,
       email: "joaopaulo@example.com",
     },
     // ...
@@ -28,7 +28,7 @@ async function getData(): Promise<Invoice[]> {
 
 export default async function dataTablePage() {
   const data = (await getData()) as Invoice[];
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="mx-auto">

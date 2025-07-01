@@ -18,6 +18,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -29,8 +30,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/Pagination";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+// Mapeamento de traduções para os nomes das colunas
+const columnTranslations: Record<string, string> = {
+  select: "Seleção",
+  date: "Data",
+  product: "Produto",
+  quantity: "Quantidade",
+  reason: "Motivo",
+  actions: "Ações",
+  amount: "Valor",
+  customer: "Cliente",
+  email: "Email",
+  purchaseDate: "Data",
+};
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,17 +91,76 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const [selectedColumn, setSelectedColumn] = useState<string>(
+    table.getAllColumns()[1]?.id || "",
+  );
+  const [inputValue, setInputValue] = useState<string>("");
+
+  const getNumberRange = (input: string) => {
+    if (!input) return [undefined, undefined];
+    if (input.includes("-")) {
+      const [min, max] = input
+        .split("-")
+        .map((v) => (v ? Number(v) : undefined));
+      return [min, max];
+    }
+    const num = Number(input);
+    return [num, num];
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    const timeoutId = setTimeout(() => {
+      if (
+        table.getColumn(selectedColumn)?.columnDef.filterFn === "inNumberRange"
+      ) {
+        setColumnFilters([
+          { id: selectedColumn, value: getNumberRange(e.target.value) },
+        ]);
+      } else {
+        setColumnFilters([{ id: selectedColumn, value: e.target.value }]);
+      }
+    }, 1000);
+    return () => clearTimeout(timeoutId);
+  };
+
   return (
     <div>
       <div className="flex py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Filtrar..."
+            value={inputValue}
+            onChange={handleFilterChange}
+          />
+
+          <Select value={selectedColumn} onValueChange={setSelectedColumn}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione uma coluna">
+                {columnTranslations[selectedColumn] || selectedColumn}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanFilter())
+                  .map((column) => {
+                    return (
+                      <SelectItem
+                        key={column.id}
+                        value={column.id}
+                        className="capitalize"
+                      >
+                        {columnTranslations[column.id] || column.id}
+                      </SelectItem>
+                    );
+                  })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -104,17 +188,14 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="mx-auto w-full overflow-x-auto rounded-md border">
-        <Table className="w-full text-center">
-          <TableHeader className="bg-card text-center">
+      <div className="mx-auto w-full overflow-x-auto rounded-md border-2 border-neutral-900">
+        <Table className="w-full">
+          <TableHeader className="bg-card">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="text-center">
+              <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead
-                      key={header.id}
-                      className="justify-center text-center align-middle"
-                    >
+                    <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -133,12 +214,11 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="text-center"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="justify-center text-center align-middle"
+                      className="justify-center align-middle"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -154,34 +234,50 @@ export function DataTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Não foram encontrados resultados.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-between space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+        <div className="flex items-center">
+          <Pagination
+            currentPage={table.getState().pagination.pageIndex + 1}
+            totalPages={table.getPageCount() || 1}
+            onPageChange={(page) => table.setPageIndex(page - 1)}
+          />
+        </div>
+        {/* <div className="flex items-center space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeftIcon className="h-4 w-4" /> Anterior
+          </Button>
+          <div className="text-muted-foreground flex-1 text-sm">
+            Página{" "}
+            <Button variant={"outline"}>
+              {table.getState().pagination.pageIndex + 1}
+            </Button>
+            s de {table.getPageCount()}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Próximo <ChevronRightIcon className="h-4 w-4" />
+          </Button>
+        </div> */}
       </div>
     </div>
   );

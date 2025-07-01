@@ -1,8 +1,9 @@
+import NavigationBar from "@/components/navigationBar";
+import TopCards from "@/components/topCards";
+import TopPageName from "@/components/topPageName";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import TopPageName from "@/components/topPageName";
-import TopCards from "@/components/topCards";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,12 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        // className={`${geistSans.variable} ${geistMono.variable} dark mt-2 space-y-2 antialiased`}
-        className="dark mt-2 space-y-2 font-sans antialiased"
-      >
-        <div className="mx-2 space-y-6 font-sans md:mx-auto md:max-w-5xl">
-          <TopPageName />
+      <body className="dark">
+        <div className="mx-2 mt-2 space-y-4 lg:mx-auto lg:max-w-5xl">
+          <NavigationBar />
+          {/* <TopPageName /> */}
           <TopCards />
           {children}
         </div>

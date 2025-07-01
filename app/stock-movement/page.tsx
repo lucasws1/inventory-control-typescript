@@ -7,6 +7,8 @@ import { ProductsTableData } from "@/types/productsTableData";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { formatTableData } from "@/utils/formatTableData";
 import { Metadata } from "next";
+import { DataTable } from "../dataTable/data-table";
+import { columns } from "./columns";
 
 export const metadata: Metadata = {
   title: "Estoque",
@@ -23,11 +25,12 @@ const StockMovement = async () => {
       },
     });
 
-  const tableData = formatTableData(stockMovement, "stockMovement");
-
   return (
     <div>
-      <AllInOneTable tableData={tableData} />
+      <DataTable
+        columns={columns}
+        data={stockMovement as StockMovementTableData[]}
+      />
     </div>
   );
 };

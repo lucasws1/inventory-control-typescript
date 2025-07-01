@@ -67,7 +67,7 @@ export default function StockMovementEditForm({
     <div>
       {loading && <OverlaySpinner />}
 
-      <div className="mx-2 flex justify-center">
+      <div className="flex justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle>

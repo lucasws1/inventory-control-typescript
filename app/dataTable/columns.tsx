@@ -18,14 +18,23 @@ import { DataTableColumnHeader } from "@/components/data-table-column-header";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
+// export type Invoice = {
+//   id: number;
+//   purchaseDate: string;
+//   customer: string;
+//   products: string;
+//   pending: boolean;
+//   email: string;
+//   amount: number;
+// };
 export type Invoice = {
   id: number;
-  purchaseDate: string;
-  customer: string;
-  products: string;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
   amount: number;
+  purchaseDate: Date;
+  pending: boolean;
+  customerId: number;
+  customer: Customer;
+  InvoiceItem: InvoiceItem[];
 };
 
 export const columns: ColumnDef<Invoice>[] = [
@@ -65,7 +74,7 @@ export const columns: ColumnDef<Invoice>[] = [
       <DataTableColumnHeader
         column={column}
         title="Produtos"
-        className="w-full justify-center text-center"
+        className="w-full"
       />
     ),
   },
