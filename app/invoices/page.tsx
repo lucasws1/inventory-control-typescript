@@ -1,9 +1,8 @@
-import AllInOneTable from "@/components/allInOneTable";
-import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
 import { InvoicesTableData } from "@/types/invoicesTableData";
-import { formatTableData } from "@/utils/formatTableData";
 import { Metadata } from "next";
+import DataTableClient from "../dataTable/page";
+import { columns } from "./columns";
 
 export const metadata: Metadata = {
   title: "Faturas",
@@ -24,11 +23,9 @@ const Invoices = async () => {
     },
   });
 
-  const tableData = formatTableData(invoices, "invoice");
-
   return (
     <div>
-      <AllInOneTable tableData={tableData} />
+      <DataTableClient columns={columns} data={invoices} />
     </div>
   );
 };

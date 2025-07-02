@@ -1,13 +1,7 @@
-import AllInOneTable from "@/components/allInOneTable";
-import TopCards from "@/components/topCards";
 import prisma from "@/lib/prisma";
-import { InvoicesTableData } from "@/types/invoicesTableData";
-import { Product } from "@/types/product";
-import { ProductsTableData } from "@/types/productsTableData";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
-import { formatTableData } from "@/utils/formatTableData";
 import { Metadata } from "next";
-import { DataTable } from "../dataTable/data-table";
+import DataTableClient from "../dataTable/page";
 import { columns } from "./columns";
 
 export const metadata: Metadata = {
@@ -26,12 +20,9 @@ const StockMovement = async () => {
     });
 
   return (
-    <div>
-      <DataTable
-        columns={columns}
-        data={stockMovement as StockMovementTableData[]}
-      />
-    </div>
+    <>
+      <DataTableClient columns={columns} data={stockMovement} />
+    </>
   );
 };
 

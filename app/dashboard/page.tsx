@@ -1,58 +1,23 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-// import { DataTable } from "@/components/data-table";
-import { SectionCards } from "@/components/section-cards";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Spinner, SpinnerProps } from "@/components/spinners";
 
-// import data from "./data.json";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
-import { DataTable } from "../dataTable/data-table";
-import { columns } from "../stock-movement/columns";
-import prisma from "@/lib/prisma";
-import { DataTable as DataTable2 } from "@/components/data-table";
-import data from "./data.json";
+export default function Dashboard() {
+  const variants = [
+    "default",
+    "circle",
+    "pinwheel",
+    "circle-filled",
+    "ellipsis",
+    "ring",
+    "bars",
+    "infinite",
+  ];
 
-export default async function Page() {
-  const stockMovement: StockMovementTableData[] =
-    await prisma.stockMovement.findMany({
-      orderBy: {
-        date: "desc",
-      },
-      include: {
-        Product: true,
-      },
-    });
-
+  const randomVariant = variants[
+    Math.floor(Math.random() * variants.length)
+  ] as SpinnerProps["variant"];
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
-              <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
-
-                <DataTable
-                  columns={columns}
-                  data={stockMovement as StockMovementTableData[]}
-                />
-              </div>
-              <DataTable2 data={data} />
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="absolute inset-0 flex h-screen items-center justify-center gap-4 bg-black/80">
+      <Spinner variant={randomVariant} size={100} />
+    </div>
   );
 }

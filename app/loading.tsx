@@ -1,13 +1,17 @@
 "use client";
 
-import { Card, CardHeader, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Loading = () => {
   return (
-    <div className="mx-2 space-y-4 font-sans md:mx-auto">
-      {/* TopCards Skeleton - 4 cards específicos da página de faturas */}
-
+    <div className="mx-2 space-y-4 py-4 font-sans md:mx-auto">
+      <div className="flex justify-between gap-2">
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-54" />
+          <Skeleton className="h-9 w-40" />
+        </div>
+        <Skeleton className="h-9 w-26" />
+      </div>
       {/* Table Skeleton - específico para tabela de faturas */}
       <div className="rounded-md border">
         <div className="overflow-x-auto">

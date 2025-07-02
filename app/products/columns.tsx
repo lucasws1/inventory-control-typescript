@@ -19,8 +19,9 @@ import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { DragHandle } from "../dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
+import { ProductsTableData } from "@/types/productsTableData";
 
-export const columns: ColumnDef<CustomerTableData>[] = [
+export const columns: ColumnDef<ProductsTableData>[] = [
   {
     id: "drag",
     header: () => null,
@@ -65,32 +66,22 @@ export const columns: ColumnDef<CustomerTableData>[] = [
     filterFn: "includesString",
   },
   {
-    accessorKey: "email",
+    accessorKey: "price",
     header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="E-mail"
-        className="w-full"
-      />
+      <DataTableColumnHeader column={column} title="Preço" className="w-full" />
     ),
     cell: ({ row }) => {
-      const email = row.original.email;
-      return <div>{email ? email : "E-mail não cadastrado"}</div>;
-    },
-    filterFn: "includesString",
-  },
-  {
-    accessorKey: "phone",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="Telefone"
-        className="w-full"
-      />
-    ),
-    cell: ({ row }) => {
-      const phone = row.original.phone;
-      return <div>{phone}</div>;
+      const price = row.original.price;
+      return (
+        <div>
+          {price
+            ? price.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })
+            : "Preço não cadastrado"}
+        </div>
+      );
     },
     filterFn: "includesString",
   },
@@ -104,7 +95,7 @@ export const columns: ColumnDef<CustomerTableData>[] = [
       />
     ),
     cell: ({ row }) => {
-      const date = row.original.createdAt;
+      const date = row.original.createdAt ? row.original.createdAt : new Date();
       return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
@@ -123,7 +114,8 @@ export const columns: ColumnDef<CustomerTableData>[] = [
       />
     ),
     cell: ({ row }) => {
-      const date = row.original.updatedAt;
+      const date = row.original.updatedAt ? row.original.updatedAt : new Date();
+
       return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
@@ -133,51 +125,33 @@ export const columns: ColumnDef<CustomerTableData>[] = [
     },
   },
   {
-    accessorKey: "Invoice",
-    header: "Status",
+    id: "Estoque",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Estoque"
+        className="w-full"
+      />
+    ),
+    accessorKey: "StockMovement",
     cell: ({ row }) => (
       <Badge
         variant="outline"
         className="text-muted-foreground flex items-center gap-2 px-1.5"
       >
-        {row.original.Invoice ? (
-          row.original.Invoice.find((item) => item.pending) ? (
-            // If any invoice is pending, show loading icon
-            <IconLoader className="animate-spin" />
-          ) : (
-            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+        {row.original.StockMovement.length > 0 ? (
+          row.original.StockMovement.reduce(
+            (acc, item) =>
+              item.reason === "COMPRA" || item.reason === "AJUSTE_POSITIVO"
+                ? acc + item.quantity
+                : acc - item.quantity,
+            0,
           )
         ) : (
-          "Nenhuma fatura"
+          <span>0</span>
         )}
-        {row.original.Invoice.find((item) => item.pending)
-          ? "Pendente"
-          : "Pago"}
       </Badge>
     ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Valor</div>,
-    cell: ({ row }) => {
-      const amount = row.original.Invoice.reduce(
-        (acc, invoice) => invoice.amount + acc,
-        0,
-      );
-      // If amount is null or undefined, return a default value
-      if (amount === null || amount === undefined) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
-      // If amount is not a number, return a default value
-      if (isNaN(amount)) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
-      const formatted = new Intl.NumberFormat("pt-br", {
-        style: "currency",
-        currency: "BRL",
-      }).format(amount);
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
   },
 
   {
@@ -210,7 +184,7 @@ export const columns: ColumnDef<CustomerTableData>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push(`/customer/${customer.id}`)}
+              onClick={() => router.push(`/invoices/${customer.id}`)}
             >
               Editar
             </DropdownMenuItem>

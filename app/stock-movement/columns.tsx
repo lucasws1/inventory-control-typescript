@@ -1,23 +1,74 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
-import { redirect } from "next/navigation";
 import { deleteStockMovement } from "../lib/actions";
 import { DragHandle } from "../dataTable/data-table";
+import { Badge } from "@/components/ui/badge";
+
+// Componente para as ações da linha
+function StockMovementActions({
+  stockMovement,
+}: {
+  stockMovement: StockMovementTableData;
+}) {
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    await deleteStockMovement(stockMovement.id);
+    router.refresh();
+  };
+
+  const handleEdit = () => {
+    router.push(`/stock-movement/${stockMovement.id}`);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-5 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() =>
+            navigator.clipboard.writeText(stockMovement.id.toString())
+          }
+        >
+          Copiar ID
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => handleEdit()}
+        >
+          Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => handleDelete()}
+        >
+          Deletar
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export const columns: ColumnDef<StockMovementTableData>[] = [
   {
@@ -28,21 +79,25 @@ export const columns: ColumnDef<StockMovementTableData>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -77,6 +132,21 @@ export const columns: ColumnDef<StockMovementTableData>[] = [
     filterFn: "includesString",
   },
   {
+    accessorKey: "reason",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tipo" className="w-full" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="w-32">
+          <Badge variant="outline" className="text-muted-foreground px-1.5">
+            {row.original.reason}
+          </Badge>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "quantity",
     header: ({ column }) => (
       <DataTableColumnHeader
@@ -91,58 +161,11 @@ export const columns: ColumnDef<StockMovementTableData>[] = [
     },
     filterFn: "inNumberRange",
   },
-  {
-    accessorKey: "reason",
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title="Motivo"
-        className="w-full"
-      />
-    ),
-  },
 
   {
     id: "actions",
     cell: ({ row }) => {
-      const stockMovement = row.original;
-      const handleDelete = async () => {
-        await deleteStockMovement(stockMovement.id);
-        redirect("/stock-movement");
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-5 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(stockMovement.id.toString())
-              }
-            >
-              Copiar ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => redirect(`/stock-movement/${stockMovement.id}`)}
-            >
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => handleDelete()}
-            >
-              Deletar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <StockMovementActions stockMovement={row.original} />;
     },
   },
   // {
