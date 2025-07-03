@@ -16,7 +16,7 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { deleteStockMovement } from "../lib/actions";
-import { DragHandle } from "../dataTable/data-table";
+import { DragHandle } from "../_dataTable/data-table";
 import { Badge } from "@/components/ui/badge";
 
 // Componente para as ações da linha

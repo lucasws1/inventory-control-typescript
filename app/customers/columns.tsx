@@ -17,7 +17,7 @@ import {
 import { CustomerTableData } from "@/types/customerTableData";
 import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { DragHandle } from "../dataTable/data-table";
+import { DragHandle } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
 
 export const columns: ColumnDef<CustomerTableData>[] = [

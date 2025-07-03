@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { useRouter } from "next/navigation";
-import { DragHandle } from "../dataTable/data-table";
+import { DragHandle } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
 import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
 
@@ -149,9 +149,7 @@ export const columns: ColumnDef<InvoicesTableData>[] = [
 
       const handleEdit = () => {
         // Navega para a mesma página com o parâmetro edit
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set("edit", invoice.id.toString());
-        router.push(currentUrl.toString(), { scroll: false });
+        router.push(`/invoices/${invoice.id}`);
       };
 
       return (

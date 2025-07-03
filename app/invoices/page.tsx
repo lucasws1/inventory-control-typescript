@@ -1,31 +1,36 @@
 import prisma from "@/lib/prisma";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { Metadata } from "next";
-import DataTableClient from "../dataTable/page";
-import { columns } from "./columns";
+import InvoicesWithModal from "./InvoicesWithModal";
 
 export const metadata: Metadata = {
   title: "Faturas",
 };
 
 const Invoices = async () => {
-  const invoices: InvoicesTableData[] = await prisma.invoice.findMany({
-    orderBy: {
-      purchaseDate: "desc",
-    },
-    include: {
-      customer: true,
-      InvoiceItem: {
-        include: {
-          Product: true,
+  const [invoices, products] = await Promise.all([
+    prisma.invoice.findMany({
+      orderBy: {
+        purchaseDate: "desc",
+      },
+      include: {
+        customer: true,
+        InvoiceItem: {
+          include: {
+            Product: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.product.findMany(),
+  ]);
 
   return (
     <div>
-      <DataTableClient columns={columns} data={invoices} />
+      <InvoicesWithModal
+        invoices={invoices as InvoicesTableData[]}
+        products={products as any[]}
+      />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { Metadata } from "next";
-import DataTableClient from "../dataTable/page";
+import DataTableClient from "../_dataTable/page";
 import { columns } from "./columns";
 
 export const metadata: Metadata = {

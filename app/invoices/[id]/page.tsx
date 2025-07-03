@@ -1,6 +1,4 @@
 import prisma from "@/lib/prisma";
-import { Invoice } from "@/types/invoice";
-import { Product } from "@/types/product";
 import { Metadata } from "next";
 import InvoiceEditForm from "./InvoiceEditForm";
 
@@ -36,9 +34,6 @@ export default async function InvoicePage({
   }
 
   return (
-    <InvoiceEditForm
-      products={products as Product[]}
-      invoice={invoice as Invoice}
-    />
+    <InvoiceEditForm products={products as any} invoice={invoice as any} />
   );
 }
