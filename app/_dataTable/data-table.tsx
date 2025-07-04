@@ -65,13 +65,18 @@ import {
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconEdit,
   IconGripVertical,
   IconLayoutColumns,
   IconPlus,
+  IconTrash,
 } from "@tabler/icons-react";
-import NewProduct from "../products/new-product/page";
 import { usePathname } from "next/navigation";
-import NewCustomer from "../customers/new-customer/page";
+import { useModal } from "@/contexts/ModalContext";
+import { Customer } from "@/types/customer";
+import { Product } from "@/types/product";
+import { Invoice } from "@/types/invoice";
+import { StockMovement } from "@/types/stockMovement";
 
 // Create a separate component for the drag handle
 export function DragHandle({ id }: { id: number }) {
@@ -153,24 +158,21 @@ export function DataTable<TData extends RowWithId, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
   const pathname = usePathname();
+  const { openModal } = useModal();
 
-  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-
-  const handleNewCustomer = () => {
-    setIsNewCustomerModalOpen(true);
-  };
-
-  const handleCloseCustomerModal = () => {
-    setIsNewCustomerModalOpen(false);
-  };
-
-  const handleNewProduct = () => {
-    setIsModalOpen(true);
-    setIsNewProductModalOpen(true);
-  };
+  const handleNewCustomer = () => openModal("new-customer");
+  const handleNewProduct = () => openModal("new-product");
+  const handleNewInvoice = () => openModal("new-invoice");
+  const handleNewStockMovement = () => openModal("new-stock-movement");
+  const handleEditCustomer = (customer: Customer) =>
+    openModal("edit-customer", customer);
+  const handleEditProduct = (product: Product) =>
+    openModal("edit-product", product);
+  const handleEditInvoice = (invoice: Invoice) =>
+    openModal("edit-invoice", invoice);
+  const handleEditStockMovement = (stockMovement: StockMovement) =>
+    openModal("edit-stock-movement", stockMovement);
 
   const sortableId = useId();
   const sensors = useSensors(
@@ -287,19 +289,63 @@ export function DataTable<TData extends RowWithId, TValue>({
           </div>
           <div className="flex items-center gap-2">
             <Button
-              onClick={() =>
-                pathname === "products"
-                  ? handleNewProduct()
-                  : handleNewCustomer()
+              onClick={
+                pathname === "/products"
+                  ? handleNewProduct
+                  : pathname === "/customers"
+                    ? handleNewCustomer
+                    : pathname === "/invoices"
+                      ? handleNewInvoice
+                      : pathname === "/stock-movement"
+                        ? handleNewStockMovement
+                        : undefined
               }
             >
               <IconPlus />
-              Adicionar {pathname === "/products" ? "Produto" : "Cliente"}
+              Adicionar{" "}
+              {pathname === "/products"
+                ? "Produto"
+                : pathname === "/customers"
+                  ? "Cliente"
+                  : pathname === "/invoices"
+                    ? "Venda"
+                    : pathname === "/stock-movement"
+                      ? "Estoque"
+                      : ""}
+            </Button>
+            <Button
+              variant="outline"
+              disabled={table.getFilteredSelectedRowModel().rows.length !== 1}
+              onClick={() => {
+                const row = table.getFilteredSelectedRowModel().rows[0];
+                if (row) {
+                  if (pathname === "/products") {
+                    handleEditProduct(row.original as unknown as Product);
+                  } else if (pathname === "/customers") {
+                    handleEditCustomer(row.original as unknown as Customer);
+                  } else if (pathname === "/invoices") {
+                    handleEditInvoice(row.original as unknown as Invoice);
+                  } else if (pathname === "/stock-movement") {
+                    handleEditStockMovement(
+                      row.original as unknown as StockMovement,
+                    );
+                  }
+                }
+              }}
+            >
+              <IconEdit />
+              Editar
+            </Button>
+            <Button
+              variant="outline"
+              disabled={table.getFilteredSelectedRowModel().rows.length === 0}
+            >
+              <IconTrash /> Deletar
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">
+                <Button variant="outline">
                   <IconLayoutColumns /> Colunas
                 </Button>
               </DropdownMenuTrigger>
@@ -457,18 +503,6 @@ export function DataTable<TData extends RowWithId, TValue>({
           </div>
         </div>
       </div>
-      {isModalOpen && isNewProductModalOpen && (
-        <NewProduct
-          isModal={true}
-          onClose={() => {
-            setIsModalOpen(false);
-            setIsNewProductModalOpen(false);
-          }}
-        />
-      )}
-      {isNewCustomerModalOpen && (
-        <NewCustomer isModal={true} onClose={handleCloseCustomerModal} />
-      )}
     </>
   );
 }

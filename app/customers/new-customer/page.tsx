@@ -92,7 +92,7 @@ export default function NewCustomer({
                   type="button"
                   variant="outline"
                   className="w-full cursor-pointer"
-                  onClick={handleReturn}
+                  onClick={handleCloseModal}
                 >
                   {isModal ? "Fechar janela" : "Retornar à lista de clientes"}
                 </Button>

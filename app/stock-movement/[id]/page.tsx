@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import StockMovementEditForm from "./StockMovementEditForm";
+import StockMovementEditPage from "./StockMovementEditPage";
 import { StockMovement } from "@/types/stockMovement";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default async function StockMovementPage({
   });
 
   return (
-    <StockMovementEditForm
+    <StockMovementEditPage
       stockMovement={stockMovement as unknown as StockMovement}
     />
   );

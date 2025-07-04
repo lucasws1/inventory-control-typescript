@@ -12,33 +12,24 @@ import { ColumnDef } from "@tanstack/react-table";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteCustomer } from "../lib/actions";
 import { columns } from "./columns";
-import CustomerEditForm from "./[id]/CustomerEditForm";
 import { Customer } from "@/types/customer";
 import { CustomerTableData } from "@/types/customerTableData";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function CustomersWithModal({
   customers,
 }: {
   customers: Customer[];
 }) {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null,
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { openModal } = useModal();
   const router = useRouter();
 
   const handleEditCustomer = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedCustomer(null);
+    openModal("edit-customer", customer);
   };
 
   // Modificar apenas a coluna de actions para usar nosso handler
@@ -103,15 +94,6 @@ export default function CustomersWithModal({
     <>
       {/* Tabela sempre visível */}
       <DataTableClient columns={columnsWithModalEdit} data={customers} />
-
-      {/* Modal overlay */}
-      {isModalOpen && selectedCustomer && (
-        <CustomerEditForm
-          customer={selectedCustomer as any}
-          isModal={true}
-          onClose={handleCloseModal}
-        />
-      )}
     </>
   );
 }

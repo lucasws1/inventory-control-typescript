@@ -11,32 +11,24 @@ import { StockMovement } from "@/types/stockMovement";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteStockMovement } from "../lib/actions";
 import { columns } from "./columns";
-import StockMovementEditForm from "./[id]/StockMovementEditForm";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function StockMovementWithModal({
   stockMovements,
 }: {
   stockMovements: StockMovement[];
 }) {
-  const [selectedStockMovement, setSelectedStockMovement] =
-    useState<StockMovement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { openModal } = useModal();
   const router = useRouter();
 
   const handleEditStockMovement = (stockMovement: StockMovement) => {
-    setSelectedStockMovement(stockMovement);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedStockMovement(null);
+    openModal("edit-stock-movement", stockMovement);
   };
 
   // Modificar apenas a coluna de actions para usar nosso handler
@@ -101,15 +93,6 @@ export default function StockMovementWithModal({
     <>
       {/* Tabela sempre visível */}
       <DataTableClient columns={columnsWithModalEdit} data={stockMovements} />
-
-      {/* Modal overlay */}
-      {isModalOpen && selectedStockMovement && (
-        <StockMovementEditForm
-          stockMovement={selectedStockMovement as any}
-          isModal={true}
-          onClose={handleCloseModal}
-        />
-      )}
     </>
   );
 }

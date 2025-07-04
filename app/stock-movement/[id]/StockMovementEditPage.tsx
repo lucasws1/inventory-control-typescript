@@ -2,20 +2,21 @@
 import { updateStockMovement } from "@/app/lib/actions";
 import OverlaySpinner from "@/components/overlaySpinner";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { StockMovement } from "@/types/stockMovement";
-import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
-import extenso from "extenso";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -25,23 +26,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ChevronDownIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import Form from "next/form";
-import { IconX } from "@tabler/icons-react";
 import { useDraggable } from "@/hooks/useDraggable";
+import { IconX } from "@tabler/icons-react";
+import extenso from "extenso";
+import { ChevronDownIcon } from "lucide-react";
+import Form from "next/form";
+import { useRouter } from "next/navigation";
+import { useActionState, useState } from "react";
 
-export default function StockMovementEditForm({
+export default function StockMovementEditPage({
   stockMovement,
   isModal = false,
   onClose,
 }: {
-  stockMovement: StockMovement;
+  stockMovement: any;
   isModal?: boolean;
   onClose?: () => void;
 }) {
@@ -81,14 +79,13 @@ export default function StockMovementEditForm({
       <div className="flex justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>
+            <CardTitle>Editar movimento de estoque</CardTitle>
+            <CardDescription>
               {stockMovement?.reason.charAt(0).toUpperCase() +
                 stockMovement.reason.slice(1).toLocaleLowerCase()}{" "}
               de {extenso(stockMovement.quantity, { number: { gender: "f" } })}{" "}
-              {stockMovement.Product.name}
-            </CardTitle>
-            <CardDescription>
-              Em {stockMovement?.date.toLocaleDateString("pt-BR")}
+              {stockMovement.Product.name} em{" "}
+              {stockMovement?.date.toLocaleDateString("pt-BR")}
             </CardDescription>
           </CardHeader>
           <CardContent>

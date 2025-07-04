@@ -14,19 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import { Customer } from "@/types/customer";
+import { InvoiceItem } from "@/types/invoiceItem";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-
-// export type Invoice = {
-//   id: number;
-//   purchaseDate: string;
-//   customer: string;
-//   products: string;
-//   pending: boolean;
-//   email: string;
-//   amount: number;
-// };
 export type Invoice = {
   id: number;
   amount: number;
@@ -108,7 +98,9 @@ export const columns: ColumnDef<Invoice>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() =>
+                navigator.clipboard.writeText(payment.id.toString())
+              }
             >
               Copy payment ID
             </DropdownMenuItem>

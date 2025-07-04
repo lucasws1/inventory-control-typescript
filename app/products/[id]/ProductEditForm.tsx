@@ -22,7 +22,7 @@ export default function ProductEditForm({
   isModal = false,
   onClose,
 }: {
-  product: { id: number; name: string; price: number } | null;
+  product?: { id: number; name: string; price: number } | null;
   isModal?: boolean;
   onClose?: () => void;
 }) {
@@ -30,6 +30,10 @@ export default function ProductEditForm({
   const [loading, setLoading] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
+
+  if (!product) {
+    return;
+  }
 
   const handleCloseModal = () => {
     if (onClose) {

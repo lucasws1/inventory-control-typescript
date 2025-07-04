@@ -12,12 +12,12 @@ import { Product } from "@/types/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteInvoice } from "../lib/actions";
-import InvoiceEditForm from "./[id]/InvoiceEditForm";
 import { columns } from "./columns";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { useModal } from "@/contexts/ModalContext";
 
 export default function InvoicesWithModal({
   invoices,
@@ -26,19 +26,11 @@ export default function InvoicesWithModal({
   invoices: InvoicesTableData[];
   products: Product[];
 }) {
-  const [selectedInvoice, setSelectedInvoice] =
-    useState<InvoicesTableData | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { openModal } = useModal();
   const router = useRouter();
 
   const handleEditInvoice = (invoice: InvoicesTableData) => {
-    setSelectedInvoice(invoice);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedInvoice(null);
+    openModal("edit-invoice", invoice);
   };
 
   // Modificar apenas a coluna de actions para usar nosso handler
@@ -103,16 +95,6 @@ export default function InvoicesWithModal({
     <>
       {/* Tabela sempre visível */}
       <DataTableClient columns={columnsWithModalEdit} data={invoices} />
-
-      {/* Modal overlay */}
-      {isModalOpen && selectedInvoice && (
-        <InvoiceEditForm
-          invoice={selectedInvoice as any}
-          products={products}
-          isModal={true}
-          onClose={handleCloseModal}
-        />
-      )}
     </>
   );
 }

@@ -31,9 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState } from "react";
-import NewCustomer from "@/app/customers/new-customer/page";
-import NewProduct from "@/app/products/new-product/page";
+import { useModal } from "@/contexts/ModalContext";
 
 export function NavMain({
   items,
@@ -46,23 +44,22 @@ export function NavMain({
 }) {
   const pathName = usePathname();
   const isMobile = useIsMobile();
-  const [isNewCustomerModalOpen, setIsNewCustomerModalOpen] = useState(false);
-  const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
+  const { openModal } = useModal();
 
   const handleNewCustomer = () => {
-    setIsNewCustomerModalOpen(true);
-  };
-
-  const handleCloseCustomerModal = () => {
-    setIsNewCustomerModalOpen(false);
+    openModal("new-customer");
   };
 
   const handleNewProduct = () => {
-    setIsNewProductModalOpen(true);
+    openModal("new-product");
   };
 
-  const handleCloseProductModal = () => {
-    setIsNewProductModalOpen(false);
+  const handleNewStockMovement = () => {
+    openModal("new-stock-movement");
+  };
+
+  const handleNewInvoice = () => {
+    openModal("new-invoice");
   };
 
   return (
@@ -125,12 +122,22 @@ export function NavMain({
                         <IconPlus />
                         <span>Novo</span>
                       </DropdownMenuItem>
-                    ) : (
+                    ) : item.title === "Estoque" ? (
+                      <DropdownMenuItem onClick={handleNewStockMovement}>
+                        <IconPlus />
+                        <span>Novo</span>
+                      </DropdownMenuItem>
+                    ) : item.title === "Produtos" ? (
                       <DropdownMenuItem onClick={handleNewProduct}>
                         <IconPlus />
                         <span>Novo</span>
                       </DropdownMenuItem>
-                    )}
+                    ) : item.title === "Vendas" ? (
+                      <DropdownMenuItem onClick={handleNewInvoice}>
+                        <IconPlus />
+                        <span>Novo</span>
+                      </DropdownMenuItem>
+                    ) : null}
                     <DropdownMenuItem>
                       <IconEdit />
                       <span>Editar</span>
@@ -147,16 +154,6 @@ export function NavMain({
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-
-      {/* Modal de novo cliente */}
-      {isNewCustomerModalOpen && (
-        <NewCustomer isModal={true} onClose={handleCloseCustomerModal} />
-      )}
-
-      {/* Modal de novo produto */}
-      {isNewProductModalOpen && (
-        <NewProduct isModal={true} onClose={handleCloseProductModal} />
-      )}
     </>
   );
 }
