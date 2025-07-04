@@ -2,7 +2,6 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +14,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CustomerTableData } from "@/types/customerTableData";
-import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
+import {
+  IconCircleCheckFilled,
+  IconCopy,
+  IconEdit,
+  IconLoader,
+} from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { DragHandle } from "../_dataTable/data-table";
-import { deleteInvoice } from "../lib/actions";
+import { deleteProduct } from "../lib/actions";
 import { ProductsTableData } from "@/types/productsTableData";
 
 export const columns: ColumnDef<ProductsTableData>[] = [
@@ -157,11 +163,11 @@ export const columns: ColumnDef<ProductsTableData>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const customer = row.original;
+      const product = row.original;
       const router = useRouter();
 
       const handleDelete = async () => {
-        await deleteInvoice(customer.id);
+        await deleteProduct(product.id);
         router.refresh();
       };
 
@@ -176,23 +182,27 @@ export const columns: ColumnDef<ProductsTableData>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(customer.id.toString())
+                navigator.clipboard.writeText(product.id.toString())
               }
             >
-              Copiar ID
+              <IconCopy />
+              <span>Copiar ID</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => router.push(`/products/${product.id}`)}
+            >
+              <IconEdit />
+              <span>Editar</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push(`/invoices/${customer.id}`)}
-            >
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer"
               onClick={() => handleDelete()}
             >
-              Deletar
+              <IconTrash />
+              <span>Deletar</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

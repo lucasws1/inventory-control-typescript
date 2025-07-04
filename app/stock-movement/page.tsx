@@ -1,8 +1,7 @@
 import prisma from "@/lib/prisma";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { Metadata } from "next";
-import DataTableClient from "../_dataTable/page";
-import { columns } from "./columns";
+import StockMovementWithModal from "./StockMovementWithModal";
 
 export const metadata: Metadata = {
   title: "Estoque",
@@ -21,7 +20,7 @@ const StockMovement = async () => {
 
   return (
     <>
-      <DataTableClient columns={columns} data={stockMovement} />
+      <StockMovementWithModal stockMovements={stockMovement as any[]} />
     </>
   );
 };

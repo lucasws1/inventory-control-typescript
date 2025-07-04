@@ -129,7 +129,7 @@ export default function StockMovementForm({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-auto overflow-hidden p-0"
+                    className="scrollbar-hidden w-auto overflow-hidden p-0"
                     align="start"
                   >
                     <Calendar

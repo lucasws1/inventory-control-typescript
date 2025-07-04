@@ -8,5 +8,9 @@ export default function DataTableClient({
   columns: any;
   data: any;
 }) {
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <div className="relative">
+      <DataTable columns={columns} data={data} />
+    </div>
+  );
 }

@@ -7,38 +7,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InvoicesTableData } from "@/types/invoicesTableData";
 import { Product } from "@/types/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import DataTableClient from "../_dataTable/page";
-import { deleteInvoice } from "../lib/actions";
-import InvoiceEditForm from "./[id]/InvoiceEditForm";
+import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
+import ProductEditForm from "./[id]/ProductEditForm";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { ProductsTableData } from "@/types/productsTableData";
 
-export default function InvoicesWithModal({
-  invoices,
+export default function ProductsWithModal({
   products,
 }: {
-  invoices: InvoicesTableData[];
   products: Product[];
 }) {
-  const [selectedInvoice, setSelectedInvoice] =
-    useState<InvoicesTableData | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const handleEditInvoice = (invoice: InvoicesTableData) => {
-    setSelectedInvoice(invoice);
+  const handleEditProduct = (product: Product) => {
+    setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedInvoice(null);
+    setSelectedProduct(null);
   };
 
   // Modificar apenas a coluna de actions para usar nosso handler
@@ -48,10 +45,10 @@ export default function InvoicesWithModal({
         return {
           ...column,
           cell: ({ row }: any) => {
-            const invoice = row.original;
+            const product = row.original;
 
             const handleDelete = async () => {
-              await deleteInvoice(invoice.id);
+              await deleteProduct(product.id);
               router.refresh();
             };
 
@@ -66,7 +63,7 @@ export default function InvoicesWithModal({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onClick={() =>
-                      navigator.clipboard.writeText(invoice.id.toString())
+                      navigator.clipboard.writeText(product.id.toString())
                     }
                   >
                     <IconCopy />
@@ -75,7 +72,7 @@ export default function InvoicesWithModal({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => handleEditInvoice(invoice)}
+                    onClick={() => handleEditProduct(product)}
                   >
                     <IconEdit />
                     <span>Editar</span>
@@ -93,7 +90,7 @@ export default function InvoicesWithModal({
               </DropdownMenu>
             );
           },
-        } as ColumnDef<InvoicesTableData>;
+        } as ColumnDef<ProductsTableData>;
       }
       return column;
     });
@@ -102,13 +99,12 @@ export default function InvoicesWithModal({
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={invoices} />
+      <DataTableClient columns={columnsWithModalEdit} data={products} />
 
       {/* Modal overlay */}
-      {isModalOpen && selectedInvoice && (
-        <InvoiceEditForm
-          invoice={selectedInvoice as any}
-          products={products}
+      {isModalOpen && selectedProduct && (
+        <ProductEditForm
+          product={selectedProduct as any}
           isModal={true}
           onClose={handleCloseModal}
         />

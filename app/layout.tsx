@@ -31,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="dark">
+    <html lang="en" className="scrollbar-hidden">
+      <body className="dark scrollbar-hidden">
         <SidebarProvider
           style={
             {
@@ -42,10 +42,10 @@ export default function RootLayout({
           }
         >
           <AppSidebar variant="inset" />
-          <SidebarInset>
+          <SidebarInset className="scrollbar-hidden">
             <SiteHeader />
-            <div className="flex flex-1 flex-col">
-              <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="scrollbar-hidden flex flex-1 flex-col">
+              <div className="scrollbar-hidden @container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                   <SectionCards />
                   <div className="px-4 lg:px-6">

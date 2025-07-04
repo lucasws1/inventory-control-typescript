@@ -33,17 +33,24 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import Form from "next/form";
+import { IconX } from "@tabler/icons-react";
+import { useDraggable } from "@/hooks/useDraggable";
 
 export default function StockMovementEditForm({
   stockMovement,
+  isModal = false,
+  onClose,
 }: {
   stockMovement: StockMovement;
+  isModal?: boolean;
+  onClose?: () => void;
 }) {
   const [state, formAction, pending] = useActionState(
     updateStockMovement,
     null,
   );
   const [loading, setLoading] = useState(false);
+  const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
   const [openDate, setOpenDate] = useState(false);
   const [dateValue, setDateValue] = useState<Date>(new Date());
@@ -59,11 +66,15 @@ export default function StockMovementEditForm({
     "OUTRO",
   ];
 
-  const handleReturn = () => {
-    setLoading(true);
-    router.push("/stock-movement");
+  const handleCloseModal = () => {
+    if (onClose) {
+      onClose();
+    } else if (isModal) {
+      router.push("/stock-movement");
+    }
   };
-  return (
+
+  const renderForm = () => (
     <div>
       {loading && <OverlaySpinner />}
 
@@ -132,7 +143,7 @@ export default function StockMovementEditForm({
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-auto overflow-hidden p-0"
+                      className="scrollbar-hidden w-auto overflow-hidden p-0"
                       align="start"
                     >
                       <Calendar
@@ -159,16 +170,16 @@ export default function StockMovementEditForm({
                   <Button
                     type="submit"
                     className="w-full cursor-pointer"
-                    onClick={handleReturn}
+                    onClick={handleCloseModal}
                   >
                     Enviar
                   </Button>
                   <Button
                     variant="outline"
                     className="w-full cursor-pointer"
-                    onClick={handleReturn}
+                    onClick={handleCloseModal}
                   >
-                    Retornar para estoque
+                    Fechar janela
                   </Button>
                 </div>
               </div>
@@ -177,5 +188,46 @@ export default function StockMovementEditForm({
         </Card>
       </div>
     </div>
+  );
+
+  // Retorna o formulário em modal ou modo normal
+  if (isModal) {
+    return (
+      <>
+        {loading ? <OverlaySpinner /> : ""}
+
+        {/* Modal Backdrop */}
+        <div
+          className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            {...dragHandleProps}
+            style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+          >
+            {/* Close button - DENTRO do card para não sumir */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-1 right-2 z-10 h-4 w-4 rounded-sm hover:text-red-500"
+              onClick={handleCloseModal}
+            >
+              <IconX className="h-2 w-2" />
+            </Button>
+
+            {renderForm()}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
+    </>
   );
 }

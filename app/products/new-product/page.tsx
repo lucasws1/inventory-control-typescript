@@ -22,21 +22,34 @@ import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 import { createProduct } from "@/app/lib/actions";
 import { useRouter } from "next/navigation";
+import { IconX } from "@tabler/icons-react";
+import { useDraggable } from "@/hooks/useDraggable";
+import { createPortal } from "react-dom";
 
-export default function NewProduct() {
+export default function NewProduct({
+  isModal = false,
+  onClose,
+}: {
+  isModal?: boolean;
+  onClose?: () => void;
+}) {
   const [state, formAction, pending] = useActionState(createProduct, null);
   const [dateValue, setDateValue] = useState(new Date());
   const [openDate, setOpenDate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
 
-  const handleReturn = () => {
-    setLoading(true);
-    router.push("/products");
+  const handleCloseModal = () => {
+    if (onClose) {
+      onClose();
+    } else if (isModal) {
+      router.push("/products");
+    }
   };
 
-  return (
-    <>
+  const renderForm = () => (
+    <div>
       {loading ? <OverlaySpinner /> : ""}
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
@@ -107,23 +120,71 @@ export default function NewProduct() {
                 </Popover>
               </div>
               <div className="relative flex flex-col gap-2">
-                <Button type="submit" className="w-full cursor-pointer">
+                <Button
+                  type="submit"
+                  onClick={() => handleCloseModal()}
+                  className="w-full cursor-pointer"
+                >
                   Cadastrar
                 </Button>
 
                 <Button
-                  onClick={handleReturn}
+                  onClick={() => handleCloseModal()}
                   type="button"
                   variant="outline"
                   className="w-full cursor-pointer"
                 >
-                  Retornar à lista de produtos
+                  Fechar janela
                 </Button>
               </div>
             </div>
           </Form>
         </CardContent>
       </Card>
+    </div>
+  );
+
+  const modalContent = (
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+
+      {/* Modal Backdrop */}
+      <div
+        className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
+        onClick={handleCloseModal}
+      >
+        <div
+          className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+          {...dragHandleProps}
+          style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+        >
+          {/* Close button - DENTRO do card para não sumir */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
+            onClick={handleCloseModal}
+          >
+            <IconX className="h-2 w-2" />
+          </Button>
+
+          {renderForm()}
+        </div>
+      </div>
+    </>
+  );
+
+  if (isModal) {
+    if (typeof document !== "undefined") {
+      return createPortal(modalContent, document.body);
+    }
+    return null;
+  }
+  return (
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );
 }

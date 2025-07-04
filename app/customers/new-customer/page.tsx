@@ -14,19 +14,41 @@ import { Label } from "@/components/ui/label";
 import Form from "next/form";
 import { useActionState, useState } from "react";
 import { useRouter } from "next/navigation";
+import { IconX } from "@tabler/icons-react";
+import { useDraggable } from "@/hooks/useDraggable";
+import { createPortal } from "react-dom";
 
-export default function NewCustomer() {
+export default function NewCustomer({
+  isModal = false,
+  onClose,
+}: {
+  isModal?: boolean;
+  onClose?: () => void;
+}) {
   const [state, formAction, pending] = useActionState(createCustomer, null);
   const [loading, setLoading] = useState(false);
+  const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
 
-  const handleReturn = () => {
-    setLoading(true);
-    router.push("/customers");
+  const handleCloseModal = () => {
+    if (onClose) {
+      onClose();
+    } else if (isModal) {
+      router.push("/customers");
+    }
   };
 
-  return (
-    <>
+  const handleReturn = () => {
+    if (isModal) {
+      handleCloseModal();
+    } else {
+      setLoading(true);
+      router.push("/customers");
+    }
+  };
+
+  const renderForm = () => (
+    <div>
       {loading ? <OverlaySpinner /> : ""}
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
@@ -59,7 +81,11 @@ export default function NewCustomer() {
                 />
               </div>
               <div className="relative flex flex-col gap-2">
-                <Button type="submit" className="w-full cursor-pointer">
+                <Button
+                  type="submit"
+                  onClick={() => handleCloseModal()}
+                  className="w-full cursor-pointer"
+                >
                   Cadastrar
                 </Button>
                 <Button
@@ -68,13 +94,58 @@ export default function NewCustomer() {
                   className="w-full cursor-pointer"
                   onClick={handleReturn}
                 >
-                  Retornar à lista de clientes
+                  {isModal ? "Fechar janela" : "Retornar à lista de clientes"}
                 </Button>
               </div>
             </div>
           </Form>
         </CardContent>
       </Card>
+    </div>
+  );
+
+  const modalContent = (
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+
+      {/* Modal Backdrop */}
+      <div
+        className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
+        onClick={handleCloseModal}
+      >
+        <div
+          className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+          {...dragHandleProps}
+          style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+        >
+          {/* Close button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
+            onClick={handleCloseModal}
+          >
+            <IconX className="h-2 w-2" />
+          </Button>
+
+          {renderForm()}
+        </div>
+      </div>
+    </>
+  );
+
+  if (isModal) {
+    if (typeof document !== "undefined") {
+      return createPortal(modalContent, document.body);
+    }
+    return null;
+  }
+
+  return (
+    <>
+      {loading ? <OverlaySpinner /> : ""}
+      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );
 }

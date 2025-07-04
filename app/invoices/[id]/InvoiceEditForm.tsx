@@ -2,6 +2,7 @@
 import { updateInvoice } from "@/app/lib/actions";
 import OverlaySpinner from "@/components/overlaySpinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -40,21 +41,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useDraggable } from "@/hooks/useDraggable"; // Descomente para testar drag
 import { Invoice } from "@/types/invoice";
 import { Product } from "@/types/product";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
+import { IconShoppingCart, IconX } from "@tabler/icons-react";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
   ChevronDownIcon,
-  X,
 } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
-import { useDraggable } from "@/hooks/useDraggable"; // Descomente para testar drag
-import { IconShoppingCart, IconX } from "@tabler/icons-react";
-import { Badge } from "@/components/ui/badge";
 
 export type InvoiceItem = {
   productId: number;
@@ -81,7 +80,6 @@ export default function InvoiceEditForm({
   onClose?: () => void;
 }) {
   const [state, formAction, pending] = useActionState(updateInvoice, null);
-  // const [customerId, setCustomerId] = useState(invoice.customerId + "");
   const [productQuantity, setProductQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState("");
   const [newInvoiceItems, setNewInvoiceItems] = useState<InvoiceItem[]>(
@@ -100,8 +98,6 @@ export default function InvoiceEditForm({
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  // Hook para drag opcional - descomente para testar
   const { position, dragHandleProps } = useDraggable();
 
   const handleCloseModal = () => {
@@ -111,11 +107,6 @@ export default function InvoiceEditForm({
       router.push("/invoices");
     }
   };
-
-  // const handleReturn = () => {
-  //   setLoading(true);
-  //   router.push("/invoices");
-  // };
 
   const handleCloseDialog = () => {
     setProductId("");
@@ -198,7 +189,7 @@ export default function InvoiceEditForm({
                     {newInvoiceItems.map((item) => (
                       <div key={item.productId}>
                         <div className="grid w-auto grid-cols-[auto_auto_auto_auto] gap-2 truncate">
-                          <div className="grid grid-cols-[auto_auto_auto_auto] truncate">
+                          <div className="grid grid-cols-[auto_auto_auto_auto] gap-2 truncate">
                             <Badge variant={"outline"}>{item.quantity}</Badge>
                             {
                               <Badge variant="outline">
@@ -480,11 +471,11 @@ export default function InvoiceEditForm({
 
         {/* Modal Backdrop */}
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
+          className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
           onClick={handleCloseModal}
         >
           <div
-            className="relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+            className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             {...dragHandleProps}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
@@ -493,10 +484,10 @@ export default function InvoiceEditForm({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-0 right-2 z-10 h-6 w-6 rounded-full bg-red-500/80 text-white hover:bg-red-600"
+              className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
               onClick={handleCloseModal}
             >
-              <IconX className="h-4 w-4" />
+              <IconX className="h-2 w-2" />
             </Button>
 
             {renderForm()}

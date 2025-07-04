@@ -7,38 +7,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InvoicesTableData } from "@/types/invoicesTableData";
-import { Product } from "@/types/product";
+import { StockMovement } from "@/types/stockMovement";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import DataTableClient from "../_dataTable/page";
-import { deleteInvoice } from "../lib/actions";
-import InvoiceEditForm from "./[id]/InvoiceEditForm";
+import { deleteStockMovement } from "../lib/actions";
 import { columns } from "./columns";
+import StockMovementEditForm from "./[id]/StockMovementEditForm";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { StockMovementTableData } from "@/types/stockMovementTableData";
 
-export default function InvoicesWithModal({
-  invoices,
-  products,
+export default function StockMovementWithModal({
+  stockMovements,
 }: {
-  invoices: InvoicesTableData[];
-  products: Product[];
+  stockMovements: StockMovement[];
 }) {
-  const [selectedInvoice, setSelectedInvoice] =
-    useState<InvoicesTableData | null>(null);
+  const [selectedStockMovement, setSelectedStockMovement] =
+    useState<StockMovement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const handleEditInvoice = (invoice: InvoicesTableData) => {
-    setSelectedInvoice(invoice);
+  const handleEditStockMovement = (stockMovement: StockMovement) => {
+    setSelectedStockMovement(stockMovement);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedInvoice(null);
+    setSelectedStockMovement(null);
   };
 
   // Modificar apenas a coluna de actions para usar nosso handler
@@ -48,10 +46,10 @@ export default function InvoicesWithModal({
         return {
           ...column,
           cell: ({ row }: any) => {
-            const invoice = row.original;
+            const stockMovement = row.original;
 
             const handleDelete = async () => {
-              await deleteInvoice(invoice.id);
+              await deleteStockMovement(stockMovement.id);
               router.refresh();
             };
 
@@ -66,7 +64,7 @@ export default function InvoicesWithModal({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     onClick={() =>
-                      navigator.clipboard.writeText(invoice.id.toString())
+                      navigator.clipboard.writeText(stockMovement.id.toString())
                     }
                   >
                     <IconCopy />
@@ -75,7 +73,7 @@ export default function InvoicesWithModal({
 
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => handleEditInvoice(invoice)}
+                    onClick={() => handleEditStockMovement(stockMovement)}
                   >
                     <IconEdit />
                     <span>Editar</span>
@@ -93,7 +91,7 @@ export default function InvoicesWithModal({
               </DropdownMenu>
             );
           },
-        } as ColumnDef<InvoicesTableData>;
+        } as ColumnDef<StockMovementTableData>;
       }
       return column;
     });
@@ -102,13 +100,12 @@ export default function InvoicesWithModal({
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={invoices} />
+      <DataTableClient columns={columnsWithModalEdit} data={stockMovements} />
 
       {/* Modal overlay */}
-      {isModalOpen && selectedInvoice && (
-        <InvoiceEditForm
-          invoice={selectedInvoice as any}
-          products={products}
+      {isModalOpen && selectedStockMovement && (
+        <StockMovementEditForm
+          stockMovement={selectedStockMovement as any}
           isModal={true}
           onClose={handleCloseModal}
         />

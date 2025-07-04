@@ -14,7 +14,7 @@ const Loading = () => {
       </div>
       {/* Table Skeleton - específico para tabela de faturas */}
       <div className="rounded-md border">
-        <div className="overflow-x-auto">
+        <div className="scrollbar-hidden overflow-x-auto">
           <table className="w-full">
             {/* Table Header - colunas específicas de faturas */}
             <thead>

@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import DataTableClient from "../_dataTable/page";
-import { columns } from "./columns";
+import CustomersWithModal from "./CustomersWithModal";
 
 export const metadata: Metadata = {
   title: "Clientes",
@@ -23,7 +22,7 @@ const Customers = async () => {
 
   return (
     <>
-      <DataTableClient columns={columns} data={customers} />
+      <CustomersWithModal customers={customers as any[]} />
     </>
   );
 };

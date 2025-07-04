@@ -15,7 +15,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CustomerTableData } from "@/types/customerTableData";
-import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
+import {
+  IconCircleCheckFilled,
+  IconEdit,
+  IconLoader,
+  IconTrash,
+} from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { DragHandle } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
@@ -212,13 +217,15 @@ export const columns: ColumnDef<CustomerTableData>[] = [
               className="cursor-pointer"
               onClick={() => router.push(`/customer/${customer.id}`)}
             >
-              Editar
+              <IconEdit />
+              <span>Editar</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => handleDelete()}
             >
-              Deletar
+              <IconTrash />
+              <span>Deletar</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

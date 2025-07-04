@@ -6,6 +6,7 @@ import {
   IconBrandCashapp,
   IconCamera,
   IconChartBar,
+  IconCurrencyDollar,
   IconDashboard,
   IconDatabase,
   IconFileAi,
@@ -19,10 +20,11 @@ import {
   IconSearch,
   IconSettings,
   IconShoppingCart,
+  IconUser,
   IconUsers,
 } from "@tabler/icons-react";
 
-import { NavDocuments } from "@/components/nav-documents";
+// import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -49,12 +51,6 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Vendas",
-      url: "/invoices",
-      icon: IconBrandCashapp,
-      // icon: IconListDetails,
-    },
-    {
       title: "Produtos",
       url: "/products",
       icon: IconShoppingCart,
@@ -67,7 +63,12 @@ const data = {
     {
       title: "Clientes",
       url: "/customers",
-      icon: IconUsers,
+      icon: IconUser,
+    },
+    {
+      title: "Vendas",
+      url: "/invoices",
+      icon: IconCurrencyDollar,
     },
   ],
   navClouds: [
@@ -137,19 +138,24 @@ const data = {
   ],
   documents: [
     {
-      name: "Colocar",
-      url: "#",
-      icon: IconDatabase,
+      name: "Produto",
+      url: "/products",
+      icon: IconShoppingCart,
     },
     {
-      name: "Alguma coisa",
-      url: "#",
-      icon: IconReport,
+      name: "Estoque",
+      url: "/stock-movement",
+      icon: IconBox,
     },
     {
-      name: "Aqui",
-      url: "#",
-      icon: IconFileWord,
+      name: "Cliente",
+      url: "/customers",
+      icon: IconUser,
+    },
+    {
+      name: "Venda",
+      url: "/invoices",
+      icon: IconCurrencyDollar,
     },
   ],
 };
@@ -176,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

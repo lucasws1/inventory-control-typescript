@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import InvoicesWithModal from "./InvoicesWithModal";
 
 export const metadata: Metadata = {
-  title: "Faturas",
+  title: "Vendas",
 };
 
 const Invoices = async () => {

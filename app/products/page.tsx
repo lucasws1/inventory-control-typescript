@@ -1,25 +1,19 @@
 import prisma from "@/lib/prisma";
-import { ProductsTableData } from "@/types/productsTableData";
 import { Metadata } from "next";
-import DataTableClient from "../_dataTable/page";
-import { columns } from "./columns";
+import ProductsWithModal from "./ProductsWithModal";
 
 export const metadata: Metadata = {
   title: "Produtos",
 };
 
 const Products = async () => {
-  const products: ProductsTableData[] = await prisma.product.findMany({
+  const products = await prisma.product.findMany({
     include: {
       StockMovement: true,
     },
   });
 
-  return (
-    <>
-      <DataTableClient columns={columns} data={products} />
-    </>
-  );
+  return <ProductsWithModal products={products as any[]} />;
 };
 
 export default Products;

@@ -9,7 +9,7 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   const areas: Record<string, string> = {
-    invoices: "Faturas",
+    invoices: "Vendas",
     products: "Produtos",
     customers: "Clientes",
     "stock-movement": "Movimentação de Estoque",
