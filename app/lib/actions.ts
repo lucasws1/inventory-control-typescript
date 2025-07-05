@@ -343,3 +343,75 @@ export const deleteInvoice = async (invoiceId: number) => {
     };
   }
 };
+
+export const deleteManyInvoices = async (invoiceId: number[]) => {
+  try {
+    await prisma.invoice.deleteMany({
+      where: {
+        id: { in: invoiceId },
+      },
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao deletar a venda.",
+    };
+  }
+};
+
+export const deleteManyProducts = async (productId: number[]) => {
+  try {
+    await prisma.product.deleteMany({
+      where: {
+        id: { in: productId },
+      },
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao deletar o produto.",
+    };
+  }
+};
+
+export const deleteManyCustomers = async (customerId: number[]) => {
+  try {
+    await prisma.customer.deleteMany({
+      where: {
+        id: { in: customerId },
+      },
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao deletar o cliente.",
+    };
+  }
+};
+
+export const deleteManyStockMovements = async (stockMovementId: number[]) => {
+  try {
+    await prisma.stockMovement.deleteMany({
+      where: {
+        id: { in: stockMovementId },
+      },
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao deletar o movimento de estoque.",
+    };
+  }
+};

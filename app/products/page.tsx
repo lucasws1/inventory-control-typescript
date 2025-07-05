@@ -1,6 +1,10 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import ProductsWithModal from "./ProductsWithModal";
+import dynamic from "next/dynamic";
+
+const ProductsWithModal = dynamic(() => import("./ProductsWithModal"), {
+  loading: () => <div>Carregando produtos...</div>,
+});
 
 export const metadata: Metadata = {
   title: "Produtos",

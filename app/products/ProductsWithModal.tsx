@@ -11,7 +11,7 @@ import { Product } from "@/types/product";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
@@ -24,6 +24,7 @@ export default function ProductsWithModal({
 }: {
   products: Product[];
 }) {
+  const [mounted, setMounted] = useState(false);
   const { openModal } = useModal();
   const router = useRouter();
 
@@ -35,7 +36,6 @@ export default function ProductsWithModal({
     openModal("new-product");
   };
 
-  // Modificar apenas a coluna de actions para usar nosso handler
   const columnsWithModalEdit = useMemo(() => {
     return columns.map((column) => {
       if (column.id === "actions") {
@@ -92,6 +92,14 @@ export default function ProductsWithModal({
       return column;
     });
   }, [router]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>

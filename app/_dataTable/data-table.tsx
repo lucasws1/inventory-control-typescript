@@ -1,7 +1,17 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -40,7 +50,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import React, { useId, useMemo, useState } from "react";
+import React, { useId, useMemo, useState, useEffect } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,6 +70,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useModal } from "@/contexts/ModalContext";
+import { Customer } from "@/types/customer";
+import { Invoice } from "@/types/invoice";
+import { Product } from "@/types/product";
+import { StockMovement } from "@/types/stockMovement";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -71,12 +86,9 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { usePathname } from "next/navigation";
-import { useModal } from "@/contexts/ModalContext";
-import { Customer } from "@/types/customer";
-import { Product } from "@/types/product";
-import { Invoice } from "@/types/invoice";
-import { StockMovement } from "@/types/stockMovement";
+import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
+import OverlaySpinner from "@/components/overlaySpinner";
 
 // Create a separate component for the drag handle
 export function DragHandle({ id }: { id: number }) {
@@ -149,6 +161,7 @@ export function DataTable<TData extends RowWithId, TValue>({
   columns,
   data: initialData,
 }: DataTableProps<TData, TValue>) {
+  const [mounted, setMounted] = useState(false);
   const [data, setData] = useState(() => initialData);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -158,21 +171,12 @@ export function DataTable<TData extends RowWithId, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [selectedColumn, setSelectedColumn] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>("");
+
   const pathname = usePathname();
   const { openModal } = useModal();
-
-  const handleNewCustomer = () => openModal("new-customer");
-  const handleNewProduct = () => openModal("new-product");
-  const handleNewInvoice = () => openModal("new-invoice");
-  const handleNewStockMovement = () => openModal("new-stock-movement");
-  const handleEditCustomer = (customer: Customer) =>
-    openModal("edit-customer", customer);
-  const handleEditProduct = (product: Product) =>
-    openModal("edit-product", product);
-  const handleEditInvoice = (invoice: Invoice) =>
-    openModal("edit-invoice", invoice);
-  const handleEditStockMovement = (stockMovement: StockMovement) =>
-    openModal("edit-stock-movement", stockMovement);
+  const router = useRouter();
 
   const sortableId = useId();
   const sensors = useSensors(
@@ -208,6 +212,40 @@ export function DataTable<TData extends RowWithId, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <OverlaySpinner />;
+  }
+
+  const handleNewCustomer = () => openModal("new-customer");
+  const handleNewProduct = () => openModal("new-product");
+  const handleNewInvoice = () => openModal("new-invoice");
+  const handleNewStockMovement = () => openModal("new-stock-movement");
+  const handleEditCustomer = (customer: Customer) =>
+    openModal("edit-customer", customer);
+  const handleEditProduct = (product: Product) =>
+    openModal("edit-product", product);
+  const handleEditInvoice = (invoice: Invoice) =>
+    openModal("edit-invoice", invoice);
+  const handleEditStockMovement = (stockMovement: StockMovement) =>
+    openModal("edit-stock-movement", stockMovement);
+
+  const handleDeleteMany = async (selectedIds: number[]) => {
+    const response = await axios.delete(`/api/${pathname.slice(1)}`, {
+      data: { ids: selectedIds },
+    });
+
+    window.location.reload();
+    console.log(
+      `Deleted ${selectedIds.length} items from ${pathname}, response:`,
+      response,
+    );
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
@@ -218,9 +256,6 @@ export function DataTable<TData extends RowWithId, TValue>({
       });
     }
   }
-
-  const [selectedColumn, setSelectedColumn] = useState<string>("");
-  const [inputValue, setInputValue] = useState<string>("");
 
   const getNumberRange = (input: string) => {
     if (!input) return [undefined, undefined];
@@ -336,13 +371,44 @@ export function DataTable<TData extends RowWithId, TValue>({
               <IconEdit />
               Editar
             </Button>
-            <Button
-              variant="outline"
-              disabled={table.getFilteredSelectedRowModel().rows.length === 0}
-            >
-              <IconTrash /> Deletar
-            </Button>
 
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  disabled={
+                    table.getFilteredSelectedRowModel().rows.length === 0
+                  }
+                  variant={"outline"}
+                >
+                  <IconTrash /> Deletar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Você tem certeza absoluta?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. Isso excluirá
+                    permanentemente os dados selecionados.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() =>
+                      handleDeleteMany(
+                        table
+                          .getFilteredSelectedRowModel()
+                          .rows.map((row) => row.original.id) as number[],
+                      )
+                    }
+                  >
+                    <IconTrash /> Deletar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">

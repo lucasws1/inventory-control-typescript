@@ -8,6 +8,7 @@ import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { ModalProvider } from "@/contexts/ModalContext";
 import GlobalModalManager from "@/components/GlobalModalManager";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

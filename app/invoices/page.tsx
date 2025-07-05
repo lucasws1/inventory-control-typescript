@@ -1,7 +1,11 @@
 import prisma from "@/lib/prisma";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { Metadata } from "next";
-import InvoicesWithModal from "./InvoicesWithModal";
+import dynamic from "next/dynamic";
+
+const InvoicesWithModal = dynamic(() => import("./InvoicesWithModal"), {
+  loading: () => <div>Carregando vendas...</div>,
+});
 
 export const metadata: Metadata = {
   title: "Vendas",

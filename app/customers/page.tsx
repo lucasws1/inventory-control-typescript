@@ -1,6 +1,15 @@
+import OverlaySpinner from "@/components/overlaySpinner";
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import CustomersWithModal from "./CustomersWithModal";
+import dynamic from "next/dynamic";
+
+const CustomersWithModal = dynamic(() => import("./CustomersWithModal"), {
+  loading: () => (
+    <div>
+      <OverlaySpinner />
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: "Clientes",
