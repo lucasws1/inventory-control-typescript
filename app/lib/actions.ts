@@ -16,6 +16,8 @@ export async function createProduct(prevState: any, formData: FormData) {
   try {
     const dateValue = formData.get("dateValue") as string;
     const date = new Date(dateValue);
+    const isModal = formData.get("isModal") === "true";
+
     const newProduct = await prisma.product.create({
       data: {
         name: formData.get("name") as string,
@@ -29,16 +31,23 @@ export async function createProduct(prevState: any, formData: FormData) {
         },
       },
     });
+
+    if (!isModal) {
+      redirect("/products");
+    }
+
+    return { success: true, product: newProduct };
   } catch (error) {
-    throw new Error("Erro ao criar produto.");
-  } finally {
-    redirect("/products");
+    console.error("Erro ao criar produto:", error);
+    return { success: false, error: "Erro ao criar produto." };
   }
 }
 
 export async function createStockMovement(prevState: any, formData: FormData) {
   try {
-    await prisma.stockMovement.create({
+    const isModal = formData.get("isModal") === "true";
+
+    const newStockMovement = await prisma.stockMovement.create({
       data: {
         quantity: Number(formData.get("quantity")),
         date: new Date(formData.get("dateValue") as string),
@@ -52,13 +61,15 @@ export async function createStockMovement(prevState: any, formData: FormData) {
         },
       },
     });
-    console.log("sucesso");
-  } catch (error) {
-    console.log(error);
 
-    throw new Error("Erro ao criar cliente.");
-  } finally {
-    redirect("/stock-movement");
+    if (!isModal) {
+      redirect("/stock-movement");
+    }
+
+    return { success: true, stockMovement: newStockMovement };
+  } catch (error) {
+    console.error("Erro ao criar movimentação de estoque:", error);
+    return { success: false, error: "Erro ao criar movimentação de estoque." };
   }
 }
 
@@ -98,7 +109,8 @@ export const deleteProduct = async (productId: number) => {
   } catch (error) {
     throw new Error("Erro ao deletar o produto.");
   } finally {
-    revalidatePath("/products");
+    revalidatePath("/products", "page");
+    revalidatePath("/", "layout");
   }
 };
 
@@ -110,22 +122,31 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
       phone: formData.get("phone") as string,
     };
 
+    const isModal = formData.get("isModal") === "true";
+
     const parseResult = CustomerSchema.safeParse(data);
     if (!parseResult.success) {
-      throw new Error("Dados inválidos. Verifique os campos.");
+      return { success: false, error: "Dados inválidos. Verifique os campos." };
     }
 
-    await prisma.customer.create({
+    const validatedData = parseResult.data;
+
+    const newCustomer = await prisma.customer.create({
       data: {
-        name: formData.get("name") as string,
-        email: formData.get("email") as string,
-        phone: formData.get("phone") as string,
+        name: validatedData.name,
+        email: validatedData.email || null,
+        phone: validatedData.phone || null,
       },
     });
+
+    if (!isModal) {
+      redirect("/customers");
+    }
+
+    return { success: true, customer: newCustomer };
   } catch (error) {
-    throw new Error("Erro ao criar cliente.");
-  } finally {
-    redirect("/customers");
+    console.error("Erro ao criar cliente:", error);
+    return { success: false, error: "Erro ao criar cliente." };
   }
 };
 
@@ -143,11 +164,15 @@ export async function updateCustomer(prevState: any, formData: FormData) {
       throw new Error("Dados inválidos. Verifique os campos.");
     }
 
-    const emailValue = data.email.trim() === "" ? null : data.email;
+    const validatedData = parseResult.data;
 
     await prisma.customer.update({
-      where: { id: Number(formData.get("id")) },
-      data: { ...data, email: emailValue },
+      where: { id: validatedData.id },
+      data: {
+        name: validatedData.name,
+        email: validatedData.email || null,
+        phone: validatedData.phone || null,
+      },
     });
   } catch (error) {
     throw new Error("Erro ao atualizar o cliente.");
@@ -237,7 +262,8 @@ export const deleteCustomer = async (customerId: any) => {
   } catch (error) {
     throw new Error("Erro ao deletar o cliente.");
   } finally {
-    revalidatePath("/customers");
+    revalidatePath("/customers", "page");
+    revalidatePath("/", "layout");
   }
 };
 
@@ -249,7 +275,8 @@ export const deleteStockMovement = async (stockMovementId: number) => {
   } catch (error) {
     throw new Error("Erro ao deletar o produto.");
   } finally {
-    revalidatePath("stock-movement");
+    revalidatePath("/stock-movement", "page");
+    revalidatePath("/", "layout");
   }
 };
 
@@ -257,6 +284,7 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
   try {
     const invoiceItems = JSON.parse(formData.get("invoiceItems") as string);
     const stockMovement = JSON.parse(formData.get("stockMovement") as string);
+    const isModal = formData.get("isModal") === "true";
 
     const amount = invoiceItems.reduce((acc: number, item: any) => {
       return acc + item.quantity * item.unitPrice;
@@ -272,10 +300,10 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
 
     const parseResult = CreateInvoiceSchema.safeParse(data);
     if (!parseResult.success) {
-      throw new Error(
-        "Dados inválidos. Verifique os campos.",
-        parseResult.error,
-      );
+      return {
+        success: false,
+        error: "Dados inválidos. Verifique os campos.",
+      };
     }
 
     const newInvoice = await prisma.invoice.create({
@@ -292,6 +320,14 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
           })),
         },
       },
+      include: {
+        customer: true,
+        InvoiceItem: {
+          include: {
+            Product: true,
+          },
+        },
+      },
     });
 
     const newStockMovement = await prisma.stockMovement.createMany({
@@ -302,6 +338,11 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
         reason: item.reason,
       })),
     });
+
+    if (!isModal) {
+      redirect("/invoices");
+    }
+
     return {
       success: true,
       message: "Venda lançada com sucesso!",
@@ -312,14 +353,8 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
     console.error("Error creating invoice:", error);
     return {
       success: false,
-      message: "Erro ao lançar a venda.",
-      error:
-        typeof error === "object" && error !== null && "message" in error
-          ? (error as { message: string }).message
-          : String(error),
+      error: "Erro ao lançar a venda.",
     };
-  } finally {
-    redirect("/invoices");
   }
 };
 
@@ -328,7 +363,7 @@ export const deleteInvoice = async (invoiceId: number) => {
     const deleteInvoice = await prisma.invoice.delete({
       where: { id: invoiceId },
     });
-    revalidatePath("/invoices");
+
     return {
       success: true,
       deleteInvoice,

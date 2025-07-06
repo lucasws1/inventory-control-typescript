@@ -7,26 +7,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useModal } from "@/contexts/ModalContext";
 import { InvoicesTableData } from "@/types/invoicesTableData";
-import { Product } from "@/types/product";
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteInvoice } from "../lib/actions";
 import { columns } from "./columns";
-import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
-import { useModal } from "@/contexts/ModalContext";
 
 export default function InvoicesWithModal({
   invoices,
-  products,
 }: {
   invoices: InvoicesTableData[];
-  products: Product[];
 }) {
-  const [mounted, setMounted] = useState(false);
   const { openModal } = useModal();
   const router = useRouter();
 
@@ -90,14 +86,6 @@ export default function InvoicesWithModal({
       return column;
     });
   }, [router]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>

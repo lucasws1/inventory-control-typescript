@@ -10,6 +10,10 @@ import {
   IconTrash,
   type Icon,
   IconEdit,
+  IconShoppingCart,
+  IconBox,
+  IconUser,
+  IconCurrencyDollar,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -27,6 +31,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
@@ -72,8 +77,30 @@ export function NavMain({
                 tooltip="Quick Create"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               >
-                <IconPlus />
-                <span>Novo documento</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center justify-center gap-2">
+                    <IconPlus />
+                    <span>Novo documento</span>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleNewProduct}>
+                      <IconShoppingCart />
+                      <span>Produto</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleNewStockMovement}>
+                      <IconBox />
+                      <span>Estoque</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleNewCustomer}>
+                      <IconUser />
+                      <span>Cliente</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleNewInvoice}>
+                      <IconCurrencyDollar />
+                      <span>Venda</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </SidebarMenuButton>
               <Button
                 size="icon"

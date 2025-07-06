@@ -1,6 +1,5 @@
 "use client";
 import { updateProduct } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useDraggable } from "@/hooks/useDraggable";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 export default function ProductEditForm({
   product,
@@ -27,7 +26,6 @@ export default function ProductEditForm({
   onClose?: () => void;
 }) {
   const [state, formAction, pending] = useActionState(updateProduct, null);
-  const [loading, setLoading] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
 
@@ -45,11 +43,13 @@ export default function ProductEditForm({
 
   const renderForm = () => (
     <div>
-      {loading ? <OverlaySpinner /> : ""}
       <form action={formAction}>
         <div className="mx-2 flex justify-center">
-          <Card className="w-full max-w-sm">
-            <CardHeader>
+          <Card
+            className="w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader {...dragHandleProps}>
               <CardTitle>Alterar dados de {product?.name}</CardTitle>
               <CardDescription>Produto id n. {product?.id}</CardDescription>
             </CardHeader>
@@ -105,8 +105,6 @@ export default function ProductEditForm({
   if (isModal) {
     return (
       <>
-        {loading ? <OverlaySpinner /> : ""}
-
         {/* Modal Backdrop */}
         <div
           className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -114,19 +112,17 @@ export default function ProductEditForm({
         >
           <div
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-            {...dragHandleProps}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
             {/* Close button - DENTRO do card para não sumir */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
               onClick={handleCloseModal}
             >
               <IconX className="h-2 w-2" />
-            </Button>
+            </Button> */}
 
             {renderForm()}
           </div>
@@ -137,7 +133,6 @@ export default function ProductEditForm({
 
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

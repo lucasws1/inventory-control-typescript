@@ -7,33 +7,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useModal } from "@/contexts/ModalContext";
 import { Product } from "@/types/product";
+import { ProductsTableData } from "@/types/productsTableData";
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
-import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
-import { ProductsTableData } from "@/types/productsTableData";
-import { useModal } from "@/contexts/ModalContext";
 
 export default function ProductsWithModal({
   products,
 }: {
   products: Product[];
 }) {
-  const [mounted, setMounted] = useState(false);
   const { openModal } = useModal();
   const router = useRouter();
 
   const handleEditProduct = (product: Product) => {
     openModal("edit-product", product);
-  };
-
-  const handleNewProduct = () => {
-    openModal("new-product");
   };
 
   const columnsWithModalEdit = useMemo(() => {
@@ -92,14 +87,6 @@ export default function ProductsWithModal({
       return column;
     });
   }, [router]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>

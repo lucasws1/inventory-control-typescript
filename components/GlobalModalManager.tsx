@@ -1,13 +1,13 @@
 "use client";
 import { useModal } from "@/contexts/ModalContext";
 import { useEffect, useState } from "react";
-import NewProduct from "@/app/products/new-product/page";
+import NewProductModal from "@/components/modals/NewProductModal";
 import ProductEditForm from "@/app/products/[id]/ProductEditForm";
-import NewCustomer from "@/app/customers/new-customer/page";
+import NewCustomerModal from "@/components/modals/NewCustomerModal";
 import CustomerEditForm from "@/app/customers/[id]/CustomerEditForm";
-import NewStockMovement from "@/app/stock-movement/new-stock-movement/page";
+import NewStockMovementModal from "@/components/modals/NewStockMovementModal";
 import StockMovementEditPage from "@/app/stock-movement/[id]/StockMovementEditPage";
-import NewInvoice from "@/app/invoices/new-invoice/page";
+import NewInvoiceModal from "@/components/modals/NewInvoiceModal";
 import InvoiceEditForm from "@/app/invoices/[id]/InvoiceEditForm";
 import { Product } from "@/types/product";
 import axios from "axios";
@@ -30,21 +30,12 @@ export default function GlobalModalManager() {
     }
   }, [modalType, isOpen]);
 
-  // useEffect(() => {
-  //   if (modalType === "edit-invoice" && isOpen) {
-  //     fetch("/api/products")
-  //       .then((res) => res.json())
-  //       .then((data) => setProducts(data))
-  //       .catch((error) => console.error("Error fetching products:", error));
-  //   }
-  // }, [modalType, isOpen]);
-
   if (!isOpen) return null;
 
   const renderModal = () => {
     switch (modalType) {
       case "new-product":
-        return <NewProduct isModal={true} onClose={closeModal} />;
+        return <NewProductModal isModal={true} onClose={closeModal} />;
       case "edit-product":
         return (
           <ProductEditForm
@@ -54,11 +45,11 @@ export default function GlobalModalManager() {
           />
         );
       case "new-customer":
-        return <NewCustomer isModal={true} onClose={closeModal} />;
+        return <NewCustomerModal isModal={true} onClose={closeModal} />;
       case "new-stock-movement":
-        return <NewStockMovement isModal={true} onClose={closeModal} />;
+        return <NewStockMovementModal isModal={true} onClose={closeModal} />;
       case "new-invoice":
-        return <NewInvoice isModal={true} onClose={closeModal} />;
+        return <NewInvoiceModal isModal={true} onClose={closeModal} />;
       case "edit-invoice":
         return (
           <InvoiceEditForm

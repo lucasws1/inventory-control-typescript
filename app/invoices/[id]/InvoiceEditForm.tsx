@@ -1,6 +1,5 @@
 "use client";
 import { updateInvoice } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -165,8 +164,8 @@ export default function InvoiceEditForm({
   };
 
   const renderForm = () => (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
+    <Card className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+      <CardHeader {...dragHandleProps}>
         <CardTitle>Editar Venda</CardTitle>
         <CardDescription>Insira os dados e clique em Enviar</CardDescription>
         <CardAction>
@@ -390,8 +389,10 @@ export default function InvoiceEditForm({
                     selected={date}
                     captionLayout="dropdown"
                     onSelect={(date) => {
-                      setDate(date);
-                      setOpenDate(false);
+                      if (date) {
+                        setDate(date);
+                        setOpenDate(false);
+                      }
                     }}
                   />
                 </PopoverContent>
@@ -405,7 +406,7 @@ export default function InvoiceEditForm({
           <Button type="submit" className="w-full cursor-pointer">
             Enviar
           </Button>
-          <div className="grid w-full max-w-xl items-start gap-4">
+          {/* <div className="grid w-full max-w-xl items-start gap-4">
             {status === "success" && (
               <Alert>
                 <CheckCircle2Icon />
@@ -432,7 +433,7 @@ export default function InvoiceEditForm({
                 </AlertDescription>
               </Alert>
             )}
-          </div>
+          </div> */}
 
           <Button
             type="button"
@@ -440,7 +441,7 @@ export default function InvoiceEditForm({
             className="w-full cursor-pointer"
             onClick={() => handleCloseModal()}
           >
-            Fechar janela
+            Fechar a janela
           </Button>
           {productAlreadyAdded && (
             <Alert variant="destructive">
@@ -467,8 +468,6 @@ export default function InvoiceEditForm({
   if (isModal) {
     return (
       <>
-        {loading ? <OverlaySpinner /> : ""}
-
         {/* Modal Backdrop */}
         <div
           className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -476,19 +475,17 @@ export default function InvoiceEditForm({
         >
           <div
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-            {...dragHandleProps}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
             {/* Close button - DENTRO do card para não sumir */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
               onClick={handleCloseModal}
             >
               <IconX className="h-2 w-2" />
-            </Button>
+            </Button> */}
 
             {renderForm()}
           </div>
@@ -499,7 +496,6 @@ export default function InvoiceEditForm({
 
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

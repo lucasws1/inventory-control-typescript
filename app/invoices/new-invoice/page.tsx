@@ -65,8 +65,8 @@ import { Product } from "@/types/product";
 import { useActionState, useEffect, useState } from "react";
 
 import { createInvoice } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
 import { Calendar } from "@/components/ui/calendar";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
@@ -99,13 +99,9 @@ type StockMovement = {
   reason: string;
 };
 
-export default function NewInvoice({
-  isModal = false,
-  onClose,
-}: {
-  isModal?: boolean;
-  onClose?: () => void;
-}) {
+export default function NewInvoice() {
+  const isModal = false;
+  const onClose = () => {};
   const [state, formAction, pending] = useActionState(createInvoice, null);
   const [customerId, setCustomerId] = useState("1");
   const [productQuantity, setProductQuantity] = useState(1);
@@ -121,17 +117,25 @@ export default function NewInvoice({
   const [openNewInvoiceItemProductList, setOpenNewInvoiceItemProductList] =
     useState(false);
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const { position, dragHandleProps } = useDraggable();
 
+  // Fechar modal quando a operação for bem-sucedida
+  useEffect(() => {
+    if (state?.success && isModal) {
+      toast.success(state.message || "Venda lançada com sucesso!");
+      onClose?.();
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, isModal, onClose]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        setLoading(true);
         const [productsData, customersData, invoiceItemsData] =
           await Promise.all([
             axios.get("/api/products"),
@@ -143,8 +147,6 @@ export default function NewInvoice({
         setInvoiceItems(invoiceItemsData.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -152,7 +154,6 @@ export default function NewInvoice({
   }, []);
 
   const handleReturn = () => {
-    setLoading(true);
     router.push("/invoices");
   };
 
@@ -222,7 +223,6 @@ export default function NewInvoice({
 
   const renderForm = () => (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">
         <Card className="w-full max-w-sm">
           <CardHeader>
@@ -298,6 +298,11 @@ export default function NewInvoice({
             </CardAction>
           </CardHeader>
           <Form action={formAction}>
+            <input
+              type="hidden"
+              name="isModal"
+              value={isModal ? "true" : "false"}
+            />
             <CardContent>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2"></div>
@@ -467,8 +472,10 @@ export default function NewInvoice({
                         selected={date}
                         captionLayout="dropdown"
                         onSelect={(date) => {
-                          setDate(date);
-                          setOpen(false);
+                          if (date) {
+                            setDate(date);
+                            setOpen(false);
+                          }
                         }}
                       />
                     </PopoverContent>
@@ -483,10 +490,14 @@ export default function NewInvoice({
             </CardContent>
 
             <CardFooter className="mt-6 flex-col gap-2">
-              <Button type="submit" className="w-full cursor-pointer">
-                Enviar
+              <Button
+                type="submit"
+                disabled={pending}
+                className="w-full cursor-pointer"
+              >
+                {pending ? "Enviando..." : "Enviar"}
               </Button>
-              <div className="grid w-full max-w-xl items-start gap-4">
+              {/* <div className="grid w-full max-w-xl items-start gap-4">
                 {status === "success" && (
                   <Alert>
                     <CheckCircle2Icon />
@@ -514,7 +525,7 @@ export default function NewInvoice({
                     </AlertDescription>
                   </Alert>
                 )}
-              </div>
+              </div> */}
 
               <Button
                 type="button"
@@ -548,8 +559,6 @@ export default function NewInvoice({
   );
   const modalContent = (
     <>
-      {loading ? <OverlaySpinner /> : ""}
-
       {/* Modal Backdrop */}
       <div
         className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -586,7 +595,6 @@ export default function NewInvoice({
 
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

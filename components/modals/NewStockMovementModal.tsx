@@ -36,9 +36,13 @@ import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-export default function NewStockMovement() {
-  const isModal = false;
-  const onClose = () => {};
+export default function NewStockMovementModal({
+  isModal = false,
+  onClose,
+}: {
+  isModal?: boolean;
+  onClose?: () => void;
+}) {
   const [state, formAction, pending] = useActionState(
     createStockMovement,
     null,
@@ -53,7 +57,6 @@ export default function NewStockMovement() {
   useEffect(() => {
     if (state?.success && isModal) {
       toast.success("Movimentação de estoque criada com sucesso!");
-      // setProducts((prev) => [...prev, state.stockMovement]);
       console.log("state stock movement", state);
       onClose?.();
     } else if (state?.error) {
@@ -83,8 +86,11 @@ export default function NewStockMovement() {
 
   const renderForm = () => (
     <>
-      <Card className="mx-auto w-full max-w-sm">
-        <CardHeader>
+      <Card
+        className="mx-auto w-full max-w-sm"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <CardHeader {...dragHandleProps}>
           <CardTitle>Movimentar estoque</CardTitle>
           <CardDescription>Insira os dados abaixo</CardDescription>
         </CardHeader>
@@ -199,7 +205,7 @@ export default function NewStockMovement() {
                   variant="outline"
                   className="w-full cursor-pointer"
                 >
-                  Retornar ao estoque
+                  Fechar a janela
                 </Button>
               </div>
             </div>
@@ -218,18 +224,17 @@ export default function NewStockMovement() {
         <div
           className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
-          {...dragHandleProps}
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >
           {/* Close button - DENTRO do card para não sumir */}
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
             onClick={handleCloseModal}
           >
             <IconX className="h-2 w-2" />
-          </Button>
+          </Button> */}
 
           {renderForm()}
         </div>

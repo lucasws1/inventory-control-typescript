@@ -1,6 +1,5 @@
 "use client";
 import { updateStockMovement } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -47,11 +46,12 @@ export default function StockMovementEditPage({
     updateStockMovement,
     null,
   );
-  const [loading, setLoading] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
   const [openDate, setOpenDate] = useState(false);
-  const [dateValue, setDateValue] = useState<Date>(new Date());
+  const [dateValue, setDateValue] = useState<Date>(
+    new Date(stockMovement.date),
+  );
   const [stockReason, setStockReason] = useState(
     stockMovement.reason as string,
   );
@@ -74,11 +74,9 @@ export default function StockMovementEditPage({
 
   const renderForm = () => (
     <div>
-      {loading && <OverlaySpinner />}
-
       <div className="flex justify-center">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
+        <Card className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+          <CardHeader {...dragHandleProps}>
             <CardTitle>Editar movimento de estoque</CardTitle>
             <CardDescription>
               {stockMovement?.reason.charAt(0).toUpperCase() +
@@ -149,8 +147,10 @@ export default function StockMovementEditPage({
                         selected={dateValue}
                         captionLayout="dropdown"
                         onSelect={(date) => {
-                          setDateValue(date);
-                          setOpenDate(false);
+                          if (date) {
+                            setDateValue(date);
+                            setOpenDate(false);
+                          }
                         }}
                       />
                     </PopoverContent>
@@ -191,8 +191,6 @@ export default function StockMovementEditPage({
   if (isModal) {
     return (
       <>
-        {loading ? <OverlaySpinner /> : ""}
-
         {/* Modal Backdrop */}
         <div
           className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -200,19 +198,17 @@ export default function StockMovementEditPage({
         >
           <div
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-            {...dragHandleProps}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
             {/* Close button - DENTRO do card para não sumir */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="absolute top-1 right-2 z-10 h-4 w-4 rounded-sm hover:text-red-500"
               onClick={handleCloseModal}
             >
               <IconX className="h-2 w-2" />
-            </Button>
+            </Button> */}
 
             {renderForm()}
           </div>
@@ -223,7 +219,6 @@ export default function StockMovementEditPage({
 
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

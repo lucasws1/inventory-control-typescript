@@ -6,9 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { ModalProvider } from "@/contexts/ModalContext";
-import GlobalModalManager from "@/components/GlobalModalManager";
-import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,9 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scrollbar-hidden">
+    <html lang="en" className="scrollbar-hidden dark">
       <body className="dark scrollbar-hidden">
-        <ModalProvider>
+        <Providers>
           <SidebarProvider
             style={
               {
@@ -61,8 +59,7 @@ export default function RootLayout({
               </div>
             </SidebarInset>
           </SidebarProvider>
-          <GlobalModalManager />
-        </ModalProvider>
+        </Providers>
       </body>
     </html>
   );

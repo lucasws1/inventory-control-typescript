@@ -95,7 +95,7 @@ export const columns: ColumnDef<CustomerTableData>[] = [
     ),
     cell: ({ row }) => {
       const phone = row.original.phone;
-      return <div>{phone}</div>;
+      return <div>{phone ? phone : "Telefone não cadastrado"}</div>;
     },
     filterFn: "includesString",
   },

@@ -42,7 +42,7 @@ const data = {
   user: {
     name: "lucas w. schuch",
     email: "lucas.schuch@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "",
   },
   navMain: [
     {
@@ -173,7 +173,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">
-                  Enjoei da Gláucia
+                  Inventory Control
                 </span>
               </a>
             </SidebarMenuButton>

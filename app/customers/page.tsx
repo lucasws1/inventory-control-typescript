@@ -1,19 +1,14 @@
-import OverlaySpinner from "@/components/overlaySpinner";
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 
-const CustomersWithModal = dynamic(() => import("./CustomersWithModal"), {
-  loading: () => (
-    <div>
-      <OverlaySpinner />
-    </div>
-  ),
-});
+const CustomersWithModal = dynamic(() => import("./CustomersWithModal"));
 
 export const metadata: Metadata = {
   title: "Clientes",
 };
+
+export const revalidate = 0;
 
 const Customers = async () => {
   const customers = await prisma.customer.findMany({

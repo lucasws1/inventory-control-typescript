@@ -1,5 +1,5 @@
 "use client";
-import { createCustomer } from "@/app/lib/actions";
+import { createProduct } from "@/app/lib/actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,27 +11,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Form from "next/form";
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useEffect } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconX } from "@tabler/icons-react";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-export default function NewCustomer() {
-  const isModal = false;
-  const onClose = () => {};
-  const [state, formAction, pending] = useActionState(createCustomer, null);
+export default function NewProductModal({
+  isModal = false,
+  onClose,
+}: {
+  isModal?: boolean;
+  onClose?: () => void;
+}) {
+  const [state, formAction, pending] = useActionState(createProduct, null);
+  const [dateValue, setDateValue] = useState(new Date());
+  const [openDate, setOpenDate] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
 
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
-    console.log("State after action:", state);
-
     if (state?.success && isModal) {
-      toast.success("Cliente criado com sucesso!");
-      console.log("Cliente criado com sucesso!", state);
+      toast.success("Produto criado com sucesso!");
       onClose?.();
     } else if (state?.error) {
       toast.error(state.error);
@@ -42,7 +53,7 @@ export default function NewCustomer() {
     if (onClose) {
       onClose();
     } else if (isModal) {
-      router.push("/customers");
+      router.push("/products");
     }
   };
 
@@ -53,7 +64,7 @@ export default function NewCustomer() {
         onClick={(e) => e.stopPropagation()}
       >
         <CardHeader {...dragHandleProps}>
-          <CardTitle>Cadastrar novo cliente</CardTitle>
+          <CardTitle>Cadastrar novo produto</CardTitle>
           <CardDescription>Insira os dados abaixo</CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,25 +77,65 @@ export default function NewCustomer() {
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" type="text" placeholder="Lucas" name="name" />
+                <Input id="name" type="text" placeholder="Nome" name="name" />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email (opcional)</Label>
+                <Label htmlFor="price">Valor (custo)</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="lucas@example.com"
-                  name="email"
+                  id="price"
+                  type="number"
+                  placeholder="Preço"
+                  name="price"
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="phone">Telefone (opcional)</Label>
+                <Label htmlFor="quantity">Quantidade</Label>
                 <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="(99) 99999-9999"
-                  name="phone"
+                  id="quantity"
+                  type="number"
+                  placeholder="Quantidade"
+                  name="quantity"
                 />
+              </div>
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="date" className="px-1">
+                  Data
+                </Label>
+                <Popover open={openDate} onOpenChange={setOpenDate}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      id="dateValue"
+                      className="w-full justify-between font-normal"
+                    >
+                      {new Date().toLocaleDateString("pt-BR")}
+                      <ChevronDownIcon />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto overflow-hidden p-0"
+                    align="start"
+                  >
+                    <Calendar
+                      mode="single"
+                      required={true}
+                      selected={dateValue}
+                      captionLayout="dropdown"
+                      onSelect={(date) => {
+                        if (date) {
+                          setDateValue(date);
+                          setOpenDate(false);
+                        }
+                      }}
+                    />
+                    <input
+                      id="dateValue"
+                      type="hidden"
+                      name="dateValue"
+                      value={dateValue.toISOString()}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="relative flex flex-col gap-2">
                 <Button
@@ -94,13 +145,14 @@ export default function NewCustomer() {
                 >
                   {pending ? "Cadastrando..." : "Cadastrar"}
                 </Button>
+
                 <Button
+                  onClick={() => handleCloseModal()}
                   type="button"
                   variant="outline"
                   className="w-full cursor-pointer"
-                  onClick={handleCloseModal}
                 >
-                  {isModal ? "Fechar janela" : "Retornar à lista de clientes"}
+                  Fechar janela
                 </Button>
               </div>
             </div>
@@ -119,9 +171,10 @@ export default function NewCustomer() {
       >
         <div
           className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >
-          {/* Close button */}
+          {/* Close button - DENTRO do card para não sumir */}
           {/* <Button
             variant="ghost"
             size="icon"
@@ -143,7 +196,6 @@ export default function NewCustomer() {
     }
     return null;
   }
-
   return (
     <>
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>

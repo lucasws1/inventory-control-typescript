@@ -30,8 +30,18 @@ export const InvoiceItemSchema = z.object({
 export const CustomerUpdateSchema = z.object({
   id: z.number().min(1),
   name: z.string().min(2, "Nome obrigatório!"),
-  email: z.string().email("Email inválido!").optional().or(z.literal("")),
-  phone: z.string().optional(),
+  email: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val))
+    .refine(
+      (val) => val === undefined || z.string().email().safeParse(val).success,
+      "Email inválido!",
+    ),
+  phone: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
 });
 
 // export const CustomerSchema = z.object({
@@ -46,8 +56,18 @@ export const CustomerUpdateSchema = z.object({
 
 export const CustomerSchema = z.object({
   name: z.string().min(2, "Nome obrigatório!"),
-  email: z.string().email("Email inválido!").optional().or(z.literal("")),
-  phone: z.string().optional().or(z.literal("")),
+  email: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val))
+    .refine(
+      (val) => val === undefined || z.string().email().safeParse(val).success,
+      "Email inválido!",
+    ),
+  phone: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
 });
 
 export const CreateInvoiceSchema = z.object({

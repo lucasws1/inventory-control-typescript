@@ -1,6 +1,5 @@
 "use client";
 import { updateCustomer } from "@/app/lib/actions";
-import OverlaySpinner from "@/components/overlaySpinner";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,7 +15,7 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { Customer } from "@/types/customer";
 import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
 export default function CustomerEditForm({
   customer,
@@ -28,7 +27,6 @@ export default function CustomerEditForm({
   onClose?: () => void;
 }) {
   const [state, formAction, pending] = useActionState(updateCustomer, null);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { position, dragHandleProps } = useDraggable();
   const handleCloseModal = () => {
@@ -41,11 +39,13 @@ export default function CustomerEditForm({
 
   const renderForm = () => (
     <div>
-      {loading && <OverlaySpinner />}
       <form action={formAction}>
         <div className="mx-2 flex justify-center">
-          <Card className="w-full max-w-sm">
-            <CardHeader>
+          <Card
+            className="w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader {...dragHandleProps}>
               <CardTitle>Alterar dados de {customer?.name}</CardTitle>
               <CardDescription>
                 Última edição em{" "}
@@ -68,7 +68,7 @@ export default function CustomerEditForm({
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email (opcional)</Label>
                   <Input
                     id="email"
                     name="email"
@@ -77,7 +77,7 @@ export default function CustomerEditForm({
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="phone">Telefone</Label>
+                  <Label htmlFor="phone">Telefone (opcional)</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -113,8 +113,6 @@ export default function CustomerEditForm({
   if (isModal) {
     return (
       <>
-        {loading ? <OverlaySpinner /> : ""}
-
         {/* Modal Backdrop */}
         <div
           className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -122,19 +120,17 @@ export default function CustomerEditForm({
         >
           <div
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-            {...dragHandleProps}
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
             {/* Close button - DENTRO do card para não sumir */}
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
               onClick={handleCloseModal}
             >
               <IconX className="h-2 w-2" />
-            </Button>
+            </Button> */}
 
             {renderForm()}
           </div>
@@ -145,7 +141,6 @@ export default function CustomerEditForm({
 
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

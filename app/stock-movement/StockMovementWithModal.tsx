@@ -11,7 +11,7 @@ import { StockMovement } from "@/types/stockMovement";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo } from "react";
 import DataTableClient from "../_dataTable/page";
 import { deleteStockMovement } from "../lib/actions";
 import { columns } from "./columns";
@@ -24,7 +24,6 @@ export default function StockMovementWithModal({
 }: {
   stockMovements: StockMovement[];
 }) {
-  const [mounted, setMounted] = useState(false);
   const { openModal } = useModal();
   const router = useRouter();
 
@@ -89,14 +88,6 @@ export default function StockMovementWithModal({
       return column;
     });
   }, [router]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <>

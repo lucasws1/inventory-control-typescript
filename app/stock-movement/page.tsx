@@ -5,14 +5,13 @@ import dynamic from "next/dynamic";
 
 const StockMovementWithModal = dynamic(
   () => import("./StockMovementWithModal"),
-  {
-    loading: () => <div>Carregando estoque...</div>,
-  },
 );
 
 export const metadata: Metadata = {
   title: "Estoque",
 };
+
+export const revalidate = 0;
 
 const StockMovement = async () => {
   const stockMovement: StockMovementTableData[] =

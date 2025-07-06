@@ -18,9 +18,13 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-export default function NewCustomer() {
-  const isModal = false;
-  const onClose = () => {};
+export default function NewCustomerModal({
+  isModal = false,
+  onClose,
+}: {
+  isModal?: boolean;
+  onClose?: () => void;
+}) {
   const [state, formAction, pending] = useActionState(createCustomer, null);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
@@ -48,11 +52,8 @@ export default function NewCustomer() {
 
   const renderForm = () => (
     <div>
-      <Card
-        className="mx-auto w-full max-w-sm"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <CardHeader {...dragHandleProps}>
+      <Card className="mx-auto w-full max-w-sm">
+        <CardHeader>
           <CardTitle>Cadastrar novo cliente</CardTitle>
           <CardDescription>Insira os dados abaixo</CardDescription>
         </CardHeader>
@@ -119,6 +120,8 @@ export default function NewCustomer() {
       >
         <div
           className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+          {...dragHandleProps}
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >
           {/* Close button */}

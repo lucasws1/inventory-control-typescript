@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function CustomerPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const customer = await prisma.customer.findUnique({

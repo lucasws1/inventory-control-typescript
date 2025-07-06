@@ -115,7 +115,7 @@ export const columns: ColumnDef<InvoicesTableData>[] = [
         className="text-muted-foreground flex items-center gap-2 px-1.5"
       >
         {row.original.pending ? (
-          <IconLoader className="animate-spin" />
+          <IconLoader />
         ) : (
           <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
         )}

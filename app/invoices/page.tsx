@@ -3,16 +3,15 @@ import { InvoicesTableData } from "@/types/invoicesTableData";
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 
-const InvoicesWithModal = dynamic(() => import("./InvoicesWithModal"), {
-  loading: () => <div>Carregando vendas...</div>,
-});
+const InvoicesWithModal = dynamic(() => import("./InvoicesWithModal"));
 
 export const metadata: Metadata = {
   title: "Vendas",
 };
 
+export const revalidate = 0;
 const Invoices = async () => {
-  const [invoices, products] = await Promise.all([
+  const [invoices] = await Promise.all([
     prisma.invoice.findMany({
       orderBy: {
         purchaseDate: "desc",
@@ -26,15 +25,11 @@ const Invoices = async () => {
         },
       },
     }),
-    prisma.product.findMany(),
   ]);
 
   return (
     <div>
-      <InvoicesWithModal
-        invoices={invoices as InvoicesTableData[]}
-        products={products as any[]}
-      />
+      <InvoicesWithModal invoices={invoices as InvoicesTableData[]} />
     </div>
   );
 };

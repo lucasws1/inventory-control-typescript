@@ -10,8 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Form from "next/form";
-import { useActionState } from "react";
-import OverlaySpinner from "@/components/overlaySpinner";
+import { useActionState, useEffect } from "react";
 import {
   Popover,
   PopoverContent,
@@ -25,20 +24,26 @@ import { useRouter } from "next/navigation";
 import { IconX } from "@tabler/icons-react";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 
-export default function NewProduct({
-  isModal = false,
-  onClose,
-}: {
-  isModal?: boolean;
-  onClose?: () => void;
-}) {
+export default function NewProduct() {
+  const isModal = false;
+  const onClose = () => {};
   const [state, formAction, pending] = useActionState(createProduct, null);
   const [dateValue, setDateValue] = useState(new Date());
   const [openDate, setOpenDate] = useState(false);
-  const [loading, setLoading] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
+
+  // Fechar modal quando a operação for bem-sucedida
+  useEffect(() => {
+    if (state?.success && isModal) {
+      toast.success("Produto criado com sucesso!");
+      onClose?.();
+    } else if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state, isModal, onClose]);
 
   const handleCloseModal = () => {
     if (onClose) {
@@ -50,7 +55,6 @@ export default function NewProduct({
 
   const renderForm = () => (
     <div>
-      {loading ? <OverlaySpinner /> : ""}
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <CardTitle>Cadastrar novo produto</CardTitle>
@@ -58,6 +62,11 @@ export default function NewProduct({
         </CardHeader>
         <CardContent>
           <Form action={formAction}>
+            <input
+              type="hidden"
+              name="isModal"
+              value={isModal ? "true" : "false"}
+            />
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nome</Label>
@@ -106,8 +115,10 @@ export default function NewProduct({
                       selected={dateValue}
                       captionLayout="dropdown"
                       onSelect={(date) => {
-                        setDateValue(date);
-                        setOpenDate(false);
+                        if (date) {
+                          setDateValue(date);
+                          setOpenDate(false);
+                        }
                       }}
                     />
                     <input
@@ -122,10 +133,10 @@ export default function NewProduct({
               <div className="relative flex flex-col gap-2">
                 <Button
                   type="submit"
-                  onClick={() => handleCloseModal()}
+                  disabled={pending}
                   className="w-full cursor-pointer"
                 >
-                  Cadastrar
+                  {pending ? "Cadastrando..." : "Cadastrar"}
                 </Button>
 
                 <Button
@@ -146,8 +157,6 @@ export default function NewProduct({
 
   const modalContent = (
     <>
-      {loading ? <OverlaySpinner /> : ""}
-
       {/* Modal Backdrop */}
       <div
         className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
@@ -183,7 +192,6 @@ export default function NewProduct({
   }
   return (
     <>
-      {loading ? <OverlaySpinner /> : ""}
       <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
     </>
   );

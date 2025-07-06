@@ -50,7 +50,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import React, { useId, useMemo, useState, useEffect } from "react";
+import React, { useId, useMemo, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,7 +88,7 @@ import {
 } from "@tabler/icons-react";
 import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
-import OverlaySpinner from "@/components/overlaySpinner";
+import { toast } from "sonner";
 
 // Create a separate component for the drag handle
 export function DragHandle({ id }: { id: number }) {
@@ -161,7 +161,6 @@ export function DataTable<TData extends RowWithId, TValue>({
   columns,
   data: initialData,
 }: DataTableProps<TData, TValue>) {
-  const [mounted, setMounted] = useState(false);
   const [data, setData] = useState(() => initialData);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -176,7 +175,6 @@ export function DataTable<TData extends RowWithId, TValue>({
 
   const pathname = usePathname();
   const { openModal } = useModal();
-  const router = useRouter();
 
   const sortableId = useId();
   const sensors = useSensors(
@@ -213,17 +211,30 @@ export function DataTable<TData extends RowWithId, TValue>({
     onRowSelectionChange: setRowSelection,
   });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleNewInvoice = async () => {
+    try {
+      const result = await openModal("new-invoice");
+      if (result?.success) {
+        // Log da estrutura da invoice para debug
+        console.log(
+          "Invoice structure:",
+          JSON.stringify(result.data.invoice, null, 2),
+        );
 
-  if (!mounted) {
-    return <OverlaySpinner />;
-  }
+        // Atualizar a tabela com os novos dados
+        setData((currentData) => [result.data.invoice, ...currentData]);
+      } else if (result?.cancelled) {
+        // Modal foi cancelado, não precisa fazer nada
+        console.log("Modal cancelled");
+      }
+    } catch (error) {
+      console.error("Error handling new invoice:", error);
+      toast.error("Erro ao processar nova venda");
+    }
+  };
 
-  const handleNewCustomer = () => openModal("new-customer");
   const handleNewProduct = () => openModal("new-product");
-  const handleNewInvoice = () => openModal("new-invoice");
+  const handleNewCustomer = () => openModal("new-customer");
   const handleNewStockMovement = () => openModal("new-stock-movement");
   const handleEditCustomer = (customer: Customer) =>
     openModal("edit-customer", customer);
@@ -235,15 +246,91 @@ export function DataTable<TData extends RowWithId, TValue>({
     openModal("edit-stock-movement", stockMovement);
 
   const handleDeleteMany = async (selectedIds: number[]) => {
-    const response = await axios.delete(`/api/${pathname.slice(1)}`, {
-      data: { ids: selectedIds },
-    });
+    try {
+      const response = await axios.delete(`/api/${pathname.slice(1)}`, {
+        data: { ids: selectedIds },
+      });
 
-    window.location.reload();
-    console.log(
-      `Deleted ${selectedIds.length} items from ${pathname}, response:`,
-      response,
-    );
+      // Verificar se a resposta foi bem-sucedida
+      if (response.status >= 200 && response.status < 300) {
+        // Determinar o tipo de item baseado no pathname
+        const itemType =
+          pathname === "/products"
+            ? "produto(s)"
+            : pathname === "/customers"
+              ? "cliente(s)"
+              : pathname === "/invoices"
+                ? "venda(s)"
+                : pathname === "/stock-movement"
+                  ? "movimentação(ões) de estoque"
+                  : "item(s)";
+
+        // Verificar quantos itens foram realmente deletados
+        const deletedCount = response.data?.deletedCount || selectedIds.length;
+
+        // Atualizar a tabela localmente removendo os itens deletados
+        setData((currentData) =>
+          currentData.filter(
+            (item) => !selectedIds.includes(item.id as number),
+          ),
+        );
+
+        // Limpar seleção após deletar
+        setRowSelection({});
+
+        // Exibir toast de sucesso com informações detalhadas
+        toast.success(`${deletedCount} ${itemType} deletado(s) com sucesso!`, {
+          description: `Os itens foram removidos do sistema.`,
+          duration: 5000,
+        });
+
+        console.log(
+          `Successfully deleted ${deletedCount} items from ${pathname}`,
+          response.data,
+        );
+      } else {
+        // Resposta não foi bem-sucedida
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+    } catch (error: any) {
+      console.error("Error deleting items:", error);
+
+      // Determinar a mensagem de erro baseada no tipo de erro
+      let errorMessage =
+        "Ocorreu um erro ao tentar deletar os itens selecionados.";
+      let errorDescription = "Tente novamente.";
+
+      if (error.response) {
+        // Erro de resposta da API
+        const status = error.response.status;
+        const errorData = error.response.data;
+
+        if (status === 400) {
+          errorMessage = "Dados inválidos";
+          errorDescription =
+            errorData?.error || "Verifique os itens selecionados.";
+        } else if (status === 404) {
+          errorMessage = "Itens não encontrados";
+          errorDescription = "Os itens podem já ter sido deletados.";
+        } else if (status === 500) {
+          errorMessage = "Erro interno do servidor";
+          errorDescription = errorData?.error || "Tente novamente mais tarde.";
+        } else {
+          errorMessage = `Erro HTTP ${status}`;
+          errorDescription = errorData?.error || "Erro desconhecido.";
+        }
+      } else if (error.request) {
+        // Erro de rede
+        errorMessage = "Erro de conexão";
+        errorDescription = "Verifique sua conexão com a internet.";
+      }
+
+      // Exibir toast de erro
+      toast.error(errorMessage, {
+        description: errorDescription,
+        duration: 5000,
+      });
+    }
   };
 
   function handleDragEnd(event: DragEndEvent) {

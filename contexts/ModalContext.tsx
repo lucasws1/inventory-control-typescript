@@ -13,12 +13,14 @@ type ModalType =
   | "edit-stock-movement"
   | null;
 
+type ModalResult = any;
+
 interface ModalContextType {
   modalType: ModalType;
   modalData: any;
   isOpen: boolean;
-  openModal: (type: ModalType, data?: any) => void;
-  closeModal: () => void;
+  openModal: (type: ModalType, data?: any) => Promise<ModalResult>;
+  closeModal: (result?: ModalResult) => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -27,17 +29,27 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const [modalType, setModalType] = useState<ModalType>(null);
   const [modalData, setModalData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [resolver, setResolver] = useState<
+    ((result: ModalResult) => void) | null
+  >(null);
 
   const openModal = (type: ModalType, data?: any) => {
     setModalType(type);
     setModalData(data);
     setIsOpen(true);
+    return new Promise<ModalResult>((resolve) => {
+      setResolver(() => resolve);
+    });
   };
 
-  const closeModal = () => {
+  const closeModal = (result?: ModalResult) => {
     setIsOpen(false);
     setModalType(null);
     setModalData(null);
+    if (resolver) {
+      resolver(result);
+      setResolver(null);
+    }
   };
 
   return (
