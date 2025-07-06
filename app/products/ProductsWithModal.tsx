@@ -28,7 +28,11 @@ export default function ProductsWithModal({
   const router = useRouter();
 
   const handleEditProduct = (product: Product) => {
-    openModal("edit-product", product);
+    try {
+      openModal("edit-product", product);
+    } catch (error) {
+      console.error("Erro ao abrir modal de edição:", error);
+    }
   };
 
   const columnsWithModalEdit = useMemo(() => {
@@ -40,8 +44,20 @@ export default function ProductsWithModal({
             const product = row.original;
 
             const handleDelete = async () => {
-              await deleteProduct(product.id);
-              router.refresh();
+              try {
+                await deleteProduct(product.id);
+                router.refresh();
+              } catch (error) {
+                console.error("Erro ao deletar produto:", error);
+              }
+            };
+
+            const handleCopyId = async () => {
+              try {
+                await navigator.clipboard.writeText(product.id.toString());
+              } catch (error) {
+                console.error("Erro ao copiar ID:", error);
+              }
             };
 
             return (
@@ -53,11 +69,7 @@ export default function ProductsWithModal({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() =>
-                      navigator.clipboard.writeText(product.id.toString())
-                    }
-                  >
+                  <DropdownMenuItem onClick={handleCopyId}>
                     <IconCopy />
                     <span>Copiar ID</span>
                   </DropdownMenuItem>
@@ -73,7 +85,7 @@ export default function ProductsWithModal({
                   <DropdownMenuItem
                     variant="destructive"
                     className="cursor-pointer"
-                    onClick={() => handleDelete()}
+                    onClick={handleDelete}
                   >
                     <IconTrash />
                     <span>Deletar</span>
@@ -86,7 +98,11 @@ export default function ProductsWithModal({
       }
       return column;
     });
-  }, [router]);
+  }, [router, openModal]);
+
+  if (!products || products.length === 0) {
+    return <div>Nenhum produto encontrado.</div>;
+  }
 
   return (
     <>

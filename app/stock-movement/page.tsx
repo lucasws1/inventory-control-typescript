@@ -1,11 +1,7 @@
 import prisma from "@/lib/prisma";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const StockMovementWithModal = dynamic(
-  () => import("./StockMovementWithModal"),
-);
+import StockMovementClient from "./StockMovementClient";
 
 export const metadata: Metadata = {
   title: "Estoque",
@@ -26,7 +22,7 @@ const StockMovement = async () => {
 
   return (
     <>
-      <StockMovementWithModal stockMovements={stockMovement as any[]} />
+      <StockMovementClient stockMovements={stockMovement as any[]} />
     </>
   );
 };

@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { Providers } from "@/components/providers";
+import { ChartDataProvider } from "@/contexts/ChartDataContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,30 +36,32 @@ export default function RootLayout({
     <html lang="en" className="scrollbar-hidden dark">
       <body className="dark scrollbar-hidden">
         <Providers>
-          <SidebarProvider
-            style={
-              {
-                "--sidebar-width": "calc(var(--spacing) * 72)",
-                "--header-height": "calc(var(--spacing) * 12)",
-              } as React.CSSProperties
-            }
-          >
-            <AppSidebar variant="inset" />
-            <SidebarInset className="scrollbar-hidden">
-              <SiteHeader />
-              <div className="scrollbar-hidden flex flex-1 flex-col">
-                <div className="scrollbar-hidden @container/main flex flex-1 flex-col gap-2">
-                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <SectionCards />
-                    <div className="px-4 lg:px-6">
-                      <ChartAreaInteractive />
-                      {children}
+          <ChartDataProvider>
+            <SidebarProvider
+              style={
+                {
+                  "--sidebar-width": "calc(var(--spacing) * 72)",
+                  "--header-height": "calc(var(--spacing) * 12)",
+                } as React.CSSProperties
+              }
+            >
+              <AppSidebar variant="inset" />
+              <SidebarInset className="scrollbar-hidden">
+                <SiteHeader />
+                <div className="scrollbar-hidden flex flex-1 flex-col">
+                  <div className="scrollbar-hidden @container/main flex flex-1 flex-col gap-2">
+                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                      <SectionCards />
+                      <div className="px-4 lg:px-6">
+                        <ChartAreaInteractive />
+                        {children}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
+              </SidebarInset>
+            </SidebarProvider>
+          </ChartDataProvider>
         </Providers>
       </body>
     </html>

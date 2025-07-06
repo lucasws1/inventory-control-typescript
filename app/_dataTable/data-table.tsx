@@ -174,7 +174,16 @@ export function DataTable<TData extends RowWithId, TValue>({
   const [inputValue, setInputValue] = useState<string>("");
 
   const pathname = usePathname();
-  const { openModal } = useModal();
+
+  // Adicionar verificação de segurança para o useModal
+  let openModal: any;
+  try {
+    const modalContext = useModal();
+    openModal = modalContext.openModal;
+  } catch (error) {
+    console.warn("Modal context not available:", error);
+    openModal = () => {};
+  }
 
   const sortableId = useId();
   const sensors = useSensors(

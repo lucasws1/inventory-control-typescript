@@ -1,28 +1,18 @@
 "use client";
 
-import * as React from "react";
 import {
   IconBox,
-  IconBrandCashapp,
   IconCamera,
-  IconChartBar,
   IconCurrencyDollar,
   IconDashboard,
-  IconDatabase,
   IconFileAi,
   IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
   IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
   IconSearch,
-  IconSettings,
   IconShoppingCart,
   IconUser,
-  IconUsers,
 } from "@tabler/icons-react";
+import * as React from "react";
 
 // import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
@@ -120,16 +110,12 @@ const data = {
     },
   ],
   navSecondary: [
-    {
-      title: "Configurações",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Obter Ajuda",
-      url: "#",
-      icon: IconHelp,
-    },
+    // {
+    //   title: "Configurações",
+    //   url: "#",
+    //   icon: IconSettings,
+    // },
+
     {
       title: "Pesquisar",
       url: "#",
@@ -173,7 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">
-                  Inventory Control
+                  Controle de Estoque
                 </span>
               </a>
             </SidebarMenuButton>

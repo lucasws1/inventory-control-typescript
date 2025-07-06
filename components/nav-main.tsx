@@ -1,19 +1,16 @@
 "use client";
 
 import {
-  IconCirclePlusFilled,
-  IconDots,
-  IconFolder,
-  IconMail,
-  IconShare3,
-  IconPlus,
-  IconTrash,
-  type Icon,
-  IconEdit,
-  IconShoppingCart,
   IconBox,
-  IconUser,
   IconCurrencyDollar,
+  IconDots,
+  IconEdit,
+  IconMail,
+  IconPlus,
+  IconShoppingCart,
+  IconTrash,
+  IconUser,
+  type Icon,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -26,17 +23,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useModal } from "@/contexts/ModalContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useModal } from "@/contexts/ModalContext";
 
 export function NavMain({
   items,
@@ -72,39 +68,55 @@ export function NavMain({
       <SidebarGroup>
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
-            <SidebarMenuItem className="flex items-center gap-2">
+            <SidebarMenuItem className="flex w-full items-center gap-2">
+              {/* <SidebarMenuButton asChild tooltip="Quick Create" className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"> */}
               <SidebarMenuButton
+                asChild
+                className="hover:bg-yellow-500"
                 tooltip="Quick Create"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               >
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center justify-center gap-2">
-                    <IconPlus />
-                    <span>Novo documento</span>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="flex w-full flex-1 items-center justify-center gap-2 pl-2">
+                      <IconPlus className="text-primary-foreground size-4" />
+                      Novo documento
+                    </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={handleNewProduct}>
-                      <IconShoppingCart />
-                      <span>Produto</span>
+                  <DropdownMenuContent className="bg-primary text-primary-foreground">
+                    <DropdownMenuItem
+                      className="hover:text-primary-foreground focus:text-primary-foreground flex items-center gap-2 hover:bg-stone-400/60 focus:bg-stone-400/60"
+                      onClick={handleNewProduct}
+                    >
+                      <IconShoppingCart className="text-primary-foreground size-4" />
+                      Novo produto
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleNewStockMovement}>
-                      <IconBox />
-                      <span>Estoque</span>
+                    <DropdownMenuItem
+                      className="hover:text-primary-foreground focus:text-primary-foreground hover:bg-stone-400/60 focus:bg-stone-400/60"
+                      onClick={handleNewStockMovement}
+                    >
+                      <IconBox className="text-primary-foreground size-4" />
+                      Novo estoque
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleNewCustomer}>
-                      <IconUser />
-                      <span>Cliente</span>
+                    <DropdownMenuItem
+                      className="hover:text-primary-foreground focus:text-primary-foreground hover:bg-stone-400/60 focus:bg-stone-400/60"
+                      onClick={handleNewCustomer}
+                    >
+                      <IconUser className="text-primary-foreground size-4" />
+                      Novo cliente
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleNewInvoice}>
-                      <IconCurrencyDollar />
-                      <span>Venda</span>
+                    <DropdownMenuItem
+                      className="hover:text-primary-foreground focus:text-primary-foreground hover:bg-stone-400/60 focus:bg-stone-400/60"
+                      onClick={handleNewInvoice}
+                    >
+                      <IconShoppingCart className="text-primary-foreground size-4" />
+                      Nova venda
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuButton>
               <Button
                 size="icon"
-                className="size-8 group-data-[collapsible=icon]:opacity-0"
+                className="size-8 flex-shrink-0 group-data-[collapsible=icon]:opacity-0"
                 variant="outline"
               >
                 <IconMail />

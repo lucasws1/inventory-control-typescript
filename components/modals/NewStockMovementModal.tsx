@@ -142,11 +142,14 @@ export default function NewStockMovementModal({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Tipo</SelectLabel>
-                      {Object.values(StockReason).map((reason) => (
-                        <SelectItem key={reason} value={reason}>
-                          {reason}
-                        </SelectItem>
-                      ))}
+                      {Object.values(StockReason).map(
+                        (reason) =>
+                          reason !== "VENDA" && (
+                            <SelectItem key={reason} value={reason}>
+                              {reason}
+                            </SelectItem>
+                          ),
+                      )}
                     </SelectGroup>
                   </SelectContent>
                 </Select>

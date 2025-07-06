@@ -1,9 +1,7 @@
 import prisma from "@/lib/prisma";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const InvoicesWithModal = dynamic(() => import("./InvoicesWithModal"));
+import InvoicesClient from "./InvoicesClient";
 
 export const metadata: Metadata = {
   title: "Vendas",
@@ -29,7 +27,7 @@ const Invoices = async () => {
 
   return (
     <div>
-      <InvoicesWithModal invoices={invoices as InvoicesTableData[]} />
+      <InvoicesClient invoices={invoices as InvoicesTableData[]} />
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const ProductsWithModal = dynamic(() => import("./ProductsWithModal"));
+import ProductsClient from "./ProductsClient";
 
 export const metadata: Metadata = {
   title: "Produtos",
@@ -17,7 +15,7 @@ const Products = async () => {
     },
   });
 
-  return <ProductsWithModal products={products as any[]} />;
+  return <ProductsClient products={products as any[]} />;
 };
 
 export default Products;
