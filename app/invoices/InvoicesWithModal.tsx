@@ -7,27 +7,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import DataTableClient from "../_dataTable/page";
+import { DataTable } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
 import { columns } from "./columns";
 
-export default function InvoicesWithModal({
-  invoices,
-}: {
-  invoices: InvoicesTableData[];
-}) {
+export default function InvoicesWithModal() {
   const { openModal } = useModal();
-  const router = useRouter();
+  const { invoices, loading, error, refreshData } = useData();
 
   const handleEditInvoice = (invoice: InvoicesTableData) => {
     openModal("edit-invoice", invoice);
+  };
+
+  const handleDelete = async (invoice: InvoicesTableData) => {
+    await deleteInvoice(invoice.id);
+    await refreshData(); // Atualiza os dados após deletar
   };
 
   const columnsWithModalEdit = useMemo(() => {
@@ -37,11 +38,6 @@ export default function InvoicesWithModal({
           ...column,
           cell: ({ row }: any) => {
             const invoice = row.original;
-
-            const handleDelete = async () => {
-              await deleteInvoice(invoice.id);
-              router.refresh();
-            };
 
             return (
               <DropdownMenu>
@@ -72,7 +68,7 @@ export default function InvoicesWithModal({
                   <DropdownMenuItem
                     variant="destructive"
                     className="cursor-pointer"
-                    onClick={() => handleDelete()}
+                    onClick={() => handleDelete(invoice)}
                   >
                     <IconTrash />
                     <span>Deletar</span>
@@ -85,12 +81,28 @@ export default function InvoicesWithModal({
       }
       return column;
     });
-  }, [router]);
+  }, [handleEditInvoice, handleDelete]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        Carregando invoices...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8 text-red-500">
+        Erro: {error}
+      </div>
+    );
+  }
 
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={invoices} />
+      <DataTable columns={columnsWithModalEdit} data={invoices} />
     </>
   );
 }

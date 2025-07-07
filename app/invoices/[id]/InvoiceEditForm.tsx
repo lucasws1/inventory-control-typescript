@@ -45,11 +45,7 @@ import { Invoice } from "@/types/invoice";
 import { Product } from "@/types/product";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import { IconShoppingCart, IconX } from "@tabler/icons-react";
-import {
-  AlertCircleIcon,
-  CheckCircle2Icon,
-  ChevronDownIcon,
-} from "lucide-react";
+import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -406,35 +402,6 @@ export default function InvoiceEditForm({
           <Button type="submit" className="w-full cursor-pointer">
             Enviar
           </Button>
-          {/* <div className="grid w-full max-w-xl items-start gap-4">
-            {status === "success" && (
-              <Alert>
-                <CheckCircle2Icon />
-                <AlertTitle>Successo!</AlertTitle>
-                <AlertDescription>
-                  A venda foi lançada com sucesso. Clique abaixo para retornar.
-                </AlertDescription>
-              </Alert>
-            )}
-            {status === "error" && (
-              <Alert variant="destructive">
-                <AlertCircleIcon />
-                <AlertTitle>Erro.</AlertTitle>
-                <AlertDescription>
-                  <p>
-                    Houve um erro na hora de lançar a venda. Tente novamente
-                    mais tarde.
-                  </p>
-                  <ul className="list-inside list-disc text-sm">
-                    <li>Check your card details</li>
-                    <li>Ensure sufficient funds</li>
-                    <li>Verify billing address</li>
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-          </div> */}
-
           <Button
             type="button"
             variant="outline"

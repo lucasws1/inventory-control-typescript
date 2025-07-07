@@ -7,25 +7,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { Product } from "@/types/product";
 import { ProductsTableData } from "@/types/productsTableData";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import DataTableClient from "../_dataTable/page";
+import { DataTable } from "../_dataTable/data-table";
 import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
 
-export default function ProductsWithModal({
-  products,
-}: {
-  products: Product[];
-}) {
+export default function ProductsWithModal() {
   const { openModal } = useModal();
-  const router = useRouter();
+  const { products, loading, error, refreshData } = useData();
 
   const handleEditProduct = (product: Product) => {
     try {
@@ -46,7 +42,7 @@ export default function ProductsWithModal({
             const handleDelete = async () => {
               try {
                 await deleteProduct(product.id);
-                router.refresh();
+                await refreshData();
               } catch (error) {
                 console.error("Erro ao deletar produto:", error);
               }
@@ -98,7 +94,15 @@ export default function ProductsWithModal({
       }
       return column;
     });
-  }, [router, openModal]);
+  }, [openModal, refreshData]);
+
+  if (loading) {
+    return <div>Carregando produtos...</div>;
+  }
+
+  if (error) {
+    return <div>Erro ao carregar produtos.</div>;
+  }
 
   if (!products || products.length === 0) {
     return <div>Nenhum produto encontrado.</div>;
@@ -107,7 +111,7 @@ export default function ProductsWithModal({
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={products} />
+      <DataTable columns={columnsWithModalEdit} data={products} />
     </>
   );
 }

@@ -7,26 +7,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InvoicesTableData } from "@/types/invoicesTableData";
-import { ColumnDef } from "@tanstack/react-table";
-import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
-import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useMemo } from "react";
-import DataTableClient from "../_dataTable/page";
-import { deleteCustomer } from "../lib/actions";
-import { columns } from "./columns";
+import { useData } from "@/contexts/DataContext";
+import { useModal } from "@/contexts/ModalContext";
 import { Customer } from "@/types/customer";
 import { CustomerTableData } from "@/types/customerTableData";
-import { useModal } from "@/contexts/ModalContext";
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { useMemo } from "react";
+import { DataTable } from "../_dataTable/data-table";
+import { deleteCustomer } from "../lib/actions";
+import { columns } from "./columns";
 
-export default function CustomersWithModal({
-  customers,
-}: {
-  customers: Customer[];
-}) {
+export default function CustomersWithModal() {
   const { openModal } = useModal();
-  const router = useRouter();
+  const { customers, loading, error, refreshData } = useData();
 
   const handleEditCustomer = (customer: Customer) => {
     openModal("edit-customer", customer);
@@ -42,7 +37,7 @@ export default function CustomersWithModal({
 
             const handleDelete = async () => {
               await deleteCustomer(customer.id);
-              router.refresh();
+              await refreshData();
             };
 
             return (
@@ -88,12 +83,24 @@ export default function CustomersWithModal({
       }
       return column;
     });
-  }, [router]);
+  }, [openModal, refreshData]);
+
+  if (loading) {
+    return <div>Carregando clientes...</div>;
+  }
+
+  if (error) {
+    return <div>Erro ao carregar clientes.</div>;
+  }
+
+  if (!customers || customers.length === 0) {
+    return <div>Nenhum cliente encontrado.</div>;
+  }
 
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={customers} />
+      <DataTable columns={columnsWithModalEdit} data={customers} />
     </>
   );
 }

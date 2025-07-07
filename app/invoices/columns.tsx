@@ -59,11 +59,13 @@ export const columns: ColumnDef<InvoicesTableData>[] = [
       <DataTableColumnHeader column={column} title="Data" className="w-full" />
     ),
     cell: ({ row }) => {
-      const date = row.original.purchaseDate;
+      const date = new Date(row.original.purchaseDate);
       return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
-      const date = (row.getValue(columnId) as Date).toLocaleDateString("pt-BR");
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
       const [day, month, year] = date.split("/");
 
       return `${day}${month}${year}`.includes(filterValue);

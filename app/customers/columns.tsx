@@ -109,12 +109,15 @@ export const columns: ColumnDef<CustomerTableData>[] = [
       />
     ),
     cell: ({ row }) => {
-      const date = row.original.createdAt;
+      const date = new Date(row.original.createdAt);
       return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
-      const date = (row.getValue(columnId) as Date).toLocaleDateString("pt-BR");
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
       const [day, month, year] = date.split("/");
+
       return `${day}${month}${year}`.includes(filterValue);
     },
   },
@@ -128,11 +131,13 @@ export const columns: ColumnDef<CustomerTableData>[] = [
       />
     ),
     cell: ({ row }) => {
-      const date = row.original.updatedAt;
+      const date = new Date(row.original.updatedAt);
       return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
-      const date = (row.getValue(columnId) as Date).toLocaleDateString("pt-BR");
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
       const [day, month, year] = date.split("/");
       return `${day}${month}${year}`.includes(filterValue);
     },

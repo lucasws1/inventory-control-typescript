@@ -1,32 +1,3 @@
-// import prisma from "@/lib/prisma";
-// import { Customer } from "@/types/customer";
-// import { InvoiceItem } from "@/types/invoiceItem";
-// import { Product } from "@/types/product";
-// import { Metadata } from "next";
-// import InvoiceForm from "./invoiceForm";
-
-// export const metadata: Metadata = {
-//   title: "Lançar Venda",
-// };
-
-// export default async function NewInvoice() {
-//   const [customers, products, invoiceItems] = await Promise.all([
-//     prisma.customer.findMany(),
-//     prisma.product.findMany(),
-//     prisma.invoiceItem.findMany(),
-//   ]);
-
-//   return (
-//     <div>
-//       <InvoiceForm
-//         customers={customers as Customer[]}
-//         products={products as any[]}
-//         invoiceItems={invoiceItems as InvoiceItem[]}
-//       />
-//     </div>
-//   );
-// }
-
 "use client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -60,31 +31,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Customer } from "@/types/customer";
-import { Product } from "@/types/product";
 import { useActionState, useEffect, useState } from "react";
 
 import { createInvoice } from "@/app/lib/actions";
 import { Calendar } from "@/components/ui/calendar";
-import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { useData } from "@/contexts/DataContext";
+import { useDraggable } from "@/hooks/useDraggable";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
-import {
-  AlertCircleIcon,
-  CheckCircle2Icon,
-  ChevronDownIcon,
-} from "lucide-react";
+import { IconX } from "@tabler/icons-react";
+import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import { IconX } from "@tabler/icons-react";
-import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 
 export type InvoiceItem = {
   productId: number;
@@ -112,18 +77,14 @@ export default function NewInvoice() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [openDate, setOpenDate] = useState(false);
   const [productId, setProductId] = useState("");
-  const [status, setStatus] = useState<"success" | "error" | "idle">("idle");
   const [stockMovement, setStockMovement] = useState<StockMovement[]>([]);
   const [openNewInvoiceItemProductList, setOpenNewInvoiceItemProductList] =
     useState(false);
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
   const { position, dragHandleProps } = useDraggable();
+  const { products, customers, invoiceItems } = useData();
 
-  // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
       toast.success(state.message || "Venda lançada com sucesso!");
@@ -134,24 +95,12 @@ export default function NewInvoice() {
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const [productsData, customersData, invoiceItemsData] =
-          await Promise.all([
-            axios.get("/api/products"),
-            axios.get("/api/customers"),
-            axios.get("/api/invoiceItems"),
-          ]);
-        setProducts(productsData.data);
-        setCustomers(customersData.data);
-        setInvoiceItems(invoiceItemsData.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
+    if (!productId) return;
+    const up = invoiceItems.find(
+      (inv) => inv.productId === Number(productId),
+    )?.unitPrice;
+    setUnitPrice(up !== undefined ? up.toString() : "");
+  }, [productId]);
 
   const handleReturn = () => {
     router.push("/invoices");
@@ -170,14 +119,6 @@ export default function NewInvoice() {
       router.push("/customers");
     }
   };
-
-  useEffect(() => {
-    if (!productId) return;
-    const up = invoiceItems.find(
-      (inv) => inv.productId === Number(productId),
-    )?.unitPrice;
-    setUnitPrice(up !== undefined ? up.toString() : "");
-  }, [productId]);
 
   const handleAddProduct = () => {
     if (!productId || !productQuantity || !unitPrice) return;
@@ -497,36 +438,6 @@ export default function NewInvoice() {
               >
                 {pending ? "Enviando..." : "Enviar"}
               </Button>
-              {/* <div className="grid w-full max-w-xl items-start gap-4">
-                {status === "success" && (
-                  <Alert>
-                    <CheckCircle2Icon />
-                    <AlertTitle>Successo!</AlertTitle>
-                    <AlertDescription>
-                      A venda foi lançada com sucesso. Clique abaixo para
-                      retornar.
-                    </AlertDescription>
-                  </Alert>
-                )}
-                {status === "error" && (
-                  <Alert variant="destructive">
-                    <AlertCircleIcon />
-                    <AlertTitle>Erro.</AlertTitle>
-                    <AlertDescription>
-                      <p>
-                        Houve um erro na hora de lançar a venda. Tente novamente
-                        mais tarde.
-                      </p>
-                      <ul className="list-inside list-disc text-sm">
-                        <li>Check your card details</li>
-                        <li>Ensure sufficient funds</li>
-                        <li>Verify billing address</li>
-                      </ul>
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </div> */}
-
               <Button
                 type="button"
                 variant="outline"

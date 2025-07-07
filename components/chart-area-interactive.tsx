@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, Legend } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -49,9 +49,18 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const indicators = [
+  { value: "revenue", label: "Faturamento" },
+  { value: "customers", label: "Clientes" },
+  { value: "products", label: "Produtos" },
+  { value: "stockBalance", label: "Estoque" },
+] as const;
+
 export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const { chartData, loading, timeRange, setTimeRange } = useChartData();
+  const [selectedIndicator, setSelectedIndicator] =
+    React.useState<keyof typeof chartConfig>("revenue");
 
   React.useEffect(() => {
     if (isMobile) {
@@ -83,7 +92,24 @@ export function ChartAreaInteractive() {
                 : "7 dias"}
           </span>
         </CardDescription>
-        <CardAction>
+        <CardAction className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Select
+            value={selectedIndicator}
+            onValueChange={(value) =>
+              setSelectedIndicator(value as keyof typeof chartConfig)
+            }
+          >
+            <SelectTrigger className="w-full sm:w-40" size="sm">
+              <SelectValue placeholder="Selecionar indicador" />
+            </SelectTrigger>
+            <SelectContent>
+              {indicators.map((indicator) => (
+                <SelectItem key={indicator.value} value={indicator.value}>
+                  {indicator.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <ToggleGroup
             type="single"
             value={timeRange}
@@ -199,17 +225,6 @@ export function ChartAreaInteractive() {
                   });
                 }}
               />
-              {/* <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => {
-                  if (value >= 1000) {
-                    return `${(value / 1000).toFixed(1)}k`;
-                  }
-                  return value.toString();
-                }}
-              /> */}
               <ChartTooltip
                 cursor={false}
                 defaultIndex={isMobile ? -1 : 10}
@@ -222,56 +237,16 @@ export function ChartAreaInteractive() {
                       });
                     }}
                     indicator="dot"
-                    // formatter={(value, name) => {
-                    //   if (name === "revenue") {
-                    //     return [formatCurrencyBRL(value), "Faturamento"];
-                    //   }
-                    //   if (name === "customers") {
-                    //     return [value, "Novos Clientes"];
-                    //   }
-                    //   if (name === "products") {
-                    //     return [value, "Novos Produtos"];
-                    //   }
-                    //   if (name === "stockBalance") {
-                    //     return [value, "Estoque Total"];
-                    //   }
-                    //   return [value, name];
-                    // }}
                   />
                 }
               />
-              <Legend />
               <Area
-                dataKey="revenue"
+                dataKey={selectedIndicator}
                 type="monotone"
-                fill="url(#fillRevenue)"
-                stroke="var(--color-revenue)"
+                fill={`url(#fill${selectedIndicator.charAt(0).toUpperCase() + selectedIndicator.slice(1)})`}
+                stroke={`var(--color-${selectedIndicator})`}
                 strokeWidth={2}
                 stackId="1"
-              />
-              <Area
-                dataKey="customers"
-                type="monotone"
-                fill="url(#fillCustomers)"
-                stroke="var(--color-customers)"
-                strokeWidth={2}
-                stackId="2"
-              />
-              <Area
-                dataKey="products"
-                type="monotone"
-                fill="url(#fillProducts)"
-                stroke="var(--color-products)"
-                strokeWidth={2}
-                stackId="3"
-              />
-              <Area
-                dataKey="stockBalance"
-                type="monotone"
-                fill="url(#fillStockBalance)"
-                stroke="var(--color-stockBalance)"
-                strokeWidth={2}
-                stackId="4"
               />
             </AreaChart>
           </ChartContainer>
@@ -279,11 +254,4 @@ export function ChartAreaInteractive() {
       </CardContent>
     </Card>
   );
-}
-
-function formatCurrencyBRL(value: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(value);
 }

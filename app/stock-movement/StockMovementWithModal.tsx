@@ -7,25 +7,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useData } from "@/contexts/DataContext";
+import { useModal } from "@/contexts/ModalContext";
 import { StockMovement } from "@/types/stockMovement";
+import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import DataTableClient from "../_dataTable/page";
+import { DataTable } from "../_dataTable/data-table";
 import { deleteStockMovement } from "../lib/actions";
 import { columns } from "./columns";
-import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
-import { useModal } from "@/contexts/ModalContext";
 
-export default function StockMovementWithModal({
-  stockMovements,
-}: {
-  stockMovements: StockMovement[];
-}) {
+export default function StockMovementWithModal() {
   const { openModal } = useModal();
-  const router = useRouter();
+  const { stockMovements, loading, error, refreshData } = useData();
 
   const handleEditStockMovement = (stockMovement: StockMovement) => {
     openModal("edit-stock-movement", stockMovement);
@@ -42,7 +38,7 @@ export default function StockMovementWithModal({
 
             const handleDelete = async () => {
               await deleteStockMovement(stockMovement.id);
-              router.refresh();
+              await refreshData();
             };
 
             return (
@@ -87,12 +83,24 @@ export default function StockMovementWithModal({
       }
       return column;
     });
-  }, [router]);
+  }, [openModal, refreshData]);
+
+  if (loading) {
+    return <div>Carregando movimentações de estoque...</div>;
+  }
+
+  if (error) {
+    return <div>Erro ao carregar movimentações de estoque.</div>;
+  }
+
+  if (!stockMovements || stockMovements.length === 0) {
+    return <div>Nenhuma movimentação de estoque encontrada.</div>;
+  }
 
   return (
     <>
       {/* Tabela sempre visível */}
-      <DataTableClient columns={columnsWithModalEdit} data={stockMovements} />
+      <DataTable columns={columnsWithModalEdit} data={stockMovements} />
     </>
   );
 }
