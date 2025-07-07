@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDraggable } from "@/hooks/useDraggable";
 import { Customer } from "@/types/customer";
-import { IconX } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 
@@ -122,16 +121,6 @@ export default function CustomerEditForm({
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
-            {/* Close button - DENTRO do card para não sumir */}
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
-              onClick={handleCloseModal}
-            >
-              <IconX className="h-2 w-2" />
-            </Button> */}
-
             {renderForm()}
           </div>
         </div>

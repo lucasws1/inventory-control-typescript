@@ -16,5 +16,9 @@ export default async function CustomerPage({
   const customer = await prisma.customer.findUnique({
     where: { id: Number(id) },
   });
-  return <CustomerEditForm customer={customer as Customer} />;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4">
+      <CustomerEditForm customer={customer as Customer} />
+    </div>
+  );
 }

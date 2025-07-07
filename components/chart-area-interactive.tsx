@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, Legend } from "recharts";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -35,6 +35,18 @@ const chartConfig = {
     label: "Faturamento",
     color: "var(--primary)",
   },
+  customers: {
+    label: "Clientes",
+    color: "var(--primary)",
+  },
+  products: {
+    label: "Produtos",
+    color: "var(--primary)",
+  },
+  stockBalance: {
+    label: "Estoque",
+    color: "var(--primary)",
+  },
 } satisfies ChartConfig;
 
 export function ChartAreaInteractive() {
@@ -52,10 +64,10 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Faturamento</CardTitle>
+        <CardTitle>Indicadores</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Faturamento dos últimos{" "}
+            Indicadores dos últimos{" "}
             {timeRange === "90d"
               ? "3 meses"
               : timeRange === "30d"
@@ -121,11 +133,53 @@ export function ChartAreaInteractive() {
                   <stop
                     offset="5%"
                     stopColor="var(--color-revenue)"
-                    stopOpacity={1.0}
+                    stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
                     stopColor="var(--color-revenue)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillCustomers" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-customers)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-customers)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillProducts" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-products)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-products)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient
+                  id="fillStockBalance"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-stockBalance)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-stockBalance)"
                     stopOpacity={0.1}
                   />
                 </linearGradient>
@@ -145,6 +199,17 @@ export function ChartAreaInteractive() {
                   });
                 }}
               />
+              {/* <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => {
+                  if (value >= 1000) {
+                    return `${(value / 1000).toFixed(1)}k`;
+                  }
+                  return value.toString();
+                }}
+              /> */}
               <ChartTooltip
                 cursor={false}
                 defaultIndex={isMobile ? -1 : 10}
@@ -157,14 +222,56 @@ export function ChartAreaInteractive() {
                       });
                     }}
                     indicator="dot"
+                    // formatter={(value, name) => {
+                    //   if (name === "revenue") {
+                    //     return [formatCurrencyBRL(value), "Faturamento"];
+                    //   }
+                    //   if (name === "customers") {
+                    //     return [value, "Novos Clientes"];
+                    //   }
+                    //   if (name === "products") {
+                    //     return [value, "Novos Produtos"];
+                    //   }
+                    //   if (name === "stockBalance") {
+                    //     return [value, "Estoque Total"];
+                    //   }
+                    //   return [value, name];
+                    // }}
                   />
                 }
               />
+              <Legend />
               <Area
                 dataKey="revenue"
-                type="natural"
+                type="monotone"
                 fill="url(#fillRevenue)"
                 stroke="var(--color-revenue)"
+                strokeWidth={2}
+                stackId="1"
+              />
+              <Area
+                dataKey="customers"
+                type="monotone"
+                fill="url(#fillCustomers)"
+                stroke="var(--color-customers)"
+                strokeWidth={2}
+                stackId="2"
+              />
+              <Area
+                dataKey="products"
+                type="monotone"
+                fill="url(#fillProducts)"
+                stroke="var(--color-products)"
+                strokeWidth={2}
+                stackId="3"
+              />
+              <Area
+                dataKey="stockBalance"
+                type="monotone"
+                fill="url(#fillStockBalance)"
+                stroke="var(--color-stockBalance)"
+                strokeWidth={2}
+                stackId="4"
               />
             </AreaChart>
           </ChartContainer>
@@ -172,4 +279,11 @@ export function ChartAreaInteractive() {
       </CardContent>
     </Card>
   );
+}
+
+function formatCurrencyBRL(value: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
 }

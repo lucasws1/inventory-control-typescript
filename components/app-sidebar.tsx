@@ -8,6 +8,7 @@ import {
   IconFileAi,
   IconFileDescription,
   IconInnerShadowTop,
+  IconSettings,
   IconSearch,
   IconShoppingCart,
   IconUser,
@@ -18,6 +19,8 @@ import * as React from "react";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
+import { SearchModal } from "@/components/search-modal";
+import { useSearch } from "@/hooks/use-search";
 import {
   Sidebar,
   SidebarContent,
@@ -147,33 +150,51 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { isOpen, setIsOpen } = useSearch();
+
+  const handleSearchClick = () => {
+    setIsOpen(true);
+  };
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">
-                  Controle de Estoque
-                </span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavDocuments items={data.documents} /> */}
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
+    <>
+      <Sidebar collapsible="offcanvas" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="data-[slot=sidebar-menu-button]:!p-1.5"
+              >
+                <a href="#">
+                  <IconInnerShadowTop className="!size-5" />
+                  <span className="text-base font-semibold">
+                    Controle de Estoque
+                  </span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={data.navMain} />
+          {/* <NavDocuments items={data.documents} /> */}
+          <NavSecondary
+            items={data.navSecondary}
+            className="mt-auto"
+            onItemClick={(item) => {
+              if (item.title === "Pesquisar") {
+                handleSearchClick();
+              }
+            }}
+          />
+        </SidebarContent>
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
+      </Sidebar>
+
+      <SearchModal open={isOpen} onOpenChange={setIsOpen} />
+    </>
   );
 }

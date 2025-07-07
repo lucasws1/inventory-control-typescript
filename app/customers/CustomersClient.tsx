@@ -1,6 +1,5 @@
 "use client";
 
-import { CustomerTableData } from "@/types/customerTableData";
 import dynamic from "next/dynamic";
 
 const CustomersWithModal = dynamic(() => import("./CustomersWithModal"), {
