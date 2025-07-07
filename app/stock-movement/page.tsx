@@ -22,7 +22,7 @@ const StockMovement = async () => {
 
   return (
     <>
-      <StockMovementClient stockMovements={stockMovement as any[]} />
+      <StockMovementClient />
     </>
   );
 };

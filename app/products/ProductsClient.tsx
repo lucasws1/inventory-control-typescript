@@ -3,6 +3,6 @@
 import { ProductsTableData } from "@/types/productsTableData";
 import ProductsWithModal from "./ProductsWithModal";
 
-export default function ProductsClient({ products }: { products: any[] }) {
-  return <ProductsWithModal products={products} />;
+export default function ProductsClient() {
+  return <ProductsWithModal />;
 }

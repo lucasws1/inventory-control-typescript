@@ -82,7 +82,9 @@ export default function InvoiceEditForm({
   );
   const [open, setOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState(invoice.pending.toString());
-  const [date, setDate] = useState<Date | undefined>(invoice.purchaseDate);
+  const [date, setDate] = useState<Date | undefined>(
+    invoice.purchaseDate ? new Date(invoice.purchaseDate) : undefined,
+  );
   const [openDate, setOpenDate] = useState(false);
   const [productId, setProductId] = useState("");
   const [status, setStatus] = useState<"success" | "error" | "idle">("idle");

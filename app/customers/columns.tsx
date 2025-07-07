@@ -22,15 +22,9 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { DragHandle } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
 
 export const columns: ColumnDef<CustomerTableData>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
   {
     id: "select",
     header: ({ table }) => (
@@ -152,8 +146,7 @@ export const columns: ColumnDef<CustomerTableData>[] = [
       >
         {row.original.Invoice ? (
           row.original.Invoice.find((item) => item.pending) ? (
-            // If any invoice is pending, show loading icon
-            <IconLoader className="animate-spin" />
+            <IconLoader />
           ) : (
             <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
           )
@@ -174,7 +167,6 @@ export const columns: ColumnDef<CustomerTableData>[] = [
         (acc, invoice) => invoice.amount + acc,
         0,
       );
-      // If amount is null or undefined, return a default value
       if (amount === null || amount === undefined) {
         return <div className="text-right font-medium">R$ 0,00</div>;
       }

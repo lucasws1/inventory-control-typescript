@@ -11,9 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Form from "next/form";
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IconX } from "@tabler/icons-react";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -124,16 +123,6 @@ export default function NewCustomerModal({
           {...dragHandleProps}
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >
-          {/* Close button */}
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
-            onClick={handleCloseModal}
-          >
-            <IconX className="h-2 w-2" />
-          </Button> */}
-
           {renderForm()}
         </div>
       </div>

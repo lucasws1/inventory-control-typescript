@@ -16,16 +16,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { InvoicesTableData } from "@/types/invoicesTableData";
 import { useRouter } from "next/navigation";
-import { DragHandle } from "../_dataTable/data-table";
 import { deleteInvoice } from "../lib/actions";
 import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
 
 export const columns: ColumnDef<InvoicesTableData>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
   {
     id: "select",
     header: ({ table }) => (

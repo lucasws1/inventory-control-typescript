@@ -15,7 +15,7 @@ const Products = async () => {
     },
   });
 
-  return <ProductsClient products={products as any[]} />;
+  return <ProductsClient />;
 };
 
 export default Products;

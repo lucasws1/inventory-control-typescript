@@ -10,10 +10,6 @@ const StockMovementWithModal = dynamic(
   },
 );
 
-export default function StockMovementClient({
-  stockMovements,
-}: {
-  stockMovements: any[];
-}) {
-  return <StockMovementWithModal stockMovements={stockMovements} />;
+export default function StockMovementClient() {
+  return <StockMovementWithModal />;
 }

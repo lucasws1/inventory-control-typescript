@@ -1,6 +1,33 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+// Helper function to serialize dates in nested objects
+function serializeDates(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(serializeDates);
+  }
+
+  if (typeof obj === "object") {
+    const serialized: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        serialized[key] = serializeDates(obj[key]);
+      }
+    }
+    return serialized;
+  }
+
+  return obj;
+}
+
 export async function GET() {
   try {
     const [products, customers, invoices, stockMovements, invoiceItems] =
@@ -38,13 +65,16 @@ export async function GET() {
         }),
       ]);
 
-    return NextResponse.json({
-      products,
-      customers,
-      invoices,
-      stockMovements,
-      invoiceItems,
-    });
+    // Serialize all date objects to ensure proper JSON serialization
+    const serializedData = {
+      products: serializeDates(products),
+      customers: serializeDates(customers),
+      invoices: serializeDates(invoices),
+      stockMovements: serializeDates(stockMovements),
+      invoiceItems: serializeDates(invoiceItems),
+    };
+
+    return NextResponse.json(serializedData);
   } catch (error) {
     return NextResponse.json(
       { error: "Erro ao carregar dados" },

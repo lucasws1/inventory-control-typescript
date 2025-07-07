@@ -43,12 +43,7 @@ import { Customer } from "@/types/customer";
 import { Product } from "@/types/product";
 import { useDraggable } from "@/hooks/useDraggable";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
-import { IconX } from "@tabler/icons-react";
-import {
-  AlertCircleIcon,
-  CheckCircle2Icon,
-  ChevronDownIcon,
-} from "lucide-react";
+import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
 import axios from "axios";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
@@ -460,35 +455,6 @@ export default function NewInvoiceModal({
             >
               {pending ? "Enviando..." : "Enviar"}
             </Button>
-            {/* <div className="grid w-full max-w-xl items-start gap-4">
-              {status === "success" && (
-                <Alert>
-                  <CheckCircle2Icon />
-                  <AlertTitle>Successo!</AlertTitle>
-                  <AlertDescription>
-                    A venda foi lançada com sucesso. Clique abaixo para
-                    retornar.
-                  </AlertDescription>
-                </Alert>
-              )}
-              {status === "error" && (
-                <Alert variant="destructive">
-                  <AlertCircleIcon />
-                  <AlertTitle>Erro.</AlertTitle>
-                  <AlertDescription>
-                    <p>
-                      Houve um erro na hora de lançar a venda. Tente novamente
-                      mais tarde.
-                    </p>
-                    <ul className="list-inside list-disc text-sm">
-                      <li>Check your card details</li>
-                      <li>Ensure sufficient funds</li>
-                      <li>Verify billing address</li>
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div> */}
 
             <Button
               type="button"
@@ -531,16 +497,6 @@ export default function NewInvoiceModal({
           className="scrollbar-hidden relative max-h-[90vh] w-full max-w-lg overflow-y-auto"
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
         >
-          {/* Close button */}
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
-            onClick={handleCloseModal}
-          >
-            <IconX className="h-2 w-2" />
-          </Button> */}
-
           {renderForm()}
         </div>
       </div>

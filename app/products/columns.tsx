@@ -23,16 +23,10 @@ import {
 import { IconTrash } from "@tabler/icons-react";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { DragHandle } from "../_dataTable/data-table";
 import { deleteProduct } from "../lib/actions";
 import { ProductsTableData } from "@/types/productsTableData";
 
 export const columns: ColumnDef<ProductsTableData>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
   {
     id: "select",
     header: ({ table }) => (

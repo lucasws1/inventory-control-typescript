@@ -50,7 +50,7 @@ export default function StockMovementEditPage({
   const router = useRouter();
   const [openDate, setOpenDate] = useState(false);
   const [dateValue, setDateValue] = useState<Date>(
-    new Date(stockMovement.date),
+    stockMovement.date ? new Date(stockMovement.date) : new Date(),
   );
   const [stockReason, setStockReason] = useState(
     stockMovement.reason as string,
@@ -83,7 +83,7 @@ export default function StockMovementEditPage({
                 stockMovement.reason.slice(1).toLocaleLowerCase()}{" "}
               de {extenso(stockMovement.quantity, { number: { gender: "f" } })}{" "}
               {stockMovement.Product.name} em{" "}
-              {stockMovement?.date.toLocaleDateString("pt-BR")}
+              {new Date(stockMovement?.date).toLocaleDateString("pt-BR")}
             </CardDescription>
           </CardHeader>
           <CardContent>

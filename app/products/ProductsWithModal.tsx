@@ -15,7 +15,7 @@ import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useMemo } from "react";
-import { DataTable } from "../_dataTable/data-table";
+import { DataTable } from "@/components/data-table";
 import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
 

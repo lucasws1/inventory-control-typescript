@@ -15,9 +15,10 @@ import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useMemo } from "react";
-import { DataTable } from "../_dataTable/data-table";
+import { DataTable } from "@/components/data-table";
 import { deleteCustomer } from "../lib/actions";
 import { columns } from "./columns";
+import OverlaySkeleton from "@/components/overlaySkeleton";
 
 export default function CustomersWithModal() {
   const { openModal } = useModal();
@@ -86,7 +87,11 @@ export default function CustomersWithModal() {
   }, [openModal, refreshData]);
 
   if (loading) {
-    return <div>Carregando clientes...</div>;
+    return (
+      <div>
+        <OverlaySkeleton />
+      </div>
+    );
   }
 
   if (error) {

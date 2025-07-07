@@ -24,7 +24,7 @@ const Customers = async () => {
 
   return (
     <>
-      <CustomersClient customers={customers as any[]} />
+      <CustomersClient />
     </>
   );
 };

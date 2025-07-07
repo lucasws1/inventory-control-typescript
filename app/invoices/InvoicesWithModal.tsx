@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import OverlaySkeleton from "@/components/overlaySkeleton";
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { InvoicesTableData } from "@/types/invoicesTableData";
@@ -14,7 +15,7 @@ import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { useMemo } from "react";
-import { DataTable } from "../_dataTable/data-table";
+import { DataTable } from "@/components/data-table";
 import { deleteInvoice } from "../lib/actions";
 import { columns } from "./columns";
 
@@ -84,11 +85,7 @@ export default function InvoicesWithModal() {
   }, [handleEditInvoice, handleDelete]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        Carregando invoices...
-      </div>
-    );
+    return <OverlaySkeleton />;
   }
 
   if (error) {

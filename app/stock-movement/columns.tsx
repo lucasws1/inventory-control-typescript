@@ -16,7 +16,6 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementTableData } from "@/types/stockMovementTableData";
 import { deleteStockMovement } from "../lib/actions";
-import { DragHandle } from "../_dataTable/data-table";
 import { Badge } from "@/components/ui/badge";
 
 // Componente para as ações da linha
@@ -71,11 +70,6 @@ function StockMovementActions({
 }
 
 export const columns: ColumnDef<StockMovementTableData>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
   {
     id: "select",
     header: ({ table }) => (

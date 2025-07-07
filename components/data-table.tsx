@@ -19,25 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type UniqueIdentifier,
-} from "@dnd-kit/core";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import {
-  arrayMove,
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -50,7 +31,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import React, { useId, useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,34 +62,13 @@ import {
   IconChevronsLeft,
   IconChevronsRight,
   IconEdit,
-  IconGripVertical,
   IconLayoutColumns,
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
 import axios from "axios";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-
-// Create a separate component for the drag handle
-export function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
-  });
-
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  );
-}
 
 // Mapeamento de traduções para os nomes das colunas
 const columnTranslations: Record<string, string> = {
@@ -125,43 +85,17 @@ const columnTranslations: Record<string, string> = {
 };
 
 // Ensure table rows carry a unique identifier
-type RowWithId = { id: UniqueIdentifier };
+type RowWithId = { id: number };
 
 interface DataTableProps<TData extends RowWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-function DraggableRow<TData extends RowWithId>({ row }: { row: Row<TData> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
-  });
-
-  return (
-    <TableRow
-      data-state={row.getIsSelected() && "selected"}
-      data-dragging={isDragging}
-      ref={setNodeRef}
-      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition,
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
-    </TableRow>
-  );
-}
-
 export function DataTable<TData extends RowWithId, TValue>({
   columns,
-  data: initialData,
+  data,
 }: DataTableProps<TData, TValue>) {
-  const [data, setData] = useState(() => initialData);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
@@ -184,18 +118,6 @@ export function DataTable<TData extends RowWithId, TValue>({
     console.warn("Modal context not available:", error);
     openModal = () => {};
   }
-
-  const sortableId = useId();
-  const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {}),
-  );
-
-  const dataIds = useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
-    [data],
-  );
 
   const table = useReactTable({
     data,
@@ -230,9 +152,6 @@ export function DataTable<TData extends RowWithId, TValue>({
           JSON.stringify(result.data.invoice, null, 2),
         );
 
-        // Atualizar a tabela com os novos dados
-        setData((currentData) => [result.data.invoice, ...currentData]);
-      } else if (result?.cancelled) {
         // Modal foi cancelado, não precisa fazer nada
         console.log("Modal cancelled");
       }
@@ -276,13 +195,6 @@ export function DataTable<TData extends RowWithId, TValue>({
 
         // Verificar quantos itens foram realmente deletados
         const deletedCount = response.data?.deletedCount || selectedIds.length;
-
-        // Atualizar a tabela localmente removendo os itens deletados
-        setData((currentData) =>
-          currentData.filter(
-            (item) => !selectedIds.includes(item.id as number),
-          ),
-        );
 
         // Limpar seleção após deletar
         setRowSelection({});
@@ -341,17 +253,6 @@ export function DataTable<TData extends RowWithId, TValue>({
       });
     }
   };
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
-        return arrayMove(data, oldIndex, newIndex);
-      });
-    }
-  }
 
   const getNumberRange = (input: string) => {
     if (!input) return [undefined, undefined];
@@ -535,55 +436,54 @@ export function DataTable<TData extends RowWithId, TValue>({
         </div>
         <div className="scrollbar-hidden mx-auto w-full overflow-x-auto rounded-lg">
           <div className="overflow-hidden rounded-lg border">
-            <DndContext
-              collisionDetection={closestCenter}
-              modifiers={[restrictToVerticalAxis]}
-              onDragEnd={handleDragEnd}
-              sensors={sensors}
-              id={sortableId}
-            >
-              <Table>
-                <TableHeader className="bg-muted sticky top-0 z-10">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </TableHead>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody className="scrollbar-hidden **:data-[slot=table-cell]:first:w-8">
-                  {table.getRowModel().rows?.length ? (
-                    <SortableContext
-                      items={dataIds}
-                      strategy={verticalListSortingStrategy}
+            <Table>
+              <TableHeader className="bg-muted sticky top-0 z-10">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
                     >
-                      {table.getRowModel().rows.map((row) => (
-                        <DraggableRow key={row.id} row={row} />
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
                       ))}
-                    </SortableContext>
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                      >
-                        Não foram encontrados resultados.
-                      </TableCell>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </DndContext>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      Não foram encontrados resultados.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
           <div className="flex items-center justify-between space-x-2 py-4">
             <div className="text-muted-foreground flex-1 text-sm">

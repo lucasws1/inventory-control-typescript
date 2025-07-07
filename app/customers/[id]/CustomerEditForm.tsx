@@ -48,7 +48,9 @@ export default function CustomerEditForm({
               <CardTitle>Alterar dados de {customer?.name}</CardTitle>
               <CardDescription>
                 Última edição em{" "}
-                {customer?.updatedAt?.toLocaleDateString("pt-BR")}
+                {customer?.updatedAt
+                  ? new Date(customer.updatedAt).toLocaleDateString("pt-BR")
+                  : "Data não disponível"}
               </CardDescription>
             </CardHeader>
             <CardContent>
