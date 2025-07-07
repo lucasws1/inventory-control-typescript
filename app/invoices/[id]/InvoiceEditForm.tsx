@@ -50,7 +50,7 @@ import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 
-export type InvoiceItem = {
+type NewInvoiceItem = {
   productId: number;
   quantity: number;
   unitPrice: number;
@@ -77,7 +77,7 @@ export default function InvoiceEditForm({
   const [state, formAction, pending] = useActionState(updateInvoice, null);
   const [productQuantity, setProductQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState("");
-  const [newInvoiceItems, setNewInvoiceItems] = useState<InvoiceItem[]>(
+  const [newInvoiceItems, setNewInvoiceItems] = useState<NewInvoiceItem[]>(
     invoice.InvoiceItem,
   );
   const [open, setOpen] = useState(false);

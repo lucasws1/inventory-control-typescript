@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { IconLoader } from "@tabler/icons-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -146,7 +147,9 @@ export function ChartAreaInteractive() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         {loading ? (
           <div className="flex h-[250px] items-center justify-center">
-            <div className="text-muted-foreground">Carregando dados...</div>
+            <div className="text-muted-foreground">
+              <IconLoader className="size-10 animate-spin" />
+            </div>
           </div>
         ) : (
           <ChartContainer

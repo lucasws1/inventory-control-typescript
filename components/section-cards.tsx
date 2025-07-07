@@ -1,6 +1,10 @@
 "use client";
 
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
+import {
+  IconLoader,
+  IconTrendingDown,
+  IconTrendingUp,
+} from "@tabler/icons-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +17,10 @@ import {
 } from "@/components/ui/card";
 import { useChartData } from "@/contexts/ChartDataContext";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
+
+const Spinner = () => {
+  return <IconLoader className="size-9 animate-spin" />;
+};
 
 export function SectionCards() {
   const {
@@ -34,7 +42,13 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Faturamento</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? "Carregando..." : formatCurrencyBRL(totalRevenue)}
+            {loading ? (
+              <Spinner />
+            ) : (
+              <span className="flex items-center gap-2">
+                {formatCurrencyBRL(totalRevenue)}
+              </span>
+            )}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -61,7 +75,7 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Novos Clientes</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? "Carregando..." : novosClientes}
+            {loading ? <Spinner /> : novosClientes}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -88,7 +102,7 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Novos Produtos</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? "Carregando..." : novosProdutos}
+            {loading ? <Spinner /> : novosProdutos}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -117,7 +131,7 @@ export function SectionCards() {
         <CardHeader>
           <CardDescription>Estoque Total</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? "Carregando..." : totalEstoque}
+            {loading ? <Spinner /> : totalEstoque}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">

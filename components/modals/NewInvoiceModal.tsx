@@ -51,7 +51,7 @@ import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
-export type InvoiceItem = {
+type NewInvoiceItem = {
   productId: number;
   quantity: number;
   unitPrice: number;
@@ -77,7 +77,7 @@ export default function NewInvoiceModal({
   const [customerId, setCustomerId] = useState("1");
   const [productQuantity, setProductQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState("");
-  const [newInvoiceItems, setNewInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [newInvoiceItems, setNewInvoiceItems] = useState<NewInvoiceItem[]>([]);
   const [open, setOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState("true");
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -91,7 +91,7 @@ export default function NewInvoiceModal({
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [invoiceItems, setInvoiceItems] = useState<NewInvoiceItem[]>([]);
   const { position, dragHandleProps } = useDraggable();
 
   // Fechar modal quando a operação for bem-sucedida
