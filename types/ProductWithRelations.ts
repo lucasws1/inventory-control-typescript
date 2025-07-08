@@ -1,7 +1,8 @@
 import { Prisma } from "@/app/generated/prisma";
 
-export type ProductsTableData = Prisma.ProductGetPayload<{
+export type ProductWithRelations = Prisma.ProductGetPayload<{
   include: {
     StockMovement: true;
+    InvoiceItem: true;
   };
 }>;

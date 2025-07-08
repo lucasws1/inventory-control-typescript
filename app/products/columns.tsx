@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomerTableData } from "@/types/customerTableData";
+import { CustomerTableData } from "@/types/CustomerWithRelations";
 import {
   IconCircleCheckFilled,
   IconCopy,
@@ -24,7 +24,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { deleteProduct } from "../lib/actions";
-import { ProductsTableData } from "@/types/productsTableData";
+import { ProductsTableData } from "@/types/ProductWithRelations";
 
 export const columns: ColumnDef<ProductsTableData>[] = [
   {

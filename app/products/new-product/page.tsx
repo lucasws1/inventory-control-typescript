@@ -58,7 +58,9 @@ export default function NewProduct() {
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <CardTitle>Cadastrar novo produto</CardTitle>
-          <CardDescription>Insira os dados abaixo</CardDescription>
+          <CardDescription>
+            Insira os dados abaixo para fazer um novo cadastro de produto.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form action={formAction}>

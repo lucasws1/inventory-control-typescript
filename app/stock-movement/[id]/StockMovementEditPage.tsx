@@ -79,14 +79,20 @@ export default function StockMovementEditPage({
           <CardHeader {...dragHandleProps}>
             <CardTitle>Editar movimento de estoque</CardTitle>
             <CardDescription>
-              {stockMovement?.reason.charAt(0).toUpperCase() +
-                stockMovement.reason.slice(1).toLocaleLowerCase()}{" "}
-              de {extenso(stockMovement.quantity, { number: { gender: "f" } })}{" "}
-              {stockMovement.Product.name} em{" "}
-              {new Date(stockMovement?.date).toLocaleDateString("pt-BR")}
+              Para alterar a movimentação de estoque, preencha os campos abaixo.
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="flex w-full flex-col gap-2">
+              <Label htmlFor="productName">Produto</Label>
+              <Input
+                id="productName"
+                name="productName"
+                type="text"
+                defaultValue={stockMovement.Product.name}
+                disabled
+              />
+            </div>
             <Form action={formAction}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">

@@ -1,6 +1,6 @@
 import { Prisma } from "@/app/generated/prisma";
 
-export type StockMovementTableData = Prisma.StockMovementGetPayload<{
+export type StockMovementWithRelations = Prisma.StockMovementGetPayload<{
   include: {
     Product: true;
   };

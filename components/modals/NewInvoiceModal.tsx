@@ -50,6 +50,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
+import { IconShoppingCart } from "@tabler/icons-react";
 
 type NewInvoiceItem = {
   productId: number;
@@ -193,14 +194,17 @@ export default function NewInvoiceModal({
       <Card className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         <CardHeader {...dragHandleProps}>
           <CardTitle>Nova venda</CardTitle>
-          <CardDescription>Insira os dados e clique em Enviar</CardDescription>
+          <CardDescription>
+            Insira os dados abaixo para fazer uma nova venda.
+          </CardDescription>
           <CardAction>
             <Popover
               open={openNewInvoiceItemProductList}
               onOpenChange={setOpenNewInvoiceItemProductList}
             >
-              <PopoverTrigger className="cursor-pointer">
-                Itens ({newInvoiceItems.length})
+              <PopoverTrigger className="flex cursor-pointer items-center gap-2">
+                <IconShoppingCart className="size-4" /> (
+                {newInvoiceItems.length})
               </PopoverTrigger>
               <PopoverContent className="w-auto">
                 {newInvoiceItems.length === 0 ? (

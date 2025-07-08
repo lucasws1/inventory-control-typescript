@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
 import { deleteStockMovement } from "../lib/actions";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 function StockMovementActions({
   stockMovement,
 }: {
-  stockMovement: StockMovementTableData;
+  stockMovement: StockMovementWithRelations;
 }) {
   const router = useRouter();
 
@@ -69,7 +69,7 @@ function StockMovementActions({
   );
 }
 
-export const columns: ColumnDef<StockMovementTableData>[] = [
+export const columns: ColumnDef<StockMovementWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (

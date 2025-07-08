@@ -10,7 +10,7 @@ import {
 import OverlaySkeleton from "@/components/overlaySkeleton";
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
-import { InvoicesTableData } from "@/types/invoicesTableData";
+import { InvoicesTableData } from "@/types/InvoiceWithRelations";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";

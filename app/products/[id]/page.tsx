@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import ProductEditForm from "./ProductEditForm";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
 
 export default async function ProductPage({
   params,
@@ -7,10 +8,13 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product: { id: number; name: string; price: number } | null =
-    await prisma.product.findUnique({
-      where: { id: Number(id) },
-    });
+  const product: ProductWithRelations | null = await prisma.product.findUnique({
+    where: { id: Number(id) },
+    include: {
+      InvoiceItem: true,
+      StockMovement: true,
+    },
+  });
 
   return (
     <div>

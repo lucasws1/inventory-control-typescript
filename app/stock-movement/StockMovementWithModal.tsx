@@ -10,7 +10,7 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { StockMovement } from "@/types/stockMovement";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { StockMovementTableData } from "@/types/StockMovementWithRelations";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";

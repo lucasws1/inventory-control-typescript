@@ -54,7 +54,9 @@ export default function NewCustomerModal({
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
           <CardTitle>Cadastrar novo cliente</CardTitle>
-          <CardDescription>Insira os dados abaixo</CardDescription>
+          <CardDescription>
+            Insira os dados abaixo para fazer um novo cadastro.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form action={formAction}>
@@ -66,14 +68,19 @@ export default function NewCustomerModal({
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" type="text" placeholder="Lucas" name="name" />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Insira o nome"
+                  name="name"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email (opcional)</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="lucas@example.com"
+                  placeholder="Insira o email"
                   name="email"
                 />
               </div>
@@ -82,7 +89,7 @@ export default function NewCustomerModal({
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="(99) 99999-9999"
+                  placeholder="Insira o número do telefone"
                   name="phone"
                 />
               </div>

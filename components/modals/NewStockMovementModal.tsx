@@ -90,8 +90,10 @@ export default function NewStockMovementModal({
         onClick={(e) => e.stopPropagation()}
       >
         <CardHeader {...dragHandleProps}>
-          <CardTitle>Movimentar estoque</CardTitle>
-          <CardDescription>Insira os dados abaixo</CardDescription>
+          <CardTitle>Movimentação de estoque</CardTitle>
+          <CardDescription>
+            Insira os dados abaixo para fazer uma nova movimentação de estoque.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form action={formAction}>

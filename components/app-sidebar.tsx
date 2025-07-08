@@ -2,6 +2,7 @@
 
 import {
   IconBox,
+  IconFileSearch,
   IconCamera,
   IconCurrencyDollar,
   IconDashboard,
@@ -9,9 +10,9 @@ import {
   IconFileDescription,
   IconInnerShadowTop,
   IconSettings,
-  IconSearch,
   IconShoppingCart,
   IconUser,
+  IconSearch,
 } from "@tabler/icons-react";
 import * as React from "react";
 

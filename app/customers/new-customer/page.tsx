@@ -10,11 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Form from "next/form";
-import { useActionState, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { IconX } from "@tabler/icons-react";
 import { useDraggable } from "@/hooks/useDraggable";
+import Form from "next/form";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
@@ -54,7 +53,9 @@ export default function NewCustomer() {
       >
         <CardHeader {...dragHandleProps}>
           <CardTitle>Cadastrar novo cliente</CardTitle>
-          <CardDescription>Insira os dados abaixo</CardDescription>
+          <CardDescription>
+            Insira os dados abaixo para fazer um novo cadastro.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form action={formAction}>
@@ -66,14 +67,19 @@ export default function NewCustomer() {
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" type="text" placeholder="Lucas" name="name" />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Insira o nome"
+                  name="name"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email (opcional)</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="lucas@example.com"
+                  placeholder="Insira o email"
                   name="email"
                 />
               </div>
@@ -82,7 +88,7 @@ export default function NewCustomer() {
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="(99) 99999-9999"
+                  placeholder="Insira o número do telefone"
                   name="phone"
                 />
               </div>

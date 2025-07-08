@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDraggable } from "@/hooks/useDraggable";
-import { Customer } from "@/types/customer";
+import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 
@@ -21,7 +21,7 @@ export default function CustomerEditForm({
   isModal = false,
   onClose,
 }: {
-  customer: Customer;
+  customer: CustomerWithRelations;
   isModal?: boolean;
   onClose?: () => void;
 }) {
@@ -84,6 +84,50 @@ export default function CustomerEditForm({
                     name="phone"
                     type="phone"
                     defaultValue={customer?.phone as string}
+                  />
+                </div>
+
+                <div className="flex w-full flex-col gap-2">
+                  <Label htmlFor="invoices">Compras</Label>
+                  <Input
+                    id="invoices"
+                    name="invoices"
+                    type="number"
+                    disabled
+                    defaultValue={customer?.Invoice.length || 0}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="createdAt">Data de cadastro</Label>
+                  <Input
+                    id="createdAt"
+                    name="createdAt"
+                    type="text"
+                    disabled
+                    defaultValue={
+                      customer?.createdAt
+                        ? new Date(customer.createdAt).toLocaleDateString(
+                            "pt-BR",
+                          )
+                        : "Data não disponível"
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="updatedAt">Última edição</Label>
+                  <Input
+                    id="updatedAt"
+                    name="updatedAt"
+                    type="text"
+                    disabled
+                    defaultValue={
+                      customer?.updatedAt
+                        ? new Date(customer.updatedAt).toLocaleDateString(
+                            "pt-BR",
+                          )
+                        : "Data não disponível"
+                    }
                   />
                 </div>
               </div>

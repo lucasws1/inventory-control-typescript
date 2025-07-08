@@ -1,6 +1,6 @@
 "use client";
 
-import { InvoicesTableData } from "@/types/invoicesTableData";
+import { InvoiceWithRelations } from "@/types/InvoiceWithRelations";
 import {
   createContext,
   useContext,
@@ -8,17 +8,17 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
-import { ProductsTableData } from "@/types/productsTableData";
-import { CustomerTableData } from "@/types/customerTableData";
-import { InvoiceItemTableData } from "@/types/invoiceItemsTableData";
+import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
+import { CustomerWithRelations } from "@/types/CustomerWithRelations";
+import { InvoiceItemWithRelations } from "@/types/InvoiceItemWithRelations";
 
 interface DataContextType {
-  products: ProductsTableData[];
-  customers: CustomerTableData[];
-  invoices: InvoicesTableData[];
-  stockMovements: StockMovementTableData[];
-  invoiceItems: InvoiceItemTableData[];
+  products: ProductWithRelations[];
+  customers: CustomerWithRelations[];
+  invoices: InvoiceWithRelations[];
+  stockMovements: StockMovementWithRelations[];
+  invoiceItems: InvoiceItemWithRelations[];
   loading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
@@ -29,12 +29,14 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [products, setProducts] = useState<ProductsTableData[]>([]);
-  const [customers, setCustomers] = useState<CustomerTableData[]>([]);
-  const [invoices, setInvoices] = useState<InvoicesTableData[]>([]);
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItemTableData[]>([]);
+  const [products, setProducts] = useState<ProductWithRelations[]>([]);
+  const [customers, setCustomers] = useState<CustomerWithRelations[]>([]);
+  const [invoices, setInvoices] = useState<InvoiceWithRelations[]>([]);
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItemWithRelations[]>(
+    [],
+  );
   const [stockMovements, setStockMovements] = useState<
-    StockMovementTableData[]
+    StockMovementWithRelations[]
   >([]);
 
   const fetchData = useCallback(async () => {

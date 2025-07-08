@@ -1,6 +1,6 @@
 import { Prisma } from "@/app/generated/prisma";
 
-export type InvoicesTableData = Prisma.InvoiceGetPayload<{
+export type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
   include: {
     customer: true;
     InvoiceItem: {

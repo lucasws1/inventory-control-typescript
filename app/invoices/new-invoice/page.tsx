@@ -44,7 +44,7 @@ import { Separator } from "@/components/ui/separator";
 import { useData } from "@/contexts/DataContext";
 import { useDraggable } from "@/hooks/useDraggable";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
-import { IconX } from "@tabler/icons-react";
+import { IconShoppingCart, IconX } from "@tabler/icons-react";
 import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
@@ -169,15 +169,16 @@ export default function NewInvoice() {
           <CardHeader>
             <CardTitle>Nova venda</CardTitle>
             <CardDescription>
-              Insira os dados e clique em Enviar
+              Insira os dados abaixo para fazer uma nova venda.
             </CardDescription>
             <CardAction>
               <Popover
                 open={openNewInvoiceItemProductList}
                 onOpenChange={setOpenNewInvoiceItemProductList}
               >
-                <PopoverTrigger className="cursor-pointer">
-                  Itens ({newInvoiceItems.length})
+                <PopoverTrigger className="flex cursor-pointer items-center gap-2">
+                  <IconShoppingCart className="size-4" /> (
+                  {newInvoiceItems.length})
                 </PopoverTrigger>
                 <PopoverContent className="w-auto">
                   {newInvoiceItems.length === 0 ? (

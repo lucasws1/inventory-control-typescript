@@ -85,8 +85,10 @@ export default function NewStockMovement() {
     <>
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Movimentar estoque</CardTitle>
-          <CardDescription>Insira os dados abaixo</CardDescription>
+          <CardTitle>Movimentação de estoque</CardTitle>
+          <CardDescription>
+            Insira os dados abaixo para fazer uma nova movimentação de estoque.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form action={formAction}>

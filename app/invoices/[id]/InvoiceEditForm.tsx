@@ -40,7 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { useDraggable } from "@/hooks/useDraggable"; // Descomente para testar drag
+import { useDraggable } from "@/hooks/useDraggable";
 import { Invoice } from "@/types/invoice";
 import { Product } from "@/types/product";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";

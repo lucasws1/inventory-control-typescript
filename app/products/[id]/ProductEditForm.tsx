@@ -1,4 +1,5 @@
 "use client";
+
 import { updateProduct } from "@/app/lib/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDraggable } from "@/hooks/useDraggable";
-import { IconX } from "@tabler/icons-react";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
 
@@ -21,7 +22,7 @@ export default function ProductEditForm({
   isModal = false,
   onClose,
 }: {
-  product?: { id: number; name: string; price: number } | null;
+  product?: ProductWithRelations | null;
   isModal?: boolean;
   onClose?: () => void;
 }) {
@@ -44,39 +45,107 @@ export default function ProductEditForm({
   const renderForm = () => (
     <div>
       <form action={formAction}>
-        <div className="mx-2 flex justify-center">
+        <div className="mx-auto flex justify-center">
           <Card
             className="w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader {...dragHandleProps}>
-              <CardTitle>Alterar dados de {product?.name}</CardTitle>
-              <CardDescription>Produto id n. {product?.id}</CardDescription>
+              <CardTitle>Editar produto</CardTitle>
+              <CardDescription>
+                Insira os novos dados abaixo para editar o produto.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Input type="hidden" name="id" value={product?.id} />
+              <div className="flex flex-col gap-4">
+                <div className="flex gap-2">
+                  <div className="flex w-full flex-col gap-2">
+                    <Label htmlFor="name">Nome</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      defaultValue={product?.name as string}
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="id">ID</Label>
+                    <Input
+                      id="id"
+                      name="id"
+                      type="number"
+                      className="w-16"
+                      disabled
+                      defaultValue={product?.id}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <div className="flex w-full flex-col gap-2">
+                    <Label htmlFor="price">Preço</Label>
+                    <Input
+                      id="price"
+                      name="price"
+                      type="number"
+                      defaultValue={product?.price as number}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="invoiceItems">Vendas</Label>
+                    <Input
+                      className="w-16"
+                      id="invoiceItems"
+                      name="invoiceItems"
+                      type="number"
+                      disabled
+                      defaultValue={product?.InvoiceItem.length || 0}
+                    />
+                  </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Nome</Label>
+                  <Label htmlFor="createdAt">Cadastro</Label>
                   <Input
-                    id="name"
-                    name="name"
+                    id="createdAt"
+                    name="createdAt"
                     type="text"
-                    defaultValue={product?.name as string}
-                    required
+                    disabled
+                    defaultValue={
+                      product?.createdAt
+                        ? new Date(product.createdAt).toLocaleDateString(
+                            "pt-BR",
+                          )
+                        : "Data não disponível"
+                    }
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Preço</Label>
+                  <Label htmlFor="updatedAt">Última edição</Label>
                   <Input
-                    id="price"
-                    name="price"
+                    id="updatedAt"
+                    name="updatedAt"
                     type="text"
-                    defaultValue={product?.price as number}
+                    disabled
+                    defaultValue={
+                      product?.updatedAt
+                        ? new Date(product.updatedAt).toLocaleDateString(
+                            "pt-BR",
+                          )
+                        : "Data não disponível"
+                    }
                   />
                 </div>
+                {/* <div className="grid gap-2">
+                  <Label htmlFor="invoiceItems">Vendas</Label>
+                  <Input
+                    id="invoiceItems"
+                    name="invoiceItems"
+                    type="text"
+                    disabled
+                    defaultValue={product?.InvoiceItem.length || 0}
+                  />
+                </div> */}
               </div>
             </CardContent>
 
@@ -114,16 +183,6 @@ export default function ProductEditForm({
             className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
             style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
           >
-            {/* Close button - DENTRO do card para não sumir */}
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-1 right-3 z-10 h-4 w-4 rounded-sm hover:text-red-500"
-              onClick={handleCloseModal}
-            >
-              <IconX className="h-2 w-2" />
-            </Button> */}
-
             {renderForm()}
           </div>
         </div>

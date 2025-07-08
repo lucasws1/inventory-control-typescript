@@ -10,7 +10,7 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { Product } from "@/types/product";
-import { ProductsTableData } from "@/types/productsTableData";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -90,7 +90,7 @@ export default function ProductsWithModal() {
               </DropdownMenu>
             );
           },
-        } as ColumnDef<ProductsTableData>;
+        } as ColumnDef<ProductWithRelations>;
       }
       return column;
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductsTableData } from "@/types/productsTableData";
+import { ProductsTableData } from "@/types/ProductWithRelations";
 import ProductsWithModal from "./ProductsWithModal";
 
 export default function ProductsClient() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
 import dynamic from "next/dynamic";
 
 const StockMovementWithModal = dynamic(

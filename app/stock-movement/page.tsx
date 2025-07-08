@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { StockMovementTableData } from "@/types/stockMovementTableData";
+import { StockMovementTableData } from "@/types/StockMovementWithRelations";
 import { Metadata } from "next";
 import StockMovementClient from "./StockMovementClient";
 

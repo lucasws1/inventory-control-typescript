@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomerTableData } from "@/types/customerTableData";
+import { CustomerTableData } from "@/types/CustomerWithRelations";
 import {
   IconCircleCheckFilled,
   IconEdit,

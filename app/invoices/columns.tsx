@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InvoicesTableData } from "@/types/invoicesTableData";
+import { InvoicesTableData } from "@/types/InvoiceWithRelations";
 import { useRouter } from "next/navigation";
 import { deleteInvoice } from "../lib/actions";
 import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";

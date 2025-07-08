@@ -29,18 +29,14 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                // asChild={!onItemClick}
-                // onClick={onItemClick ? () => onItemClick(item) : undefined}
-              >
+              <SidebarMenuButton asChild>
                 {onItemClick ? (
                   <button
                     className="flex w-full cursor-pointer items-center justify-between"
                     onClick={() => onItemClick(item)}
                   >
                     <div className="flex items-center gap-2">
-                      <item.icon />
+                      <item.icon className="size-5" />
                       <span>{item.title}</span>
                     </div>
                     {item.title === "Pesquisar" && (

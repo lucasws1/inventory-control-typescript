@@ -5,6 +5,7 @@ import {
   IconCurrencyDollar,
   IconDots,
   IconEdit,
+  IconList,
   IconMail,
   IconPlus,
   IconShoppingCart,
@@ -69,7 +70,6 @@ export function NavMain({
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
             <SidebarMenuItem className="flex w-full items-center gap-2">
-              {/* <SidebarMenuButton asChild tooltip="Quick Create" className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"> */}
               <SidebarMenuButton
                 asChild
                 className="hover:bg-yellow-500"
@@ -177,15 +177,20 @@ export function NavMain({
                         <span>Novo</span>
                       </DropdownMenuItem>
                     ) : null}
-                    <DropdownMenuItem>
-                      <IconEdit />
-                      <span>Editar</span>
+                    <DropdownMenuItem
+                      asChild
+                      className="flex items-center gap-2"
+                    >
+                      <Link href={item.url}>
+                        <IconList />
+                        <span>Listar</span>
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
+                    {/* <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive">
                       <IconTrash />
                       <span>Deletar</span>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuItem>
