@@ -55,10 +55,29 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
     enableHiding: false,
     enableColumnFilter: false,
   },
+
+  {
+    accessorKey: "customer",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Cliente"
+        className="w-full"
+      />
+    ),
+    cell: ({ row }) => {
+      return <div>{row.original.customer.name}</div>;
+    },
+    filterFn: "includesString",
+  },
   {
     accessorKey: "purchaseDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data" className="w-full" />
+      <DataTableColumnHeader
+        column={column}
+        title="Data de compra"
+        className="w-full"
+      />
     ),
     cell: ({ row }) => {
       const date = new Date(row.original.purchaseDate);
@@ -74,18 +93,47 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
     },
   },
   {
-    accessorKey: "customer",
+    accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="Cliente"
+        title="Criado em"
         className="w-full"
       />
     ),
     cell: ({ row }) => {
-      return <div>{row.original.customer.name}</div>;
+      const date = new Date(row.original.createdAt);
+      return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
-    filterFn: "includesString",
+    filterFn: (row, columnId, filterValue) => {
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
+      const [day, month, year] = date.split("/");
+
+      return `${day}${month}${year}`.includes(filterValue);
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Atualizado em"
+        className="w-full"
+      />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.updatedAt);
+      return <div>{date.toLocaleDateString("pt-BR")}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
+      const [day, month, year] = date.split("/");
+      return `${day}${month}${year}`.includes(filterValue);
+    },
   },
   {
     id: "product",

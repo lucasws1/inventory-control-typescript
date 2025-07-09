@@ -29,19 +29,23 @@ model Invoice {
   amount       Float
   pending      Boolean       @default(true)
   purchaseDate DateTime
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   customerId   Int
   customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   InvoiceItem  InvoiceItem[]
 }
 
 model InvoiceItem {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   quantity  Int
   unitPrice Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   productId Int
-  Product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   invoiceId Int
-  Invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  Invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -68,5 +72,7 @@ model StockMovement {
   Product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int
   date      DateTime
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   reason    StockReason
 }

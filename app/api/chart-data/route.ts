@@ -22,256 +22,218 @@ export async function GET(request: NextRequest) {
 
     const previousPeriodStart = new Date(currentPeriodStart);
     previousPeriodStart.setDate(previousPeriodStart.getDate() - daysToSubtract);
+    const previousPeriodEnd = new Date(currentPeriodStart);
 
-    // Faturamento diário
-    const currentPeriodRevenue = await prisma.invoice.groupBy({
-      by: ["purchaseDate"],
-      where: {
-        purchaseDate: {
-          gte: currentPeriodStart,
-          lte: endDate,
+    // Get all data for the current period
+    const [invoices, customers, products, stockMovements] = await Promise.all([
+      // All invoices in the period
+      prisma.invoice.findMany({
+        where: {
+          purchaseDate: {
+            gte: currentPeriodStart,
+            lte: endDate,
+          },
         },
-      },
-      _sum: {
-        amount: true,
-      },
-      orderBy: {
-        purchaseDate: "asc",
-      },
-    });
-
-    // Novos clientes diários
-    const currentPeriodCustomers = await prisma.customer.groupBy({
-      by: ["createdAt"],
-      where: {
-        createdAt: {
-          gte: currentPeriodStart,
-          lte: endDate,
+        orderBy: {
+          purchaseDate: "asc",
         },
-      },
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
+      }),
 
-    // Novos produtos diários
-    const currentPeriodProducts = await prisma.product.groupBy({
-      by: ["createdAt"],
-      where: {
-        createdAt: {
-          gte: currentPeriodStart,
-          lte: endDate,
+      // All customers created in the period
+      prisma.customer.findMany({
+        where: {
+          createdAt: {
+            gte: currentPeriodStart,
+            lte: endDate,
+          },
         },
-      },
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
-
-    // Buscar todas as movimentações de estoque até a data final para calcular saldo acumulado
-    const allStockMovements = await prisma.stockMovement.findMany({
-      where: {
-        date: {
-          lte: endDate,
+        orderBy: {
+          createdAt: "asc",
         },
-      },
-      orderBy: {
-        date: "asc",
-      },
-      include: {
-        Product: true,
-      },
-    });
+      }),
 
-    // Calcular saldo acumulado por data
-    const stockBalanceByDate = new Map();
-    let runningBalance = 0;
+      // All products created in the period
+      prisma.product.findMany({
+        where: {
+          createdAt: {
+            gte: currentPeriodStart,
+            lte: endDate,
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      }),
 
-    // Processar todas as movimentações em ordem cronológica
-    allStockMovements.forEach((movement) => {
-      runningBalance += movement.quantity;
-      const dateKey = movement.date.toISOString().split("T")[0];
+      // All stock movements up to end date for cumulative calculation
+      prisma.stockMovement.findMany({
+        where: {
+          date: {
+            lte: endDate,
+          },
+        },
+        orderBy: {
+          date: "asc",
+        },
+      }),
+    ]);
 
-      // Atualizar o saldo para esta data
-      stockBalanceByDate.set(dateKey, runningBalance);
-    });
-
-    // Criar um mapa de datas para facilitar a combinação dos dados
-    const dateMap = new Map();
-
-    // Adicionar dados de faturamento
-    currentPeriodRevenue.forEach((item) => {
-      const date = item.purchaseDate.toISOString().split("T")[0];
-      dateMap.set(date, {
-        date,
-        revenue: item._sum.amount || 0,
-        customers: 0,
-        products: 0,
-        stockBalance: stockBalanceByDate.get(date) || 0,
-      });
-    });
-
-    // Adicionar dados de clientes
-    currentPeriodCustomers.forEach((item) => {
-      const date = item.createdAt.toISOString().split("T")[0];
-      if (dateMap.has(date)) {
-        dateMap.get(date).customers = item._count.id;
-      } else {
-        dateMap.set(date, {
-          date,
-          revenue: 0,
-          customers: item._count.id,
-          products: 0,
-          stockBalance: stockBalanceByDate.get(date) || 0,
-        });
-      }
-    });
-
-    // Adicionar dados de produtos
-    currentPeriodProducts.forEach((item) => {
-      const date = item.createdAt.toISOString().split("T")[0];
-      if (dateMap.has(date)) {
-        dateMap.get(date).products = item._count.id;
-      } else {
-        dateMap.set(date, {
-          date,
-          revenue: 0,
-          customers: 0,
-          products: item._count.id,
-          stockBalance: stockBalanceByDate.get(date) || 0,
-        });
-      }
-    });
-
-    // Adicionar dados de saldo de estoque para todas as datas do período
-    const startDate = new Date(currentPeriodStart);
-    const endDateObj = new Date(endDate);
-
+    // Generate all dates in the period
+    const dates = [];
     for (
-      let d = new Date(startDate);
-      d <= endDateObj;
+      let d = new Date(currentPeriodStart);
+      d <= endDate;
       d.setDate(d.getDate() + 1)
     ) {
-      const dateKey = d.toISOString().split("T")[0];
-      if (!dateMap.has(dateKey)) {
-        dateMap.set(dateKey, {
-          date: dateKey,
-          revenue: 0,
-          customers: 0,
-          products: 0,
-          stockBalance: stockBalanceByDate.get(dateKey) || 0,
-        });
-      } else {
-        // Atualizar o saldo de estoque para datas que já existem
-        dateMap.get(dateKey).stockBalance =
-          stockBalanceByDate.get(dateKey) || 0;
-      }
+      dates.push(new Date(d));
     }
 
-    // Converter para array e ordenar por data
-    const chartData = Array.from(dateMap.values()).sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-    );
+    // Calculate cumulative data for each date
+    const chartData = dates.map((date) => {
+      const dateKey = date.toISOString().split("T")[0];
 
-    // Calcular totais para comparação
-    const currentTotal = currentPeriodRevenue.reduce(
-      (sum, item) => sum + (item._sum.amount || 0),
+      // Cumulative revenue up to this date
+      const revenueUpToDate = invoices
+        .filter((invoice) => invoice.purchaseDate <= date)
+        .reduce((sum, invoice) => sum + invoice.amount, 0);
+
+      // Cumulative customers up to this date
+      const customersUpToDate = customers.filter(
+        (customer) => customer.createdAt <= date,
+      ).length;
+
+      // Cumulative products up to this date
+      const productsUpToDate = products.filter(
+        (product) => product.createdAt <= date,
+      ).length;
+
+      // Current stock balance up to this date
+      const stockBalanceUpToDate = stockMovements
+        .filter((movement) => movement.date <= date)
+        .reduce((sum, movement) => sum + movement.quantity, 0);
+
+      return {
+        date: dateKey,
+        revenue: revenueUpToDate,
+        customers: customersUpToDate,
+        products: productsUpToDate,
+        stockBalance: stockBalanceUpToDate,
+      };
+    });
+
+    // Calculate totals for comparison with previous period
+    const currentTotal = invoices.reduce(
+      (sum, invoice) => sum + invoice.amount,
       0,
     );
 
-    // Buscar dados do período anterior para comparação
-    const previousPeriodRevenue = await prisma.invoice.groupBy({
-      by: ["purchaseDate"],
-      where: {
-        purchaseDate: {
-          gte: previousPeriodStart,
-          lt: currentPeriodStart,
-        },
-      },
-      _sum: {
-        amount: true,
-      },
-      orderBy: {
-        purchaseDate: "asc",
-      },
-    });
-    const previousTotal = previousPeriodRevenue.reduce(
-      (sum, item) => sum + (item._sum.amount || 0),
+    // Previous period data for comparison
+    const [previousInvoices, previousCustomers, previousProducts] =
+      await Promise.all([
+        prisma.invoice.findMany({
+          where: {
+            purchaseDate: {
+              gte: previousPeriodStart,
+              lt: previousPeriodEnd,
+            },
+          },
+        }),
+
+        prisma.customer.count({
+          where: {
+            createdAt: {
+              gte: previousPeriodStart,
+              lt: previousPeriodEnd,
+            },
+          },
+        }),
+
+        prisma.product.count({
+          where: {
+            createdAt: {
+              gte: previousPeriodStart,
+              lt: previousPeriodEnd,
+            },
+          },
+        }),
+      ]);
+
+    const previousTotal = previousInvoices.reduce(
+      (sum, invoice) => sum + invoice.amount,
       0,
     );
     const revenueChange =
       previousTotal > 0
         ? ((currentTotal - previousTotal) / previousTotal) * 100
-        : 0;
+        : currentTotal > 0
+          ? 100
+          : 0; // If no previous revenue but current exists, 100% growth
 
-    // Novos Clientes
-    const novosClientes = await prisma.customer.count({
+    // Calculate total customers at end of each period for comparison
+    const totalCustomersAtEndOfCurrentPeriod = await prisma.customer.count({
       where: {
         createdAt: {
-          gte: currentPeriodStart,
           lte: endDate,
         },
       },
     });
-    const previousNovosClientes = await prisma.customer.count({
+
+    const totalCustomersAtEndOfPreviousPeriod = await prisma.customer.count({
       where: {
         createdAt: {
-          gte: previousPeriodStart,
-          lt: currentPeriodStart,
+          lte: previousPeriodEnd,
         },
       },
     });
+
+    // Current period counts (new customers created in period)
+    const novosClientes = customers.length;
+    const previousNovosClientes = previousCustomers;
+
+    // Calculate growth based on total customer base growth
     const clientesChange =
-      previousNovosClientes > 0
-        ? ((novosClientes - previousNovosClientes) / previousNovosClientes) *
+      totalCustomersAtEndOfPreviousPeriod > 0
+        ? ((totalCustomersAtEndOfCurrentPeriod -
+            totalCustomersAtEndOfPreviousPeriod) /
+            totalCustomersAtEndOfPreviousPeriod) *
           100
-        : 0;
+        : totalCustomersAtEndOfCurrentPeriod > 0
+          ? 100
+          : 0;
 
-    // Novos Produtos
-    const novosProdutos = await prisma.product.count({
+    // Calculate total products at end of each period for comparison
+    const totalProductsAtEndOfCurrentPeriod = await prisma.product.count({
       where: {
         createdAt: {
-          gte: currentPeriodStart,
           lte: endDate,
         },
       },
     });
-    const previousNovosProdutos = await prisma.product.count({
+
+    const totalProductsAtEndOfPreviousPeriod = await prisma.product.count({
       where: {
         createdAt: {
-          gte: previousPeriodStart,
-          lt: currentPeriodStart,
+          lte: previousPeriodEnd,
         },
       },
     });
+
+    const novosProdutos = products.length;
+    const previousNovosProdutos = previousProducts;
+
+    // Calculate growth based on total product catalog growth
     const produtosChange =
-      previousNovosProdutos > 0
-        ? ((novosProdutos - previousNovosProdutos) / previousNovosProdutos) *
+      totalProductsAtEndOfPreviousPeriod > 0
+        ? ((totalProductsAtEndOfCurrentPeriod -
+            totalProductsAtEndOfPreviousPeriod) /
+            totalProductsAtEndOfPreviousPeriod) *
           100
-        : 0;
+        : totalProductsAtEndOfCurrentPeriod > 0
+          ? 100
+          : 0;
 
-    // Total em estoque atual
-    const produtos = await prisma.product.findMany({
-      include: {
-        StockMovement: true,
-      },
-    });
-    const totalEstoque = produtos.reduce((sum, produto) => {
-      const saldo = produto.StockMovement.reduce(
-        (acc, mov) => acc + mov.quantity,
-        0,
-      );
-      return sum + saldo;
-    }, 0);
-
-    // Calcular variação do estoque comparando início e fim do período
-    const stockMovementsInPeriod = await prisma.stockMovement.findMany({
+    // Stock change for the period (not total stock)
+    const currentPeriodStockMovements = await prisma.stockMovement.findMany({
       where: {
         date: {
           gte: currentPeriodStart,
@@ -280,20 +242,20 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const stockMovementsPreviousPeriod = await prisma.stockMovement.findMany({
+    const previousPeriodStockMovements = await prisma.stockMovement.findMany({
       where: {
         date: {
           gte: previousPeriodStart,
-          lt: currentPeriodStart,
+          lt: previousPeriodEnd,
         },
       },
     });
 
-    const currentPeriodStockChange = stockMovementsInPeriod.reduce(
+    const currentPeriodStockChange = currentPeriodStockMovements.reduce(
       (sum, mov) => sum + mov.quantity,
       0,
     );
-    const previousPeriodStockChange = stockMovementsPreviousPeriod.reduce(
+    const previousPeriodStockChange = previousPeriodStockMovements.reduce(
       (sum, mov) => sum + mov.quantity,
       0,
     );
@@ -304,6 +266,18 @@ export async function GET(request: NextRequest) {
             Math.abs(previousPeriodStockChange)) *
           100
         : 0;
+
+    // Calculate total current stock
+    const totalEstoque = await prisma.stockMovement.aggregate({
+      _sum: {
+        quantity: true,
+      },
+      where: {
+        date: {
+          lte: endDate,
+        },
+      },
+    });
 
     return NextResponse.json({
       chartData,
@@ -316,7 +290,8 @@ export async function GET(request: NextRequest) {
       novosProdutos,
       previousNovosProdutos,
       produtosChange,
-      totalEstoque,
+      totalEstoque: totalEstoque._sum.quantity || 0,
+      movimentacaoEstoque: currentPeriodStockChange,
       estoqueChange,
     });
   } catch (error) {

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Form from "next/form";
 import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -27,7 +26,6 @@ export default function NewCustomerModal({
 }) {
   const [state, formAction, pending] = useActionState(createCustomer, null);
   const { position, dragHandleProps } = useDraggable();
-  const router = useRouter();
   const { refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
@@ -40,19 +38,12 @@ export default function NewCustomerModal({
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const refresh = async () => {
-      if (state?.success) {
-        await refreshData();
-      }
-    };
-    refresh();
+    (async () => state?.success && (await refreshData()))();
   }, [state, refreshData]);
 
   const handleCloseModal = () => {
     if (onClose) {
       onClose();
-    } else if (isModal) {
-      router.push("/customers");
     }
   };
 

@@ -12,6 +12,7 @@ import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
 import { ProductWithRelations } from "@/types/ProductWithRelations";
 import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { InvoiceItemWithRelations } from "@/types/InvoiceItemWithRelations";
+import axios from "axios";
 
 interface DataContextType {
   products: ProductWithRelations[];
@@ -44,13 +45,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/data");
-
-      if (!response.ok) {
-        throw new Error("Erro ao carregar dados");
-      }
-
-      const data = await response.json();
+      const { data } = await axios.get("/api/data");
 
       setProducts(data.products);
       setCustomers(data.customers);

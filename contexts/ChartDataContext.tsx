@@ -44,18 +44,23 @@ export function ChartDataProvider({ children }: { children: React.ReactNode }) {
   const getChartData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const { data } = await axios.get(
         `/api/chart-data?timeRange=${timeRange}`,
       );
-      setChartData(response.data.chartData);
-      setTotalRevenue(response.data.currentTotal || 0);
-      setRevenueChange(response.data.revenueChange || 0);
-      setNovosClientes(response.data.novosClientes || 0);
-      setClientesChange(response.data.clientesChange || 0);
-      setNovosProdutos(response.data.novosProdutos || 0);
-      setProdutosChange(response.data.produtosChange || 0);
-      setTotalEstoque(response.data.totalEstoque || 0);
-      setEstoqueChange(response.data.estoqueChange || 0);
+
+      if (!data.chartData) {
+        throw new Error("Erro ao carregar dados");
+      }
+
+      setChartData(data.chartData);
+      setTotalRevenue(data.currentTotal || 0);
+      setRevenueChange(data.revenueChange || 0);
+      setNovosClientes(data.novosClientes || 0);
+      setClientesChange(data.clientesChange || 0);
+      setNovosProdutos(data.novosProdutos || 0);
+      setProdutosChange(data.produtosChange || 0);
+      setTotalEstoque(data.totalEstoque || 0);
+      setEstoqueChange(data.estoqueChange || 0);
     } catch (error) {
       console.error("Erro ao buscar dados do gráfico:", error);
       if (axios.isAxiosError(error)) {

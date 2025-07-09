@@ -39,14 +39,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Customer } from "@/types/customer";
-import { Product } from "@/types/product";
 import { useDraggable } from "@/hooks/useDraggable";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
-import axios from "axios";
 import Form from "next/form";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -90,10 +86,6 @@ export default function NewInvoiceModal({
   const [openNewInvoiceItemProductList, setOpenNewInvoiceItemProductList] =
     useState(false);
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
-  const router = useRouter();
-  // const [products, setProducts] = useState<Product[]>([]);
-  // const [customers, setCustomers] = useState<Customer[]>([]);
-  // const [invoiceItems, setInvoiceItems] = useState<NewInvoiceItem[]>([]);
   const { position, dragHandleProps } = useDraggable();
   const { products, customers, invoiceItems, refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
@@ -107,33 +99,8 @@ export default function NewInvoiceModal({
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const refresh = async () => {
-      if (state?.success) {
-        await refreshData();
-      }
-    };
-    refresh();
+    (async () => state?.success && (await refreshData()))();
   }, [state, refreshData]);
-
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const [productsData, customersData, invoiceItemsData] =
-  //         await Promise.all([
-  //           axios.get("/api/products"),
-  //           axios.get("/api/customers"),
-  //           axios.get("/api/invoiceItems"),
-  //         ]);
-  //       setProducts(productsData.data);
-  //       setCustomers(customersData.data);
-  //       setInvoiceItems(invoiceItemsData.data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchProducts();
-  // }, []);
 
   const handleCloseDialog = () => {
     setProductId("");
@@ -144,8 +111,6 @@ export default function NewInvoiceModal({
   const handleCloseModal = () => {
     if (onClose) {
       onClose({ success: false, cancelled: true });
-    } else if (isModal) {
-      router.push("/invoices");
     }
   };
 

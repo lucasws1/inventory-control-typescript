@@ -3,6 +3,220 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
+// Helper function to generate random date within a range
+function randomDateBetween(start: Date, end: Date): Date {
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+  );
+}
+
+// Helper function to generate random number between min and max
+function randomBetween(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Mock data for the last 180 days
+export async function generateMockData() {
+  const now = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 180);
+
+  console.log("🌱 Generating balanced mock data for the last 180 days...");
+
+  // 1. Generate customers evenly distributed
+  const numCustomers = 50;
+  const mockCustomers = [];
+  for (let i = 0; i < numCustomers; i++) {
+    const createdAt = new Date(
+      startDate.getTime() +
+        ((now.getTime() - startDate.getTime()) * i) / numCustomers,
+    );
+    mockCustomers.push({
+      name: `Cliente ${i + 1}`,
+      email: `cliente${i + 1}@email.com`,
+      phone: `51999${String(i).padStart(6, "0")}`,
+      createdAt,
+    });
+  }
+
+  // 2. Generate products evenly distributed
+  const productNames = [
+    "Notebook Dell",
+    "Mouse Logitech",
+    "Teclado Mecânico",
+    'Monitor 24"',
+    "Webcam HD",
+    "Headset Gamer",
+    "Smartphone Samsung",
+    "Tablet iPad",
+    "Carregador USB-C",
+    "Cabo HDMI",
+    "SSD 1TB",
+    "Memória RAM 16GB",
+    "Placa de Vídeo",
+    "Processador Intel",
+    "Cooler CPU",
+    "Fonte 650W",
+    "Gabinete Gamer",
+    "Mousepad",
+    "Mesa Gamer",
+    "Cadeira Office",
+    "Impressora Laser",
+    "Scanner",
+    "Roteador WiFi",
+    "Switch 8 Portas",
+    "Pendrive 64GB",
+    "HD Externo 2TB",
+    "Fone Bluetooth",
+    "Smartwatch",
+    "Caixa de Som",
+    "Microfone",
+    "Ring Light",
+    "Tripé",
+    "Power Bank",
+  ];
+  const numProducts = productNames.length;
+  const mockProducts = [];
+  for (let i = 0; i < numProducts; i++) {
+    const createdAt = new Date(
+      startDate.getTime() +
+        ((now.getTime() - startDate.getTime()) * i) / numProducts,
+    );
+    mockProducts.push({
+      name: productNames[i],
+      price: randomBetween(50, 5000),
+      createdAt,
+    });
+  }
+
+  // 3. Clear existing data
+  console.log("🗑️ Cleaning existing data...");
+  await prisma.invoiceItem.deleteMany();
+  await prisma.invoice.deleteMany();
+  await prisma.stockMovement.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.customer.deleteMany();
+
+  // 4. Insert customers
+  console.log("👥 Creating customers...");
+  const createdCustomers = [];
+  for (const customer of mockCustomers) {
+    const created = await prisma.customer.create({ data: customer });
+    createdCustomers.push(created);
+  }
+
+  // 5. Insert products with initial stock movements
+  console.log("📦 Creating products...");
+  const createdProducts = [];
+  for (const product of mockProducts) {
+    const created = await prisma.product.create({ data: product });
+    createdProducts.push(created);
+    // Add initial stock for each product (purchase)
+    await prisma.stockMovement.create({
+      data: {
+        productId: created.id,
+        quantity: 100,
+        date: new Date(product.createdAt.getTime() + 1000 * 60 * 60),
+        reason: StockReason.COMPRA,
+      },
+    });
+  }
+
+  // 6. Generate invoices and stock movements evenly for each day
+  console.log("🧾 Creating invoices and stock movements...");
+  for (let day = 0; day < 180; day++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(currentDate.getDate() + day);
+
+    // 2 vendas por dia, sempre
+    for (let i = 0; i < 2; i++) {
+      // Clientes e produtos disponíveis até a data
+      const availableCustomers = createdCustomers.filter(
+        (c) => c.createdAt <= currentDate,
+      );
+      const availableProducts = createdProducts.filter(
+        (p) => p.createdAt <= currentDate,
+      );
+      if (availableCustomers.length === 0 || availableProducts.length === 0)
+        continue;
+
+      const customer =
+        availableCustomers[(day * 2 + i) % availableCustomers.length];
+      // 1-2 produtos por venda
+      const numItems = randomBetween(1, 2);
+      const selectedProducts = [];
+      for (let j = 0; j < numItems; j++) {
+        const product =
+          availableProducts[(day + i + j) % availableProducts.length];
+        const quantity = randomBetween(1, 3);
+        const unitPrice = product.price * (0.9 + Math.random() * 0.2); // ±10%
+        selectedProducts.push({ product, quantity, unitPrice });
+      }
+      const totalAmount = selectedProducts.reduce(
+        (sum, item) => sum + item.quantity * item.unitPrice,
+        0,
+      );
+      // Cria invoice
+      const invoice = await prisma.invoice.create({
+        data: {
+          customerId: customer.id,
+          amount: totalAmount,
+          pending: Math.random() > 0.8, // 20% pendente
+          purchaseDate: new Date(currentDate.getTime() + i * 1000 * 60 * 60),
+        },
+      });
+      // Cria invoice items e movimentação de estoque
+      for (const item of selectedProducts) {
+        await prisma.invoiceItem.create({
+          data: {
+            invoiceId: invoice.id,
+            productId: item.product.id,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          },
+        });
+        await prisma.stockMovement.create({
+          data: {
+            productId: item.product.id,
+            quantity: -item.quantity,
+            date: invoice.purchaseDate,
+            reason: StockReason.VENDA,
+          },
+        });
+      }
+    }
+    // Entrada de estoque extra a cada 10 dias
+    if (day % 10 === 0) {
+      const availableProducts = createdProducts.filter(
+        (p) => p.createdAt <= currentDate,
+      );
+      if (availableProducts.length > 0) {
+        const product = availableProducts[day % availableProducts.length];
+        await prisma.stockMovement.create({
+          data: {
+            productId: product.id,
+            quantity: randomBetween(10, 30),
+            date: new Date(currentDate.getTime() + 1000 * 60 * 30),
+            reason: StockReason.COMPRA,
+          },
+        });
+      }
+    }
+  }
+
+  console.log("✅ Balanced mock data generated successfully!");
+  console.log(`📊 Created:`);
+  console.log(`   • ${createdCustomers.length} customers`);
+  console.log(`   • ${createdProducts.length} products`);
+  const invoiceCount = await prisma.invoice.count();
+  const stockMovementCount = await prisma.stockMovement.count();
+  const invoiceItemCount = await prisma.invoiceItem.count();
+  console.log(`   • ${invoiceCount} invoices`);
+  console.log(`   • ${invoiceItemCount} invoice items`);
+  console.log(`   • ${stockMovementCount} stock movements`);
+}
+
+// Keep existing data for reference
 const customerData = [
   {
     name: "Paulinho",
@@ -383,37 +597,17 @@ const stockMovementData = [
 ];
 
 export async function main() {
-  // for (const c of customerData) {
-  //   await prisma.customer.create({ data: c });
-  // }
-
-  // for (const i of invoiceData) {
-  //   await prisma.invoice.create({ data: i });
-  // }
-
-  // for (const p of productData) {
-  //   await prisma.product.create({ data: p });
-  // }
-
-  for (const item of invoiceItemData) {
-    await prisma.invoiceItem.create({ data: item });
-  }
-
-  for (const sm of stockMovementData) {
-    await prisma.stockMovement.create({ data: sm });
-  }
-
-  console.log(
-    ":) Invoices, Products, Invoice Items, and Stock Movements seeded successfully.",
-  );
+  // Generate comprehensive mock data for charts
+  await generateMockData();
 }
 
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.log(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+if (require.main === module) {
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

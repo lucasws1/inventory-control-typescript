@@ -98,7 +98,7 @@ export default function CustomerEditForm({
                   />
                 </div>
 
-                <div className="grid gap-2">
+                {/* <div className="grid gap-2">
                   <Label htmlFor="createdAt">Data de cadastro</Label>
                   <Input
                     id="createdAt"
@@ -129,7 +129,7 @@ export default function CustomerEditForm({
                         : "Data não disponível"
                     }
                   />
-                </div>
+                </div> */}
               </div>
             </CardContent>
 

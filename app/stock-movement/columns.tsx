@@ -50,6 +50,18 @@ export const columns: ColumnDef<StockMovementWithRelations>[] = [
     enableColumnFilter: false,
   },
   {
+    id: "product",
+    accessorKey: "Product.name",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Produto"
+        className="w-full"
+      />
+    ),
+    filterFn: "includesString",
+  },
+  {
     accessorKey: "date",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Data" className="w-full" />
@@ -68,17 +80,49 @@ export const columns: ColumnDef<StockMovementWithRelations>[] = [
     },
   },
   {
-    id: "product",
-    accessorKey: "Product.name",
+    accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="Produto"
+        title="Criado em"
         className="w-full"
       />
     ),
-    filterFn: "includesString",
+    cell: ({ row }) => {
+      const date = new Date(row.original.createdAt);
+      return <div>{date.toLocaleDateString("pt-BR")}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
+      const [day, month, year] = date.split("/");
+
+      return `${day}${month}${year}`.includes(filterValue);
+    },
   },
+  {
+    accessorKey: "updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Atualizado em"
+        className="w-full"
+      />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.updatedAt);
+      return <div>{date.toLocaleDateString("pt-BR")}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
+      const [day, month, year] = date.split("/");
+      return `${day}${month}${year}`.includes(filterValue);
+    },
+  },
+
   {
     accessorKey: "reason",
     header: ({ column }) => (
@@ -165,6 +209,7 @@ export const columns: ColumnDef<StockMovementWithRelations>[] = [
       );
     },
   },
+
   // {
   //   accessorKey: "amount",
   //   header: () => <div className="text-right">Valor</div>,

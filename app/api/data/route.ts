@@ -37,10 +37,16 @@ export async function GET() {
             StockMovement: true,
             InvoiceItem: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         }),
         prisma.customer.findMany({
           include: {
             Invoice: true,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         }),
         prisma.invoice.findMany({
@@ -52,15 +58,24 @@ export async function GET() {
             },
             customer: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         }),
         prisma.stockMovement.findMany({
           include: {
             Product: true,
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         }),
         prisma.invoiceItem.findMany({
           include: {
             Product: true,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         }),
       ]);

@@ -20,7 +20,6 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -37,7 +36,6 @@ export default function NewProductModal({
   const [dateValue, setDateValue] = useState(new Date());
   const [openDate, setOpenDate] = useState(false);
   const { position, dragHandleProps } = useDraggable();
-  const router = useRouter();
   const { refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
@@ -50,19 +48,12 @@ export default function NewProductModal({
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const refresh = async () => {
-      if (state?.success) {
-        await refreshData();
-      }
-    };
-    refresh();
+    (async () => state?.success && (await refreshData()))();
   }, [state, refreshData]);
 
   const handleCloseModal = () => {
     if (onClose) {
       onClose();
-    } else if (isModal) {
-      router.push("/products");
     }
   };
 

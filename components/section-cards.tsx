@@ -68,7 +68,9 @@ export function SectionCards() {
               <IconTrendingDown className="size-4" />
             )}
           </div>
-          <div className="text-muted-foreground">Faturamento no período</div>
+          <div className="text-muted-foreground">
+            Receita bruta no período selecionado
+          </div>
         </CardFooter>
       </Card>
       {/* Novos Clientes */}
@@ -95,7 +97,9 @@ export function SectionCards() {
               <IconTrendingDown className="size-4" />
             )}
           </div>
-          <div className="text-muted-foreground">Novos clientes no período</div>
+          <div className="text-muted-foreground">
+            Aquisição de clientes no período selecionado
+          </div>
         </CardFooter>
       </Card>
       {/* Novos Produtos */}
@@ -124,7 +128,9 @@ export function SectionCards() {
               <IconTrendingDown className="size-4" />
             )}
           </div>
-          <div className="text-muted-foreground">Novos produtos no período</div>
+          <div className="text-muted-foreground">
+            Novos produtos no período selecionado
+          </div>
         </CardFooter>
       </Card>
       {/* Estoque Total */}
@@ -153,7 +159,9 @@ export function SectionCards() {
               <IconTrendingDown className="size-4" />
             )}
           </div>
-          <div className="text-muted-foreground">Estoque no período</div>
+          <div className="text-muted-foreground">
+            Taxa de expansão no período selecionado
+          </div>
         </CardFooter>
       </Card>
     </div>

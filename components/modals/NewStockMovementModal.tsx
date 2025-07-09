@@ -30,7 +30,6 @@ import { useData } from "@/contexts/DataContext";
 import { useDraggable } from "@/hooks/useDraggable";
 import { ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
-import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -49,7 +48,6 @@ export default function NewStockMovementModal({
   const [dateValue, setDateValue] = useState<Date>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const { position, dragHandleProps } = useDraggable();
-  const router = useRouter();
   const { products, refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
@@ -62,19 +60,12 @@ export default function NewStockMovementModal({
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const refresh = async () => {
-      if (state?.success) {
-        await refreshData();
-      }
-    };
-    refresh();
+    (async () => state?.success && (await refreshData()))();
   }, [state, refreshData]);
 
   const handleCloseModal = () => {
     if (onClose) {
       onClose();
-    } else if (isModal) {
-      router.push("/stock-movement");
     }
   };
 
