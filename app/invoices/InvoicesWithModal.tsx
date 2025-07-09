@@ -10,7 +10,7 @@ import {
 import OverlaySkeleton from "@/components/overlaySkeleton";
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
-import { InvoicesTableData } from "@/types/InvoiceWithRelations";
+import { InvoiceWithRelations } from "@/types/InvoiceWithRelations";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -23,11 +23,11 @@ export default function InvoicesWithModal() {
   const { openModal } = useModal();
   const { invoices, loading, error, refreshData } = useData();
 
-  const handleEditInvoice = (invoice: InvoicesTableData) => {
+  const handleEditInvoice = (invoice: InvoiceWithRelations) => {
     openModal("edit-invoice", invoice);
   };
 
-  const handleDelete = async (invoice: InvoicesTableData) => {
+  const handleDelete = async (invoice: InvoiceWithRelations) => {
     await deleteInvoice(invoice.id);
     await refreshData(); // Atualiza os dados após deletar
   };
@@ -78,7 +78,7 @@ export default function InvoicesWithModal() {
               </DropdownMenu>
             );
           },
-        } as ColumnDef<InvoicesTableData>;
+        } as ColumnDef<InvoiceWithRelations>;
       }
       return column;
     });

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
+import { useData } from "@/contexts/DataContext";
 
 export default function NewCustomerModal({
   isModal = false,
@@ -27,19 +28,25 @@ export default function NewCustomerModal({
   const [state, formAction, pending] = useActionState(createCustomer, null);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
-
+  const { refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
-    console.log("State after action:", state);
-
     if (state?.success && isModal) {
       toast.success("Cliente criado com sucesso!");
-      console.log("Cliente criado com sucesso!", state);
       onClose?.();
     } else if (state?.error) {
       toast.error(state.error);
     }
   }, [state, isModal, onClose]);
+
+  useEffect(() => {
+    const refresh = async () => {
+      if (state?.success) {
+        await refreshData();
+      }
+    };
+    refresh();
+  }, [state, refreshData]);
 
   const handleCloseModal = () => {
     if (onClose) {

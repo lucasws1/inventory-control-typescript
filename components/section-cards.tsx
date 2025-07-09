@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  IconLoader,
+  // IconLoader,
   IconTrendingDown,
   IconTrendingUp,
 } from "@tabler/icons-react";
@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/card";
 import { useChartData } from "@/contexts/ChartDataContext";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
+import { Loader } from "./Loader/Loader";
 
 const Spinner = () => {
-  return <IconLoader className="size-9 animate-spin" />;
+  return <Loader variant="classic" size="lg" />;
 };
 
 export function SectionCards() {

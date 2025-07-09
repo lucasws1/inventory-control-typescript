@@ -18,6 +18,7 @@ import { useMemo } from "react";
 import { DataTable } from "@/components/data-table";
 import { deleteProduct } from "../lib/actions";
 import { columns } from "./columns";
+import OverlaySkeleton from "@/components/overlaySkeleton";
 
 export default function ProductsWithModal() {
   const { openModal } = useModal();
@@ -97,7 +98,11 @@ export default function ProductsWithModal() {
   }, [openModal, refreshData]);
 
   if (loading) {
-    return <div>Carregando produtos...</div>;
+    return (
+      <div>
+        <OverlaySkeleton />
+      </div>
+    );
   }
 
   if (error) {

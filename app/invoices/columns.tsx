@@ -14,12 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { InvoicesTableData } from "@/types/InvoiceWithRelations";
+import { InvoiceWithRelations } from "@/types/InvoiceWithRelations";
 import { useRouter } from "next/navigation";
 import { deleteInvoice } from "../lib/actions";
 import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
 
-export const columns: ColumnDef<InvoicesTableData>[] = [
+export const columns: ColumnDef<InvoiceWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (

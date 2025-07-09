@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useChartData } from "@/contexts/ChartDataContext";
+import { Loader } from "./Loader/Loader";
 
 export const description = "An interactive area chart";
 
@@ -148,7 +149,9 @@ export function ChartAreaInteractive() {
         {loading ? (
           <div className="flex h-[250px] items-center justify-center">
             <div className="text-muted-foreground">
-              <IconLoader className="size-10 animate-spin" />
+              {/* <IconLoader className="size-10 animate-spin" />
+               */}
+              <Loader variant="dots" size="lg" />
             </div>
           </div>
         ) : (

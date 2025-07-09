@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { useDraggable } from "@/hooks/useDraggable";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
+import { useData } from "@/contexts/DataContext";
 
 export default function NewProductModal({
   isModal = false,
@@ -37,7 +38,7 @@ export default function NewProductModal({
   const [openDate, setOpenDate] = useState(false);
   const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
-
+  const { refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
@@ -47,6 +48,15 @@ export default function NewProductModal({
       toast.error(state.error);
     }
   }, [state, isModal, onClose]);
+
+  useEffect(() => {
+    const refresh = async () => {
+      if (state?.success) {
+        await refreshData();
+      }
+    };
+    refresh();
+  }, [state, refreshData]);
 
   const handleCloseModal = () => {
     if (onClose) {
@@ -109,7 +119,7 @@ export default function NewProductModal({
                       id="dateValue"
                       className="w-full justify-between font-normal"
                     >
-                      {new Date().toLocaleDateString("pt-BR")}
+                      {dateValue.toLocaleDateString("pt-BR")}
                       <ChevronDownIcon />
                     </Button>
                   </PopoverTrigger>

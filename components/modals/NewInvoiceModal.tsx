@@ -51,6 +51,7 @@ import { useActionState, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { IconShoppingCart } from "@tabler/icons-react";
+import { useData } from "@/contexts/DataContext";
 
 type NewInvoiceItem = {
   productId: number;
@@ -90,11 +91,11 @@ export default function NewInvoiceModal({
     useState(false);
   const [productAlreadyAdded, setProductAlreadyAdded] = useState(false);
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [invoiceItems, setInvoiceItems] = useState<NewInvoiceItem[]>([]);
+  // const [products, setProducts] = useState<Product[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [invoiceItems, setInvoiceItems] = useState<NewInvoiceItem[]>([]);
   const { position, dragHandleProps } = useDraggable();
-
+  const { products, customers, invoiceItems, refreshData } = useData();
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
@@ -106,24 +107,33 @@ export default function NewInvoiceModal({
   }, [state, isModal, onClose]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const [productsData, customersData, invoiceItemsData] =
-          await Promise.all([
-            axios.get("/api/products"),
-            axios.get("/api/customers"),
-            axios.get("/api/invoiceItems"),
-          ]);
-        setProducts(productsData.data);
-        setCustomers(customersData.data);
-        setInvoiceItems(invoiceItemsData.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    const refresh = async () => {
+      if (state?.success) {
+        await refreshData();
       }
     };
+    refresh();
+  }, [state, refreshData]);
 
-    fetchProducts();
-  }, []);
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const [productsData, customersData, invoiceItemsData] =
+  //         await Promise.all([
+  //           axios.get("/api/products"),
+  //           axios.get("/api/customers"),
+  //           axios.get("/api/invoiceItems"),
+  //         ]);
+  //       setProducts(productsData.data);
+  //       setCustomers(customersData.data);
+  //       setInvoiceItems(invoiceItemsData.data);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
 
   const handleCloseDialog = () => {
     setProductId("");
@@ -446,7 +456,12 @@ export default function NewInvoiceModal({
                     />
                   </PopoverContent>
                 </Popover>
-                <input type="hidden" name="date" value={date?.toISOString()} />
+                <input
+                  id="date"
+                  type="hidden"
+                  name="date"
+                  value={date?.toISOString()}
+                />
               </div>
             </div>
           </CardContent>

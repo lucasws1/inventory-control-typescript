@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomerTableData } from "@/types/CustomerWithRelations";
+import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import {
   IconCircleCheckFilled,
   IconEdit,
@@ -24,7 +24,7 @@ import {
 import { useRouter } from "next/navigation";
 import { deleteInvoice } from "../lib/actions";
 
-export const columns: ColumnDef<CustomerTableData>[] = [
+export const columns: ColumnDef<CustomerWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (

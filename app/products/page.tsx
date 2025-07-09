@@ -1,6 +1,5 @@
-import prisma from "@/lib/prisma";
 import { Metadata } from "next";
-import ProductsClient from "./ProductsClient";
+import ProductsWithModal from "./ProductsWithModal";
 
 export const metadata: Metadata = {
   title: "Produtos",
@@ -8,14 +7,8 @@ export const metadata: Metadata = {
 
 export const revalidate = 0;
 
-const Products = async () => {
-  const products = await prisma.product.findMany({
-    include: {
-      StockMovement: true,
-    },
-  });
-
-  return <ProductsClient />;
+const Products = () => {
+  return <ProductsWithModal />;
 };
 
 export default Products;

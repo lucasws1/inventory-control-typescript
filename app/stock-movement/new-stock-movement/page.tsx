@@ -26,9 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useData } from "@/contexts/DataContext";
 import { useDraggable } from "@/hooks/useDraggable";
 import { IconX } from "@tabler/icons-react";
-import axios from "axios";
 import { ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
@@ -46,7 +46,7 @@ export default function NewStockMovement() {
   const [dateValue, setDateValue] = useState<Date>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const { position, dragHandleProps } = useDraggable();
-  const [products, setProducts] = useState<{ id: number; name: string }[]>([]);
+  const { products, refreshData } = useData();
   const router = useRouter();
 
   // Fechar modal quando a operação for bem-sucedida
@@ -60,18 +60,6 @@ export default function NewStockMovement() {
       toast.error(state.error);
     }
   }, [state, isModal, onClose]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data: productsData } = await axios.get("/api/products");
-        setProducts(productsData);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-    fetchProducts();
-  }, []);
 
   const handleCloseModal = () => {
     if (onClose) {

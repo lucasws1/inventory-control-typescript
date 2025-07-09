@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Customer } from "@/types/customer";
+import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { Metadata } from "next";
 import CustomerEditForm from "./CustomerEditForm";
 
@@ -18,7 +18,7 @@ export default async function CustomerPage({
   });
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4">
-      <CustomerEditForm customer={customer as Customer} />
+      <CustomerEditForm customer={customer as CustomerWithRelations} />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { Customer } from "@/types/customer";
-import { CustomerTableData } from "@/types/CustomerWithRelations";
+import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -80,7 +80,7 @@ export default function CustomersWithModal() {
               </DropdownMenu>
             );
           },
-        } as ColumnDef<CustomerTableData>;
+        } as ColumnDef<CustomerWithRelations>;
       }
       return column;
     });
