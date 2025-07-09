@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ProductsWithModal from "./ProductsWithModal";
+import ProductsClient from "./ProductsClient";
 
 export const metadata: Metadata = {
   title: "Produtos",
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 const Products = () => {
-  return <ProductsWithModal />;
+  return <ProductsClient />;
 };
 
 export default Products;

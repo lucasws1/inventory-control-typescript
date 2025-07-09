@@ -25,6 +25,8 @@ import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { deleteProduct } from "../lib/actions";
 import { ProductWithRelations } from "@/types/ProductWithRelations";
+import { useModal } from "@/contexts/ModalContext";
+import { useData } from "@/contexts/DataContext";
 
 export const columns: ColumnDef<ProductWithRelations>[] = [
   {
@@ -163,11 +165,32 @@ export const columns: ColumnDef<ProductWithRelations>[] = [
     id: "actions",
     cell: ({ row }) => {
       const product = row.original;
-      const router = useRouter();
+      const { openModal } = useModal();
+      const { refreshData } = useData();
+
+      const handleEditProduct = () => {
+        try {
+          openModal("edit-product", product);
+        } catch (error) {
+          console.error("Erro ao abrir modal de edição:", error);
+        }
+      };
 
       const handleDelete = async () => {
-        await deleteProduct(product.id);
-        router.refresh();
+        try {
+          await deleteProduct(product.id);
+          await refreshData();
+        } catch (error) {
+          console.error("Erro ao deletar produto:", error);
+        }
+      };
+
+      const handleCopyId = async () => {
+        try {
+          await navigator.clipboard.writeText(product.id.toString());
+        } catch (error) {
+          console.error("Erro ao copiar ID:", error);
+        }
       };
 
       return (
@@ -179,26 +202,23 @@ export const columns: ColumnDef<ProductWithRelations>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(product.id.toString())
-              }
-            >
+            <DropdownMenuItem onClick={handleCopyId}>
               <IconCopy />
               <span>Copiar ID</span>
             </DropdownMenuItem>
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push(`/products/${product.id}`)}
+              onClick={handleEditProduct}
             >
               <IconEdit />
               <span>Editar</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
+              variant="destructive"
               className="cursor-pointer"
-              onClick={() => handleDelete()}
+              onClick={handleDelete}
             >
               <IconTrash />
               <span>Deletar</span>

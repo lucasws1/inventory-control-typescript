@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
         id: customer.id,
         title: customer.name,
         subtitle: customer.email || "Sem email",
-        url: `/customers/${customer.id}`,
+        url: `/customers`,
         icon: "user",
       })),
       ...products.map((product) => ({
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
         id: product.id,
         title: product.name,
         subtitle: `R$ ${product.price.toFixed(2)}`,
-        url: `/products/${product.id}`,
+        url: `/products`,
         icon: "box",
       })),
       ...invoices.map((invoice) => ({
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
         id: invoice.id,
         title: `Fatura #${invoice.id}`,
         subtitle: `${invoice.customer.name} - R$ ${invoice.amount.toFixed(2)}`,
-        url: `/invoices/${invoice.id}`,
+        url: `/invoices`,
         icon: "dollar",
       })),
       ...stockMovements.map((movement) => ({
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         id: movement.id,
         title: `${movement.Product.name} - ${movement.quantity > 0 ? "+" : ""}${movement.quantity}`,
         subtitle: `${movement.reason} - ${new Date(movement.date).toLocaleDateString("pt-BR")}`,
-        url: `/stock-movement/${movement.id}`,
+        url: `/stock-movement`,
         icon: "box",
       })),
     ];

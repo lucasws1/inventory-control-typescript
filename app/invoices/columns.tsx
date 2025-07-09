@@ -17,7 +17,15 @@ import {
 import { InvoiceWithRelations } from "@/types/InvoiceWithRelations";
 import { useRouter } from "next/navigation";
 import { deleteInvoice } from "../lib/actions";
-import { IconCircleCheckFilled, IconLoader } from "@tabler/icons-react";
+import {
+  IconCircleCheckFilled,
+  IconLoader,
+  IconCopy,
+  IconEdit,
+  IconTrash,
+} from "@tabler/icons-react";
+import { useModal } from "@/contexts/ModalContext";
+import { useData } from "@/contexts/DataContext";
 
 export const columns: ColumnDef<InvoiceWithRelations>[] = [
   {
@@ -136,16 +144,16 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
     id: "actions",
     cell: ({ row }) => {
       const invoice = row.original;
-      const router = useRouter();
+      const { openModal } = useModal();
+      const { refreshData } = useData();
+
+      const handleEditInvoice = () => {
+        openModal("edit-invoice", invoice);
+      };
 
       const handleDelete = async () => {
         await deleteInvoice(invoice.id);
-        router.refresh();
-      };
-
-      const handleEdit = () => {
-        // Navega para a mesma página com o parâmetro edit
-        router.push(`/invoices/${invoice.id}`);
+        await refreshData();
       };
 
       return (
@@ -162,17 +170,25 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
                 navigator.clipboard.writeText(invoice.id.toString())
               }
             >
-              Copiar ID
+              <IconCopy />
+              <span>Copiar ID</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
-              Editar
-            </DropdownMenuItem>
+
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => handleDelete()}
+              onClick={handleEditInvoice}
             >
-              Deletar
+              <IconEdit />
+              <span>Editar</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              className="cursor-pointer"
+              onClick={handleDelete}
+            >
+              <IconTrash />
+              <span>Deletar</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

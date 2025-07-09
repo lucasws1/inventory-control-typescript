@@ -20,9 +20,12 @@ import {
   IconEdit,
   IconLoader,
   IconTrash,
+  IconCopy,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { deleteInvoice } from "../lib/actions";
+import { deleteCustomer } from "../lib/actions";
+import { useModal } from "@/contexts/ModalContext";
+import { useData } from "@/contexts/DataContext";
 
 export const columns: ColumnDef<CustomerWithRelations>[] = [
   {
@@ -186,11 +189,16 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
     id: "actions",
     cell: ({ row }) => {
       const customer = row.original;
-      const router = useRouter();
+      const { openModal } = useModal();
+      const { refreshData } = useData();
+
+      const handleEditCustomer = () => {
+        openModal("edit-customer", customer);
+      };
 
       const handleDelete = async () => {
-        await deleteInvoice(customer.id);
-        router.refresh();
+        await deleteCustomer(customer.id);
+        await refreshData();
       };
 
       return (
@@ -207,19 +215,22 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
                 navigator.clipboard.writeText(customer.id.toString())
               }
             >
-              Copiar ID
+              <IconCopy />
+              <span>Copiar ID</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={() => router.push(`/customer/${customer.id}`)}
+              onClick={handleEditCustomer}
             >
               <IconEdit />
               <span>Editar</span>
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
+              variant="destructive"
               className="cursor-pointer"
-              onClick={() => handleDelete()}
+              onClick={handleDelete}
             >
               <IconTrash />
               <span>Deletar</span>

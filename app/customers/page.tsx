@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import CustomersWithModal from "./CustomersWithModal";
+import CustomersClient from "./CustomersClient";
 
 export const metadata: Metadata = {
   title: "Clientes",
@@ -8,11 +8,7 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 const Customers = () => {
-  return (
-    <>
-      <CustomersWithModal />
-    </>
-  );
+  return <CustomersClient />;
 };
 
 export default Customers;

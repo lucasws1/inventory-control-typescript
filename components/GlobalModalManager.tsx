@@ -2,13 +2,13 @@
 import { useModal } from "@/contexts/ModalContext";
 import { useEffect, useState } from "react";
 import NewProductModal from "@/components/modals/NewProductModal";
-import ProductEditForm from "@/app/products/[id]/ProductEditForm";
+import ProductEditForm from "@/components/forms/ProductEditForm";
 import NewCustomerModal from "@/components/modals/NewCustomerModal";
-import CustomerEditForm from "@/app/customers/[id]/CustomerEditForm";
+import CustomerEditForm from "@/components/forms/CustomerEditForm";
 import NewStockMovementModal from "@/components/modals/NewStockMovementModal";
-import StockMovementEditPage from "@/app/stock-movement/[id]/StockMovementEditPage";
+import StockMovementEditForm from "@/components/forms/StockMovementEditForm";
 import NewInvoiceModal from "@/components/modals/NewInvoiceModal";
-import InvoiceEditForm from "@/app/invoices/[id]/InvoiceEditForm";
+import InvoiceEditForm from "@/components/forms/InvoiceEditForm";
 import { Product } from "@/types/product";
 import axios from "axios";
 
@@ -69,7 +69,7 @@ export default function GlobalModalManager() {
         );
       case "edit-stock-movement":
         return (
-          <StockMovementEditPage
+          <StockMovementEditForm
             stockMovement={modalData}
             isModal={true}
             onClose={closeModal}

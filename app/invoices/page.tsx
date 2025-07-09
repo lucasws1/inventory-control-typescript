@@ -1,12 +1,12 @@
 import { Metadata } from "next";
-import InvoicesWithModal from "./InvoicesWithModal";
+import InvoicesClient from "./InvoicesClient";
 
 const metadata: Metadata = {
   title: "Vendas",
 };
 
 const Invoices = () => {
-  return <InvoicesWithModal />;
+  return <InvoicesClient />;
 };
 
 export default Invoices;

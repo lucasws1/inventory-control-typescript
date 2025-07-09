@@ -17,57 +17,9 @@ import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
 import { deleteStockMovement } from "../lib/actions";
 import { Badge } from "@/components/ui/badge";
-
-// Componente para as ações da linha
-function StockMovementActions({
-  stockMovement,
-}: {
-  stockMovement: StockMovementWithRelations;
-}) {
-  const router = useRouter();
-
-  const handleDelete = async () => {
-    await deleteStockMovement(stockMovement.id);
-    router.refresh();
-  };
-
-  const handleEdit = () => {
-    router.push(`/stock-movement/${stockMovement.id}`);
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-5 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={() =>
-            navigator.clipboard.writeText(stockMovement.id.toString())
-          }
-        >
-          Copiar ID
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => handleEdit()}
-        >
-          Editar
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="cursor-pointer"
-          onClick={() => handleDelete()}
-        >
-          Deletar
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { useModal } from "@/contexts/ModalContext";
+import { useData } from "@/contexts/DataContext";
 
 export const columns: ColumnDef<StockMovementWithRelations>[] = [
   {
@@ -161,7 +113,56 @@ export const columns: ColumnDef<StockMovementWithRelations>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return <StockMovementActions stockMovement={row.original} />;
+      const stockMovement = row.original;
+      const { openModal } = useModal();
+      const { refreshData } = useData();
+
+      const handleEditStockMovement = () => {
+        openModal("edit-stock-movement", stockMovement);
+      };
+
+      const handleDelete = async () => {
+        await deleteStockMovement(stockMovement.id);
+        await refreshData();
+      };
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-5 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() =>
+                navigator.clipboard.writeText(stockMovement.id.toString())
+              }
+            >
+              <IconCopy />
+              <span>Copiar ID</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={handleEditStockMovement}
+            >
+              <IconEdit />
+              <span>Editar</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              className="cursor-pointer"
+              onClick={handleDelete}
+            >
+              <IconTrash />
+              <span>Deletar</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     },
   },
   // {
