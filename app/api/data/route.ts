@@ -1,5 +1,15 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+// Schema para validação da resposta
+const DataResponseSchema = z.object({
+  products: z.array(z.any()),
+  customers: z.array(z.any()),
+  invoices: z.array(z.any()),
+  stockMovements: z.array(z.any()),
+  invoiceItems: z.array(z.any()),
+});
 
 // Helper function to serialize dates in nested objects
 function serializeDates(obj: any): any {
@@ -89,7 +99,17 @@ export async function GET() {
       invoiceItems: serializeDates(invoiceItems),
     };
 
-    return NextResponse.json(serializedData);
+    // Validar estrutura da resposta
+    const validation = DataResponseSchema.safeParse(serializedData);
+    if (!validation.success) {
+      console.error("Erro na validação da resposta:", validation.error);
+      return NextResponse.json(
+        { error: "Erro na estrutura dos dados" },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(validation.data);
   } catch (error) {
     return NextResponse.json(
       { error: "Erro ao carregar dados" },

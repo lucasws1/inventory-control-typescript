@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { z } from "zod";
+
+// Schema para validação dos parâmetros de query
+const ChartDataQuerySchema = z.object({
+  timeRange: z.enum(["7d", "30d", "90d"]).default("90d"),
+});
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const timeRange = searchParams.get("timeRange") || "90d";
+
+    // Validar parâmetros de query
+    const queryValidation = ChartDataQuerySchema.safeParse({
+      timeRange: searchParams.get("timeRange"),
+    });
+
+    if (!queryValidation.success) {
+      return NextResponse.json(
+        { error: "Parâmetro timeRange inválido. Use: 7d, 30d ou 90d" },
+        { status: 400 },
+      );
+    }
+
+    const { timeRange } = queryValidation.data;
 
     let daysToSubtract;
 

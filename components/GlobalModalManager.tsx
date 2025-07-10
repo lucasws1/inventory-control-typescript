@@ -1,6 +1,5 @@
 "use client";
 import { useModal } from "@/contexts/ModalContext";
-import { useEffect, useState } from "react";
 import NewProductModal from "@/components/modals/NewProductModal";
 import ProductEditForm from "@/components/forms/ProductEditForm";
 import NewCustomerModal from "@/components/modals/NewCustomerModal";
@@ -9,26 +8,12 @@ import NewStockMovementModal from "@/components/modals/NewStockMovementModal";
 import StockMovementEditForm from "@/components/forms/StockMovementEditForm";
 import NewInvoiceModal from "@/components/modals/NewInvoiceModal";
 import InvoiceEditForm from "@/components/forms/InvoiceEditForm";
-import { Product } from "@/types/product";
-import axios from "axios";
+import { useData } from "@/contexts/DataContext";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
 
 export default function GlobalModalManager() {
   const { modalType, modalData, isOpen, closeModal } = useModal();
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    if (modalType === "edit-invoice" && isOpen) {
-      const fetchProducts = async () => {
-        try {
-          const { data: productsData } = await axios.get("/api/products");
-          setProducts(productsData);
-        } catch (error) {
-          console.log("Error fetching products:", error);
-        }
-      };
-      fetchProducts();
-    }
-  }, [modalType, isOpen]);
+  const { products } = useData();
 
   if (!isOpen) return null;
 
@@ -54,7 +39,7 @@ export default function GlobalModalManager() {
         return (
           <InvoiceEditForm
             invoice={modalData}
-            products={products}
+            products={products as ProductWithRelations[]}
             isModal={true}
             onClose={closeModal}
           />

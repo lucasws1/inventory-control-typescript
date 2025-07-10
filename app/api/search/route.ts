@@ -1,10 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { z } from "zod";
+
+// Schema para validação dos parâmetros de query
+const SearchQuerySchema = z.object({
+  q: z
+    .string()
+    .min(1, "Query não pode estar vazia")
+    .max(100, "Query muito longa"),
+});
+
+// Schema para validação da resposta
+const SearchResultSchema = z.object({
+  type: z.enum(["customer", "product", "invoice", "stockMovement"]),
+  id: z.number(),
+  title: z.string(),
+  subtitle: z.string(),
+  url: z.string(),
+  icon: z.string(),
+});
+
+const SearchResponseSchema = z.object({
+  results: z.array(SearchResultSchema),
+});
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get("q") || "";
+
+    // Validar parâmetros de query
+    const queryValidation = SearchQuerySchema.safeParse({
+      q: searchParams.get("q") || "",
+    });
+
+    if (!queryValidation.success) {
+      return NextResponse.json(
+        { error: "Parâmetro de pesquisa inválido" },
+        { status: 400 },
+      );
+    }
+
+    const { q: query } = queryValidation.data;
 
     if (!query || query.trim().length < 2) {
       return NextResponse.json({ results: [] });
@@ -69,7 +105,7 @@ export async function GET(request: NextRequest) {
 
     const results = [
       ...customers.map((customer) => ({
-        type: "customer",
+        type: "customer" as const,
         id: customer.id,
         title: customer.name,
         subtitle: customer.email || "Sem email",
@@ -77,7 +113,7 @@ export async function GET(request: NextRequest) {
         icon: "user",
       })),
       ...products.map((product) => ({
-        type: "product",
+        type: "product" as const,
         id: product.id,
         title: product.name,
         subtitle: `R$ ${product.price.toFixed(2)}`,
@@ -85,7 +121,7 @@ export async function GET(request: NextRequest) {
         icon: "box",
       })),
       ...invoices.map((invoice) => ({
-        type: "invoice",
+        type: "invoice" as const,
         id: invoice.id,
         title: `Fatura #${invoice.id}`,
         subtitle: `${invoice.customer.name} - R$ ${invoice.amount.toFixed(2)}`,
@@ -93,7 +129,7 @@ export async function GET(request: NextRequest) {
         icon: "dollar",
       })),
       ...stockMovements.map((movement) => ({
-        type: "stockMovement",
+        type: "stockMovement" as const,
         id: movement.id,
         title: `${movement.Product.name} - ${movement.quantity > 0 ? "+" : ""}${movement.quantity}`,
         subtitle: `${movement.reason} - ${new Date(movement.date).toLocaleDateString("pt-BR")}`,
@@ -102,7 +138,17 @@ export async function GET(request: NextRequest) {
       })),
     ];
 
-    return NextResponse.json({ results });
+    // Validar estrutura da resposta
+    const responseValidation = SearchResponseSchema.safeParse({ results });
+    if (!responseValidation.success) {
+      console.error("Erro na validação da resposta:", responseValidation.error);
+      return NextResponse.json(
+        { error: "Erro na estrutura dos dados" },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json(responseValidation.data);
   } catch (error) {
     console.error("Erro na pesquisa:", error);
     return NextResponse.json(

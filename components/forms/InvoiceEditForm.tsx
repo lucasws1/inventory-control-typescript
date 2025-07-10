@@ -42,7 +42,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useDraggable } from "@/hooks/useDraggable";
 import { Invoice } from "@/types/invoice";
-import { Product } from "@/types/product";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
 import { formatCurrencyBRL } from "@/utils/formatCurrencyBRL";
 import { IconShoppingCart, IconX } from "@tabler/icons-react";
 import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
@@ -70,7 +70,7 @@ export default function InvoiceEditForm({
   onClose,
 }: {
   invoice: Invoice;
-  products: Product[];
+  products: ProductWithRelations[];
   isModal?: boolean;
   onClose?: () => void;
 }) {

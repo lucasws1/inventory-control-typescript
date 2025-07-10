@@ -17,6 +17,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.10.0",
     "@prisma/client": "^6.10.1",
     "@prisma/extension-accelerate": "^2.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -41,6 +42,7 @@
     "extenso": "^2.1.0",
     "lucide-react": "^0.518.0",
     "next": "15.3.4",
+    "next-auth": "5.0.0-beta.29",
     "react": "^19.0.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",

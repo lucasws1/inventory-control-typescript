@@ -31,13 +31,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useSession } from "next-auth/react";
 
 const data = {
-  user: {
-    name: "lucas w. schuch",
-    email: "lucas.schuch@gmail.com",
-    avatar: "",
-  },
   navMain: [
     {
       title: "Painel de Controle",
@@ -152,6 +148,13 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isOpen, setIsOpen } = useSearch();
+  const { data: session, status } = useSession();
+
+  const userData = {
+    name: session?.user?.name || "Usuário",
+    email: session?.user?.email || "usuario@email.com",
+    avatar: session?.user?.image || "",
+  };
 
   const handleSearchClick = () => {
     setIsOpen(true);
@@ -191,7 +194,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={data.user} />
+          <NavUser user={userData} />
         </SidebarFooter>
       </Sidebar>
 
