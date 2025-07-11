@@ -26,36 +26,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useData } from "@/contexts/DataContext";
-import { useDraggable } from "@/hooks/useDraggable";
-import { IconX } from "@tabler/icons-react";
-import extenso from "extenso";
 import { ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { use, useActionState, useEffect, useState } from "react";
 
 export default function StockMovementEditPage({
-  stockMovement,
-  isModal = false,
-  onClose,
+  params,
 }: {
-  stockMovement: any;
-  isModal?: boolean;
-  onClose?: () => void;
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
+  const { stockMovements, products, refreshData } = useData();
+  const stockMovement = stockMovements.find(
+    (stockMovement) => stockMovement.id === Number(id),
+  );
   const [state, formAction, pending] = useActionState(
     updateStockMovement,
     null,
   );
-  const { refreshData } = useData();
-  const { position, dragHandleProps } = useDraggable();
   const router = useRouter();
   const [openDate, setOpenDate] = useState(false);
   const [dateValue, setDateValue] = useState<Date>(
-    stockMovement.date ? new Date(stockMovement.date) : new Date(),
+    stockMovement?.date ? new Date(stockMovement.date) : new Date(),
   );
   const [stockReason, setStockReason] = useState(
-    stockMovement.reason as string,
+    stockMovement?.reason as string,
   );
 
   const stockReasons: string[] = [
@@ -69,22 +65,16 @@ export default function StockMovementEditPage({
   useEffect(() => {
     if (state?.success) {
       const refresh = async () => await refreshData();
-      handleCloseModal();
+      router.push("/stock-movement");
       refresh();
     }
   }, [state]);
 
-  const handleCloseModal = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
-
   const renderForm = () => (
     <div>
       <div className="flex justify-center">
-        <Card className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-          <CardHeader {...dragHandleProps}>
+        <Card className="w-full min-w-sm" onClick={(e) => e.stopPropagation()}>
+          <CardHeader>
             <CardTitle>Editar movimento de estoque</CardTitle>
             <CardDescription>
               Para alterar a movimentação de estoque, preencha os campos abaixo.
@@ -97,7 +87,11 @@ export default function StockMovementEditPage({
                 id="productName"
                 name="productName"
                 type="text"
-                defaultValue={stockMovement.Product.name}
+                defaultValue={
+                  products.find(
+                    (product) => product.id === stockMovement?.Product.id,
+                  )?.name
+                }
                 disabled
               />
             </div>
@@ -176,16 +170,14 @@ export default function StockMovementEditPage({
                     value={dateValue.toISOString()}
                   />
                 </div>
-
                 <div className="relative flex flex-col gap-2">
                   <Button type="submit" className="w-full cursor-pointer">
                     Enviar
                   </Button>
                   <Button
-                    type="button"
                     variant="outline"
                     className="w-full cursor-pointer"
-                    onClick={handleCloseModal}
+                    onClick={() => router.push("/stock-movement")}
                   >
                     Fechar janela
                   </Button>
@@ -198,29 +190,11 @@ export default function StockMovementEditPage({
     </div>
   );
 
-  // Retorna o formulário em modal ou modo normal
-  if (isModal) {
-    return (
-      <>
-        {/* Modal Backdrop */}
-        <div
-          className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-          >
-            {renderForm()}
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
-      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
+      <div className="absolute inset-0 z-50 flex h-full w-full min-w-md items-center justify-center bg-black/90">
+        {renderForm()}
+      </div>
     </>
   );
 }

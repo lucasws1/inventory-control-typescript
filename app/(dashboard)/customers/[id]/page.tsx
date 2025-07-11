@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useData } from "@/contexts/DataContext";
-import { useDraggable } from "@/hooks/useDraggable";
 import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { useActionState, useEffect } from "react";
 
@@ -26,7 +25,6 @@ export default function CustomerEditForm({
   onClose?: () => void;
 }) {
   const [state, formAction, pending] = useActionState(updateCustomer, null);
-  const { position, dragHandleProps } = useDraggable();
   const { refreshData } = useData();
 
   useEffect(() => {
@@ -51,7 +49,7 @@ export default function CustomerEditForm({
             className="w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
-            <CardHeader {...dragHandleProps}>
+            <CardHeader>
               <CardTitle>Alterar dados de {customer?.name}</CardTitle>
               <CardDescription>
                 Última edição em{" "}
@@ -125,25 +123,6 @@ export default function CustomerEditForm({
       </form>
     </div>
   );
-  // Retorna o formulário em modal ou modo normal
-  if (isModal) {
-    return (
-      <>
-        {/* Modal Backdrop */}
-        <div
-          className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-          >
-            {renderForm()}
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>

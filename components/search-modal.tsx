@@ -55,6 +55,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
           const response = await axios.get(
             `/api/search?q=${encodeURIComponent(query)}`,
           );
+
           setResults(response.data.results || []);
         } catch (error) {
           console.error("Erro na pesquisa:", error);
@@ -65,7 +66,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
       } else {
         setResults([]);
       }
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(searchTimeout);
   }, [query]);
@@ -81,7 +82,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
       e.preventDefault();
       const selectedResult = results[selectedIndex];
       if (selectedResult) {
-        router.push(selectedResult.url);
+        router.push(selectedResult.url + "/" + selectedResult.id);
         onOpenChange(false);
         setQuery("");
         setResults([]);
@@ -92,7 +93,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
   };
 
   const handleResultClick = (result: SearchResult) => {
-    router.push(result.url);
+    router.push(result.url + "/" + result.id);
     onOpenChange(false);
     setQuery("");
     setResults([]);

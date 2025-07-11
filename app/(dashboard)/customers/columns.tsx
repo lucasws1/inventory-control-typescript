@@ -183,6 +183,7 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
       }).format(amount);
       return <div className="text-right font-medium">{formatted}</div>;
     },
+    filterFn: "includesString",
   },
 
   {

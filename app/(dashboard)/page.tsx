@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 export default async function DashboardPage() {
   const session = await auth();
 
+  // Não precisa fazer redirect aqui, o middleware já cuida disso
+  // Apenas mostra loading ou conteúdo baseado na sessão
   if (!session?.user) {
-    console.log("Usuário não autenticado, redirecionando para login...");
     redirect("/login");
   }
 

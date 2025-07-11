@@ -12,52 +12,45 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useData } from "@/contexts/DataContext";
-import { useDraggable } from "@/hooks/useDraggable";
-import { ProductWithRelations } from "@/types/ProductWithRelations";
-import Form from "next/form";
 import { useActionState, useEffect } from "react";
+import { useData } from "@/contexts/DataContext";
+import { use } from "react";
+import Form from "next/form";
+import { useRouter } from "next/navigation";
 
-export default function ProductEditForm({
-  product,
-  isModal = false,
-  onClose,
+export default function ProductEditPage({
+  params,
 }: {
-  product?: ProductWithRelations | null;
-  isModal?: boolean;
-  onClose?: () => void;
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
   const [state, formAction, pending] = useActionState(updateProduct, null);
-  const { position, dragHandleProps } = useDraggable();
-  const { refreshData } = useData();
-
-  if (!product) {
-    return;
-  }
+  const { products, refreshData } = useData();
+  const router = useRouter();
+  const product = products.find((product) => product.id === Number(id)) || null;
 
   useEffect(() => {
     if (state?.success) {
       const refresh = async () => await refreshData();
-      handleCloseModal();
+      router.push("/products");
       refresh();
     }
   }, [state]);
 
-  const handleCloseModal = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
+  const createdAt = product?.createdAt
+    ? new Date(product.createdAt).toLocaleDateString("pt-BR")
+    : "Data não disponível";
+
+  const updatedAt = product?.updatedAt
+    ? new Date(product.updatedAt).toLocaleDateString("pt-BR")
+    : "Data não disponível";
 
   const renderForm = () => (
     <div>
       <Form action={formAction}>
         <div className="mx-auto flex justify-center">
-          <Card
-            className="w-full max-w-sm"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardHeader {...dragHandleProps}>
+          <Card className="w-full max-w-sm">
+            <CardHeader>
               <CardTitle>Editar produto</CardTitle>
               <CardDescription>
                 Insira os novos dados abaixo para editar o produto.
@@ -98,7 +91,7 @@ export default function ProductEditForm({
                       name="price"
                       type="number"
                       step="0.01"
-                      defaultValue={product?.price as number}
+                      defaultValue={product?.price}
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -119,14 +112,8 @@ export default function ProductEditForm({
                     id="createdAt"
                     name="createdAt"
                     type="text"
+                    defaultValue={createdAt}
                     disabled
-                    defaultValue={
-                      product?.createdAt
-                        ? new Date(product.createdAt).toLocaleDateString(
-                            "pt-BR",
-                          )
-                        : "Data não disponível"
-                    }
                   />
                 </div>
                 <div className="grid gap-2">
@@ -136,13 +123,7 @@ export default function ProductEditForm({
                     name="updatedAt"
                     type="text"
                     disabled
-                    defaultValue={
-                      product?.updatedAt
-                        ? new Date(product.updatedAt).toLocaleDateString(
-                            "pt-BR",
-                          )
-                        : "Data não disponível"
-                    }
+                    defaultValue={updatedAt}
                   />
                 </div>
               </div>
@@ -153,10 +134,9 @@ export default function ProductEditForm({
                 Salvar Alterações
               </Button>
               <Button
-                type="button"
                 variant="outline"
                 className="w-full cursor-pointer"
-                onClick={handleCloseModal}
+                onClick={() => router.push("/products")}
               >
                 Fechar janela
               </Button>
@@ -166,29 +146,12 @@ export default function ProductEditForm({
       </Form>
     </div>
   );
-  // Retorna o formulário em modal ou modo normal
-  if (isModal) {
-    return (
-      <>
-        {/* Modal Backdrop */}
-        <div
-          className="scrollbar-hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4"
-          onClick={handleCloseModal}
-        >
-          <div
-            className="scrollbar-hidden relative max-h-[90vh] w-full max-w-sm overflow-y-auto"
-            style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-          >
-            {renderForm()}
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
-      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
+      <div className="absolute inset-0 z-50 flex h-full w-full items-center justify-center bg-black/90">
+        {renderForm()}
+      </div>
     </>
   );
 }

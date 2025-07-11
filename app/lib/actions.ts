@@ -74,8 +74,10 @@ export async function createStockMovement(prevState: any, formData: FormData) {
 }
 
 export async function updateStockMovement(prevState: any, formData: FormData) {
+  console.log(formData);
   try {
     const data = {
+      id: Number(formData.get("id")),
       quantity: Number(formData.get("quantity")) as number,
       date: new Date(formData.get("dateValue") as string),
       reason: formData.get("reason") as
@@ -85,19 +87,23 @@ export async function updateStockMovement(prevState: any, formData: FormData) {
         | "AJUSTE_NEGATIVO",
     };
 
+    console.log(data);
+
     const parseResult = StockMovementUpdateSchema.safeParse(data);
     if (!parseResult.success) {
       throw new Error("Dados inválidos. Verifique os campos.");
     }
 
     await prisma.stockMovement.update({
-      where: { id: Number(formData.get("id")) },
+      where: { id: data.id },
       data: data,
     });
+
+    return { success: true, stockMovement: data };
   } catch (error) {
-    throw new Error("Erro ao atualizar o cliente.");
-  } finally {
-    redirect("/stock-movement");
+    throw new Error("Erro ao atualizar o movimento de estoque.", {
+      cause: error,
+    });
   }
 }
 
@@ -151,6 +157,7 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
 };
 
 export async function updateCustomer(prevState: any, formData: FormData) {
+  console.log(formData);
   try {
     const data = {
       id: Number(formData.get("id")),
@@ -174,10 +181,12 @@ export async function updateCustomer(prevState: any, formData: FormData) {
         phone: validatedData.phone || null,
       },
     });
+
+    return { success: true, customer: validatedData };
   } catch (error) {
-    throw new Error("Erro ao atualizar o cliente.");
-  } finally {
-    redirect("/customers");
+    throw new Error("Erro ao atualizar o cliente.", {
+      cause: error,
+    });
   }
 }
 
@@ -200,7 +209,6 @@ export async function updateInvoice(prevState: any, formData: FormData) {
     customerId: Number(formData.get("customer")),
     invoiceItems,
   };
-  console.log(data);
 
   const parseResult = CreateInvoiceSchema.safeParse(data);
   if (!parseResult.success) {
@@ -225,10 +233,10 @@ export async function updateInvoice(prevState: any, formData: FormData) {
         },
       },
     });
+
+    return { success: true, invoice: invoiceUpdate };
   } catch (error) {
     throw new Error("Erro ao atualizar invoice.");
-  } finally {
-    redirect("/invoices");
   }
 }
 
@@ -247,10 +255,10 @@ export async function updateProduct(prevState: any, formData: FormData) {
         price: data.price,
       },
     });
+
+    return { success: true, product: data };
   } catch (error) {
     throw new Error("Erro ao atualizar o produto.");
-  } finally {
-    redirect("/products");
   }
 }
 
