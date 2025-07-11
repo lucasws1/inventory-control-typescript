@@ -2,17 +2,15 @@
 
 import {
   IconBox,
-  IconFileSearch,
   IconCamera,
   IconCurrencyDollar,
   IconDashboard,
   IconFileAi,
   IconFileDescription,
   IconInnerShadowTop,
-  IconSettings,
+  IconSearch,
   IconShoppingCart,
   IconUser,
-  IconSearch,
 } from "@tabler/icons-react";
 import * as React from "react";
 
@@ -21,7 +19,6 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import { SearchModal } from "@/components/search-modal";
-import { useSearch } from "@/hooks/use-search";
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +28,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useSearch } from "@/hooks/use-search";
 import { useSession } from "next-auth/react";
 
 const data = {
@@ -148,13 +146,6 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isOpen, setIsOpen } = useSearch();
-  const { data: session, status } = useSession();
-
-  const userData = {
-    name: session?.user?.name || "Usuário",
-    email: session?.user?.email || "usuario@email.com",
-    avatar: session?.user?.image || "",
-  };
 
   const handleSearchClick = () => {
     setIsOpen(true);
@@ -194,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           />
         </SidebarContent>
         <SidebarFooter>
-          <NavUser user={userData} />
+          <NavUser />
         </SidebarFooter>
       </Sidebar>
 

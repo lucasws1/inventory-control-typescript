@@ -14,20 +14,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomerWithRelations } from "@/types/CustomerWithRelations";
+import { InvoiceWithRelations } from "@/types/InvoiceWithRelations";
+import { useRouter } from "next/navigation";
+import { deleteInvoice } from "@/app/lib/actions";
 import {
   IconCircleCheckFilled,
-  IconEdit,
   IconLoader,
-  IconTrash,
   IconCopy,
+  IconEdit,
+  IconTrash,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import { deleteCustomer } from "../lib/actions";
 import { useModal } from "@/contexts/ModalContext";
 import { useData } from "@/contexts/DataContext";
 
-export const columns: ColumnDef<CustomerWithRelations>[] = [
+export const columns: ColumnDef<InvoiceWithRelations>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -55,46 +55,42 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
     enableHiding: false,
     enableColumnFilter: false,
   },
+
   {
-    accessorKey: "name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Nome" className="w-full" />
-    ),
-    cell: ({ row }) => {
-      const name = row.original.name;
-      return <div>{name}</div>;
-    },
-    filterFn: "includesString",
-  },
-  {
-    accessorKey: "email",
+    accessorKey: "customer",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="E-mail"
+        title="Cliente"
         className="w-full"
       />
     ),
     cell: ({ row }) => {
-      const email = row.original.email;
-      return <div>{email ? email : "E-mail não cadastrado"}</div>;
+      return <div>{row.original.customer.name}</div>;
     },
     filterFn: "includesString",
   },
   {
-    accessorKey: "phone",
+    accessorKey: "purchaseDate",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title="Telefone"
+        title="Data de compra"
         className="w-full"
       />
     ),
     cell: ({ row }) => {
-      const phone = row.original.phone;
-      return <div>{phone ? phone : "Telefone não cadastrado"}</div>;
+      const date = new Date(row.original.purchaseDate);
+      return <div>{date.toLocaleDateString("pt-BR")}</div>;
     },
-    filterFn: "includesString",
+    filterFn: (row, columnId, filterValue) => {
+      const date = new Date(
+        row.getValue(columnId) as string,
+      ).toLocaleDateString("pt-BR");
+      const [day, month, year] = date.split("/");
+
+      return `${day}${month}${year}`.includes(filterValue);
+    },
   },
   {
     accessorKey: "createdAt",
@@ -140,25 +136,42 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
     },
   },
   {
-    accessorKey: "Invoice",
+    id: "product",
+    accessorKey: "InvoiceItem",
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title="Produto"
+        className="w-full"
+      />
+    ),
+    cell: ({ row }) => {
+      const product = row.original.InvoiceItem.map((item) => (
+        <div key={item.id} className="flex gap-2">
+          <Badge variant="outline" className="text-muted-foreground">
+            {item.quantity}x {item.Product.name}
+          </Badge>
+        </div>
+      ));
+
+      return <div className="flex gap-2">{product}</div>;
+    },
+    filterFn: "includesString",
+  },
+  {
+    accessorKey: "pending",
     header: "Status",
     cell: ({ row }) => (
       <Badge
         variant="outline"
         className="text-muted-foreground flex items-center gap-2 px-1.5"
       >
-        {row.original.Invoice ? (
-          row.original.Invoice.find((item) => item.pending) ? (
-            <IconLoader />
-          ) : (
-            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-          )
+        {row.original.pending ? (
+          <IconLoader />
         ) : (
-          "Nenhuma fatura"
+          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
         )}
-        {row.original.Invoice.find((item) => item.pending)
-          ? "Pendente"
-          : "Pago"}
+        {row.original.pending ? "Pendente" : "Pago"}
       </Badge>
     ),
   },
@@ -166,17 +179,7 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
     accessorKey: "amount",
     header: () => <div className="text-right">Valor</div>,
     cell: ({ row }) => {
-      const amount = row.original.Invoice.reduce(
-        (acc, invoice) => invoice.amount + acc,
-        0,
-      );
-      if (amount === null || amount === undefined) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
-      // If amount is not a number, return a default value
-      if (isNaN(amount)) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
+      const amount = parseFloat(row.getValue("amount"));
       const formatted = new Intl.NumberFormat("pt-br", {
         style: "currency",
         currency: "BRL",
@@ -188,16 +191,16 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const customer = row.original;
+      const invoice = row.original;
       const { openModal } = useModal();
       const { refreshData } = useData();
 
-      const handleEditCustomer = () => {
-        openModal("edit-customer", customer);
+      const handleEditInvoice = () => {
+        openModal("edit-invoice", invoice);
       };
 
       const handleDelete = async () => {
-        await deleteCustomer(customer.id);
+        await deleteInvoice(invoice.id);
         await refreshData();
       };
 
@@ -212,7 +215,7 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(customer.id.toString())
+                navigator.clipboard.writeText(invoice.id.toString())
               }
             >
               <IconCopy />
@@ -221,7 +224,7 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
 
             <DropdownMenuItem
               className="cursor-pointer"
-              onClick={handleEditCustomer}
+              onClick={handleEditInvoice}
             >
               <IconEdit />
               <span>Editar</span>

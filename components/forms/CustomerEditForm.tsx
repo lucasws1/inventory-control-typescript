@@ -97,39 +97,6 @@ export default function CustomerEditForm({
                     defaultValue={customer?.Invoice.length || 0}
                   />
                 </div>
-
-                {/* <div className="grid gap-2">
-                  <Label htmlFor="createdAt">Data de cadastro</Label>
-                  <Input
-                    id="createdAt"
-                    name="createdAt"
-                    type="text"
-                    disabled
-                    defaultValue={
-                      customer?.createdAt
-                        ? new Date(customer.createdAt).toLocaleDateString(
-                            "pt-BR",
-                          )
-                        : "Data não disponível"
-                    }
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="updatedAt">Última edição</Label>
-                  <Input
-                    id="updatedAt"
-                    name="updatedAt"
-                    type="text"
-                    disabled
-                    defaultValue={
-                      customer?.updatedAt
-                        ? new Date(customer.updatedAt).toLocaleDateString(
-                            "pt-BR",
-                          )
-                        : "Data não disponível"
-                    }
-                  />
-                </div> */}
               </div>
             </CardContent>
 

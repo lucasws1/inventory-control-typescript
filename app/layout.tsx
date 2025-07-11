@@ -38,7 +38,8 @@ export default function RootLayout({
       <body className="dark scrollbar-hidden">
         <DataProvider>
           <Providers>
-            <ChartDataProvider>
+            {children}
+            {/* <ChartDataProvider>
               <SidebarProvider
                 style={
                   {
@@ -63,7 +64,7 @@ export default function RootLayout({
                   </div>
                 </SidebarInset>
               </SidebarProvider>
-            </ChartDataProvider>
+            </ChartDataProvider> */}
           </Providers>
         </DataProvider>
       </body>

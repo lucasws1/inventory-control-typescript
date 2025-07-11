@@ -3,5 +3,6 @@ export default function LoginLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <section>{children}</section>;
+  // Layout simples sem verificação de sessão para evitar problemas com App Router
+  return <>{children}</>;
 }

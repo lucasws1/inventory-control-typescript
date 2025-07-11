@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { StockMovementWithRelations } from "@/types/StockMovementWithRelations";
-import { deleteStockMovement } from "../lib/actions";
+import { deleteStockMovement } from "@/app/lib/actions";
 import { Badge } from "@/components/ui/badge";
 import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useModal } from "@/contexts/ModalContext";

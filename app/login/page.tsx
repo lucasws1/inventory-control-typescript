@@ -1,50 +1,31 @@
-"use client";
-
-import { redirect } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
-import OverlaySkeleton from "@/components/overlaySkeleton";
+import { LoginForm } from "@/components/login-form";
+import { GalleryVerticalEnd } from "lucide-react";
 
 export default function LoginPage() {
-  const { data: session, status } = useSession();
-
-  useEffect(() => {
-    // Se já estiver logado, redireciona para o dashboard
-    if (status === "authenticated") {
-      redirect("/");
-    }
-  }, [status]);
-
-  if (status === "loading") {
-    return (
-      <div>
-        <OverlaySkeleton />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex justify-center gap-2 md:justify-start">
+          <a href="#" className="flex items-center gap-2 font-medium">
+            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+              <GalleryVerticalEnd className="size-4" />
+            </div>
             Controle de Estoque
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Faça login para acessar o sistema
-          </p>
+          </a>
         </div>
-        <div className="mt-8 space-y-6">
-          <div>
-            <Button
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-            >
-              Entrar com Google
-            </Button>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <LoginForm />
           </div>
         </div>
+      </div>
+
+      <div className="bg-muted relative hidden lg:block">
+        <img
+          src="/coins.webp"
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
       </div>
     </div>
   );
