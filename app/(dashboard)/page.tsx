@@ -1,7 +1,4 @@
-import {
-  CardBody,
-  CardWithGridEllipsis,
-} from "@/components/CardWithGridEllipsis";
+import { WelcomeCard } from "@/components/WelcomeCard";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -12,14 +9,9 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto mt-10 flex h-fit items-center justify-center">
-      <div className="flex">
-        <CardWithGridEllipsis>
-          <CardBody
-            userName={session.user.name || "Usuário"}
-            userImage={session.user.image || "/defaultUserImage.png"}
-          />
-        </CardWithGridEllipsis>
+    <div className="min-h-screen">
+      <div className="mt-20">
+        <WelcomeCard />
       </div>
     </div>
   );

@@ -41,7 +41,6 @@
     "clsx": "^2.1.1",
     "extenso": "^2.1.0",
     "lucide-react": "^0.518.0",
-    "motion": "^12.23.3",
     "next": "15.3.4",
     "next-auth": "5.0.0-beta.29",
     "react": "^19.0.0",
