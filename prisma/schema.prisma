@@ -17,11 +17,16 @@ datasource db {
 model Customer {
   id        Int       @id @default(autoincrement())
   name      String
-  email     String?   @unique
+  email     String?
   phone     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   Invoice   Invoice[]
+
+  @@unique([email, userId])
+  @@index([userId])
 }
 
 model Invoice {
@@ -33,7 +38,11 @@ model Invoice {
   updatedAt    DateTime      @updatedAt
   customerId   Int
   customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   InvoiceItem  InvoiceItem[]
+
+  @@index([userId])
 }
 
 model InvoiceItem {
@@ -46,6 +55,10 @@ model InvoiceItem {
   Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   invoiceId Int
   Invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Product {
@@ -54,8 +67,12 @@ model Product {
   price         Float
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   InvoiceItem   InvoiceItem[]
   StockMovement StockMovement[]
+
+  @@index([userId])
 }
 
 enum StockReason {
@@ -75,6 +92,10 @@ model StockMovement {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   reason    StockReason
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // NextAuth v5 models
@@ -106,13 +127,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String          @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?         @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  Customer      Customer[]
+  Invoice       Invoice[]
+  Product       Product[]
+  StockMovement StockMovement[]
+  InvoiceItem   InvoiceItem[]
 }
 
 model VerificationToken {

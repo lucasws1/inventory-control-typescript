@@ -101,7 +101,12 @@ export async function generateMockData() {
   console.log("👥 Creating customers...");
   const createdCustomers = [];
   for (const customer of mockCustomers) {
-    const created = await prisma.customer.create({ data: customer });
+    const created = await prisma.customer.create({
+      data: {
+        ...customer,
+        userId: "default-user-id",
+      },
+    });
     createdCustomers.push(created);
   }
 
@@ -109,7 +114,12 @@ export async function generateMockData() {
   console.log("📦 Creating products...");
   const createdProducts = [];
   for (const product of mockProducts) {
-    const created = await prisma.product.create({ data: product });
+    const created = await prisma.product.create({
+      data: {
+        ...product,
+        userId: "default-user-id",
+      },
+    });
     createdProducts.push(created);
     // Add initial stock for each product (purchase)
     await prisma.stockMovement.create({
@@ -118,6 +128,7 @@ export async function generateMockData() {
         quantity: 100,
         date: new Date(product.createdAt.getTime() + 1000 * 60 * 60),
         reason: StockReason.COMPRA,
+        userId: "default-user-id",
       },
     });
   }
@@ -163,6 +174,7 @@ export async function generateMockData() {
           amount: totalAmount,
           pending: Math.random() > 0.8, // 20% pendente
           purchaseDate: new Date(currentDate.getTime() + i * 1000 * 60 * 60),
+          userId: "default-user-id",
         },
       });
       // Cria invoice items e movimentação de estoque
@@ -173,6 +185,7 @@ export async function generateMockData() {
             productId: item.product.id,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
+            userId: "default-user-id",
           },
         });
         await prisma.stockMovement.create({
@@ -181,6 +194,7 @@ export async function generateMockData() {
             quantity: -item.quantity,
             date: invoice.purchaseDate,
             reason: StockReason.VENDA,
+            userId: "default-user-id",
           },
         });
       }
@@ -198,6 +212,7 @@ export async function generateMockData() {
             quantity: randomBetween(10, 30),
             date: new Date(currentDate.getTime() + 1000 * 60 * 30),
             reason: StockReason.COMPRA,
+            userId: "default-user-id",
           },
         });
       }

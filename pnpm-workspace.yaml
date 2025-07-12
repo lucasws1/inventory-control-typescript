@@ -4,6 +4,7 @@ onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
   - msw
+  - oxc-resolver
   - prisma
   - sharp
   - unrs-resolver

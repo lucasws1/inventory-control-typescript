@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 // Schema para validação dos parâmetros de query
 const SearchQuerySchema = z.object({
@@ -26,6 +27,16 @@ const SearchResponseSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Usuário não autenticado" },
+        { status: 401 },
+      );
+    }
+
+    const userId = session.user.id;
     const { searchParams } = new URL(request.url);
 
     // Validar parâmetros de query
@@ -51,6 +62,7 @@ export async function GET(request: NextRequest) {
     // Buscar clientes
     const customers = await prisma.customer.findMany({
       where: {
+        userId,
         OR: [
           { name: { contains: searchTerm, mode: "insensitive" } },
           { email: { contains: searchTerm, mode: "insensitive" } },
@@ -62,6 +74,7 @@ export async function GET(request: NextRequest) {
     // Buscar produtos
     const products = await prisma.product.findMany({
       where: {
+        userId,
         name: { contains: searchTerm, mode: "insensitive" },
       },
       take: 5,
@@ -70,6 +83,7 @@ export async function GET(request: NextRequest) {
     // Buscar faturas
     const invoices = await prisma.invoice.findMany({
       where: {
+        userId,
         OR: [
           { id: { equals: parseInt(searchTerm) || 0 } },
           {
@@ -88,6 +102,7 @@ export async function GET(request: NextRequest) {
     // Buscar movimentações de estoque
     const stockMovements = await prisma.stockMovement.findMany({
       where: {
+        userId,
         OR: [
           { id: { equals: parseInt(searchTerm) || 0 } },
           {

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 // Schema para validação da resposta
 const DataResponseSchema = z.object({
@@ -40,9 +41,21 @@ function serializeDates(obj: any): any {
 
 export async function GET() {
   try {
+    // Verificar autenticação
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Usuário não autenticado" },
+        { status: 401 },
+      );
+    }
+
+    const userId = session.user.id;
+
     const [products, customers, invoices, stockMovements, invoiceItems] =
       await Promise.all([
         prisma.product.findMany({
+          where: { userId },
           include: {
             StockMovement: true,
             InvoiceItem: true,
@@ -52,6 +65,7 @@ export async function GET() {
           },
         }),
         prisma.customer.findMany({
+          where: { userId },
           include: {
             Invoice: true,
           },
@@ -60,6 +74,7 @@ export async function GET() {
           },
         }),
         prisma.invoice.findMany({
+          where: { userId },
           include: {
             InvoiceItem: {
               include: {
@@ -73,6 +88,7 @@ export async function GET() {
           },
         }),
         prisma.stockMovement.findMany({
+          where: { userId },
           include: {
             Product: true,
           },
@@ -81,8 +97,10 @@ export async function GET() {
           },
         }),
         prisma.invoiceItem.findMany({
+          where: { userId },
           include: {
             Product: true,
+            Invoice: true,
           },
           orderBy: {
             createdAt: "desc",

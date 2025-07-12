@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 // Schema para validação dos parâmetros de query
 const ChartDataQuerySchema = z.object({
@@ -9,6 +10,16 @@ const ChartDataQuerySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Usuário não autenticado" },
+        { status: 401 },
+      );
+    }
+
+    const userId = session.user.id;
     const { searchParams } = new URL(request.url);
 
     // Validar parâmetros de query
@@ -48,6 +59,7 @@ export async function GET(request: NextRequest) {
       // All invoices in the period
       prisma.invoice.findMany({
         where: {
+          userId,
           purchaseDate: {
             gte: currentPeriodStart,
             lte: endDate,
@@ -61,6 +73,7 @@ export async function GET(request: NextRequest) {
       // All customers created in the period
       prisma.customer.findMany({
         where: {
+          userId,
           createdAt: {
             gte: currentPeriodStart,
             lte: endDate,
@@ -74,6 +87,7 @@ export async function GET(request: NextRequest) {
       // All products created in the period
       prisma.product.findMany({
         where: {
+          userId,
           createdAt: {
             gte: currentPeriodStart,
             lte: endDate,
@@ -87,6 +101,7 @@ export async function GET(request: NextRequest) {
       // All stock movements up to end date for cumulative calculation
       prisma.stockMovement.findMany({
         where: {
+          userId,
           date: {
             lte: endDate,
           },
@@ -151,6 +166,7 @@ export async function GET(request: NextRequest) {
       await Promise.all([
         prisma.invoice.findMany({
           where: {
+            userId,
             purchaseDate: {
               gte: previousPeriodStart,
               lt: previousPeriodEnd,
@@ -160,6 +176,7 @@ export async function GET(request: NextRequest) {
 
         prisma.customer.count({
           where: {
+            userId,
             createdAt: {
               gte: previousPeriodStart,
               lt: previousPeriodEnd,
@@ -169,6 +186,7 @@ export async function GET(request: NextRequest) {
 
         prisma.product.count({
           where: {
+            userId,
             createdAt: {
               gte: previousPeriodStart,
               lt: previousPeriodEnd,
@@ -191,6 +209,7 @@ export async function GET(request: NextRequest) {
     // Calculate total customers at end of each period for comparison
     const totalCustomersAtEndOfCurrentPeriod = await prisma.customer.count({
       where: {
+        userId,
         createdAt: {
           lte: endDate,
         },
@@ -199,6 +218,7 @@ export async function GET(request: NextRequest) {
 
     const totalCustomersAtEndOfPreviousPeriod = await prisma.customer.count({
       where: {
+        userId,
         createdAt: {
           lte: previousPeriodEnd,
         },
@@ -223,6 +243,7 @@ export async function GET(request: NextRequest) {
     // Calculate total products at end of each period for comparison
     const totalProductsAtEndOfCurrentPeriod = await prisma.product.count({
       where: {
+        userId,
         createdAt: {
           lte: endDate,
         },
@@ -231,6 +252,7 @@ export async function GET(request: NextRequest) {
 
     const totalProductsAtEndOfPreviousPeriod = await prisma.product.count({
       where: {
+        userId,
         createdAt: {
           lte: previousPeriodEnd,
         },
@@ -254,6 +276,7 @@ export async function GET(request: NextRequest) {
     // Stock change for the period (not total stock)
     const currentPeriodStockMovements = await prisma.stockMovement.findMany({
       where: {
+        userId,
         date: {
           gte: currentPeriodStart,
           lte: endDate,
@@ -263,6 +286,7 @@ export async function GET(request: NextRequest) {
 
     const previousPeriodStockMovements = await prisma.stockMovement.findMany({
       where: {
+        userId,
         date: {
           gte: previousPeriodStart,
           lt: previousPeriodEnd,
@@ -292,6 +316,7 @@ export async function GET(request: NextRequest) {
         quantity: true,
       },
       where: {
+        userId,
         date: {
           lte: endDate,
         },

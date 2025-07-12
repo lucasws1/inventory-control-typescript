@@ -7,6 +7,9 @@ export type Invoice = {
   purchaseDate: Date;
   pending: boolean;
   customerId: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
   customer: Customer;
   InvoiceItem: InvoiceItem[];
 };

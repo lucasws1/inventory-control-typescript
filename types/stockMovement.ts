@@ -7,5 +7,8 @@ export type StockMovement = {
   Product: Product;
   quantity: number;
   date: Date;
+  createdAt: Date;
+  updatedAt: Date;
   reason: StockReason;
+  userId: string;
 };

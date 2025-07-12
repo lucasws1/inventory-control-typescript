@@ -11,9 +11,19 @@ import {
 import { InvoiceItem } from "@/types/invoiceItem";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+
+async function getCurrentUserId(): Promise<string> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Usuário não autenticado");
+  }
+  return session.user.id;
+}
 
 export async function createProduct(prevState: any, formData: FormData) {
   try {
+    const userId = await getCurrentUserId();
     const dateValue = formData.get("dateValue") as string;
     const date = new Date(dateValue);
     const isModal = formData.get("isModal") === "true";
@@ -22,11 +32,13 @@ export async function createProduct(prevState: any, formData: FormData) {
       data: {
         name: formData.get("name") as string,
         price: Number(formData.get("price")),
+        userId,
         StockMovement: {
           create: {
             quantity: Number(formData.get("quantity")),
             date,
             reason: "COMPRA",
+            userId,
           },
         },
       },
@@ -45,6 +57,7 @@ export async function createProduct(prevState: any, formData: FormData) {
 
 export async function createStockMovement(prevState: any, formData: FormData) {
   try {
+    const userId = await getCurrentUserId();
     const isModal = formData.get("isModal") === "true";
 
     const newStockMovement = await prisma.stockMovement.create({
@@ -56,9 +69,8 @@ export async function createStockMovement(prevState: any, formData: FormData) {
           | "VENDA"
           | "AJUSTE_POSITIVO"
           | "AJUSTE_NEGATIVO",
-        Product: {
-          connect: { id: Number(formData.get("product")) },
-        },
+        userId,
+        productId: Number(formData.get("product")),
       },
     });
 
@@ -75,6 +87,7 @@ export async function createStockMovement(prevState: any, formData: FormData) {
 
 export async function updateStockMovement(prevState: any, formData: FormData) {
   try {
+    const userId = await getCurrentUserId();
     const data = {
       id: Number(formData.get("id")),
       quantity: Number(formData.get("quantity")) as number,
@@ -92,7 +105,10 @@ export async function updateStockMovement(prevState: any, formData: FormData) {
     }
 
     await prisma.stockMovement.update({
-      where: { id: data.id },
+      where: {
+        id: data.id,
+        userId: userId, // Garantir que só update dados do próprio usuário
+      },
       data: data,
     });
 
@@ -106,8 +122,12 @@ export async function updateStockMovement(prevState: any, formData: FormData) {
 
 export const deleteProduct = async (productId: number) => {
   try {
+    const userId = await getCurrentUserId();
     await prisma.product.delete({
-      where: { id: Number(productId) },
+      where: {
+        id: Number(productId),
+        userId: userId, // Garantir que só deleta dados do próprio usuário
+      },
     });
   } catch (error) {
     throw new Error("Erro ao deletar o produto.");
@@ -134,11 +154,14 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
 
     const validatedData = parseResult.data;
 
+    const userId = await getCurrentUserId();
+
     const newCustomer = await prisma.customer.create({
       data: {
         name: validatedData.name,
         email: validatedData.email || null,
         phone: validatedData.phone || null,
+        userId,
       },
     });
 
@@ -155,6 +178,7 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
 
 export async function updateCustomer(prevState: any, formData: FormData) {
   try {
+    const userId = await getCurrentUserId();
     const data = {
       id: Number(formData.get("id")),
       name: formData.get("name") as string,
@@ -170,7 +194,10 @@ export async function updateCustomer(prevState: any, formData: FormData) {
     const validatedData = parseResult.data;
 
     await prisma.customer.update({
-      where: { id: validatedData.id },
+      where: {
+        id: validatedData.id,
+        userId: userId, // Garantir que só update dados do próprio usuário
+      },
       data: {
         name: validatedData.name,
         email: validatedData.email || null,
@@ -187,6 +214,7 @@ export async function updateCustomer(prevState: any, formData: FormData) {
 }
 
 export async function updateInvoice(prevState: any, formData: FormData) {
+  const userId = await getCurrentUserId();
   const invoiceItems: InvoiceItem[] = JSON.parse(
     formData.get("invoiceItems") as string,
   );
@@ -213,7 +241,10 @@ export async function updateInvoice(prevState: any, formData: FormData) {
 
   try {
     const invoiceUpdate = await prisma.invoice.update({
-      where: { id: data.id },
+      where: {
+        id: data.id,
+        userId: userId, // Garantir que só update dados do próprio usuário
+      },
       data: {
         amount: data.amount,
         pending: data.pending,
@@ -225,6 +256,7 @@ export async function updateInvoice(prevState: any, formData: FormData) {
             productId: item.productId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
+            userId,
           })),
         },
       },
@@ -238,6 +270,7 @@ export async function updateInvoice(prevState: any, formData: FormData) {
 
 export async function updateProduct(prevState: any, formData: FormData) {
   try {
+    const userId = await getCurrentUserId();
     const data = {
       id: Number(formData.get("id")),
       name: formData.get("name") as string,
@@ -245,7 +278,10 @@ export async function updateProduct(prevState: any, formData: FormData) {
     };
 
     await prisma.product.update({
-      where: { id: data.id },
+      where: {
+        id: data.id,
+        userId: userId, // Garantir que só update dados do próprio usuário
+      },
       data: {
         name: data.name,
         price: data.price,
@@ -260,8 +296,12 @@ export async function updateProduct(prevState: any, formData: FormData) {
 
 export const deleteCustomer = async (customerId: any) => {
   try {
+    const userId = await getCurrentUserId();
     await prisma.customer.delete({
-      where: { id: Number(customerId) },
+      where: {
+        id: Number(customerId),
+        userId: userId, // Garantir que só deleta dados do próprio usuário
+      },
     });
   } catch (error) {
     throw new Error("Erro ao deletar o cliente.");
@@ -273,8 +313,12 @@ export const deleteCustomer = async (customerId: any) => {
 
 export const deleteStockMovement = async (stockMovementId: number) => {
   try {
+    const userId = await getCurrentUserId();
     await prisma.stockMovement.delete({
-      where: { id: stockMovementId },
+      where: {
+        id: stockMovementId,
+        userId: userId, // Garantir que só deleta dados do próprio usuário
+      },
     });
   } catch (error) {
     throw new Error("Erro ao deletar o produto.");
@@ -286,6 +330,7 @@ export const deleteStockMovement = async (stockMovementId: number) => {
 
 export const createInvoice = async (prevState: any, formData: FormData) => {
   try {
+    const userId = await getCurrentUserId();
     const invoiceItems = JSON.parse(formData.get("invoiceItems") as string);
     const stockMovement = JSON.parse(formData.get("stockMovement") as string);
     const isModal = formData.get("isModal") === "true";
@@ -316,11 +361,13 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
         pending: data.pending,
         purchaseDate: data.purchaseDate,
         customerId: data.customerId,
+        userId,
         InvoiceItem: {
           create: data.invoiceItems.map((item: any) => ({
             productId: item.productId,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
+            userId,
           })),
         },
       },
@@ -340,6 +387,7 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
         quantity: item.quantity,
         date: item.date,
         reason: item.reason,
+        userId,
       })),
     });
 
@@ -364,8 +412,12 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
 
 export const deleteInvoice = async (invoiceId: number) => {
   try {
+    const userId = await getCurrentUserId();
     const deleteInvoice = await prisma.invoice.delete({
-      where: { id: invoiceId },
+      where: {
+        id: invoiceId,
+        userId: userId, // Garantir que só deleta dados do próprio usuário
+      },
     });
 
     return {
@@ -385,9 +437,11 @@ export const deleteInvoice = async (invoiceId: number) => {
 
 export const deleteManyInvoices = async (invoiceId: number[]) => {
   try {
+    const userId = await getCurrentUserId();
     const deletedInvoices = await prisma.invoice.deleteMany({
       where: {
         id: { in: invoiceId },
+        userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
 
@@ -408,9 +462,11 @@ export const deleteManyInvoices = async (invoiceId: number[]) => {
 
 export const deleteManyProducts = async (productId: number[]) => {
   try {
+    const userId = await getCurrentUserId();
     const deletedProducts = await prisma.product.deleteMany({
       where: {
         id: { in: productId },
+        userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
     return { success: true, itemsDeleted: deletedProducts };
@@ -427,9 +483,11 @@ export const deleteManyProducts = async (productId: number[]) => {
 
 export const deleteManyCustomers = async (customerId: number[]) => {
   try {
+    const userId = await getCurrentUserId();
     const deletedCustomers = await prisma.customer.deleteMany({
       where: {
         id: { in: customerId },
+        userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
     return { success: true, itemsDeleted: deletedCustomers };
@@ -446,9 +504,11 @@ export const deleteManyCustomers = async (customerId: number[]) => {
 
 export const deleteManyStockMovements = async (stockMovementId: number[]) => {
   try {
+    const userId = await getCurrentUserId();
     const deletedStockMovements = await prisma.stockMovement.deleteMany({
       where: {
         id: { in: stockMovementId },
+        userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
     return { success: true, itemsDeleted: deletedStockMovements };
