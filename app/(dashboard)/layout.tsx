@@ -1,10 +1,9 @@
-import { ChartDataProvider } from "@/contexts/ChartDataContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
-import { SectionCards } from "@/components/section-cards";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { SectionCards } from "@/components/section-cards";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ChartDataProvider } from "@/contexts/ChartDataContext";
 
 export default function DashboardLayout({
   children,

@@ -57,7 +57,7 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
   },
 
   {
-    accessorKey: "customer",
+    accessorKey: "customer.name",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
@@ -174,10 +174,27 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
         {row.original.pending ? "Pendente" : "Pago"}
       </Badge>
     ),
+    filterFn: (row, columnId, filterValue) => {
+      const pending = row.original.pending;
+      if (filterValue === "pago") {
+        return !pending;
+      } else if (filterValue === "pendente") {
+        return pending;
+      }
+      return filterValue;
+    },
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Valor</div>,
+    header: ({ column }) => (
+      <div className="flex w-full justify-end">
+        <DataTableColumnHeader
+          column={column}
+          title="Valor"
+          className="justify-end"
+        />
+      </div>
+    ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
       const formatted = new Intl.NumberFormat("pt-br", {
@@ -185,6 +202,10 @@ export const columns: ColumnDef<InvoiceWithRelations>[] = [
         currency: "BRL",
       }).format(amount);
       return <div className="text-right font-medium">{formatted}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const amount = parseFloat(row.getValue(columnId) as string);
+      return amount.toString().includes(filterValue);
     },
   },
 

@@ -3,6 +3,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 
+import { deleteProduct } from "@/app/lib/actions";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,20 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CustomerWithRelations } from "@/types/CustomerWithRelations";
-import {
-  IconCircleCheckFilled,
-  IconCopy,
-  IconEdit,
-  IconLoader,
-} from "@tabler/icons-react";
-import { IconTrash } from "@tabler/icons-react";
-import { MoreHorizontal } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { deleteProduct } from "@/app/lib/actions";
-import { ProductWithRelations } from "@/types/ProductWithRelations";
-import { useModal } from "@/contexts/ModalContext";
 import { useData } from "@/contexts/DataContext";
+import { useModal } from "@/contexts/ModalContext";
+import { ProductWithRelations } from "@/types/ProductWithRelations";
+import { IconCopy, IconEdit, IconTrash } from "@tabler/icons-react";
+import { MoreHorizontal } from "lucide-react";
 
 export const columns: ColumnDef<ProductWithRelations>[] = [
   {
@@ -133,6 +125,7 @@ export const columns: ColumnDef<ProductWithRelations>[] = [
   },
   {
     id: "Estoque",
+    accessorKey: "StockMovement",
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
@@ -140,7 +133,6 @@ export const columns: ColumnDef<ProductWithRelations>[] = [
         className="w-full"
       />
     ),
-    accessorKey: "StockMovement",
     cell: ({ row }) => (
       <Badge
         variant="outline"
@@ -159,6 +151,7 @@ export const columns: ColumnDef<ProductWithRelations>[] = [
         )}
       </Badge>
     ),
+    enableColumnFilter: false,
   },
 
   {

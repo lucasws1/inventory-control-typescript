@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
+import { deleteCustomer } from "@/app/lib/actions";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,20 +15,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useData } from "@/contexts/DataContext";
+import { useModal } from "@/contexts/ModalContext";
 import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import {
   IconCircleCheckFilled,
+  IconCopy,
   IconEdit,
   IconLoader,
   IconTrash,
-  IconCopy,
 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import { deleteCustomer } from "@/app/lib/actions";
-import { useModal } from "@/contexts/ModalContext";
-import { useData } from "@/contexts/DataContext";
 
-export const columns: ColumnDef<CustomerWithRelations>[] = [
+type CustomerWithTotal = CustomerWithRelations & {
+  totalAmount: number;
+};
+
+export const columns: ColumnDef<CustomerWithTotal>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -163,20 +166,20 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
     ),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Valor</div>,
+    id: "amount",
+    accessorKey: "totalAmount",
+    header: ({ column }) => (
+      <div className="flex w-full justify-end">
+        <DataTableColumnHeader
+          column={column}
+          title="Valor"
+          className="justify-end"
+        />
+      </div>
+    ),
     cell: ({ row }) => {
-      const amount = row.original.Invoice.reduce(
-        (acc, invoice) => invoice.amount + acc,
-        0,
-      );
-      if (amount === null || amount === undefined) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
-      // If amount is not a number, return a default value
-      if (isNaN(amount)) {
-        return <div className="text-right font-medium">R$ 0,00</div>;
-      }
+      const amount = row.original.totalAmount || 0;
+
       const formatted = new Intl.NumberFormat("pt-br", {
         style: "currency",
         currency: "BRL",
@@ -184,6 +187,9 @@ export const columns: ColumnDef<CustomerWithRelations>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
     filterFn: "includesString",
+    meta: {
+      className: "text-right",
+    },
   },
 
   {

@@ -12,41 +12,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useData } from "@/contexts/DataContext";
-import { CustomerWithRelations } from "@/types/CustomerWithRelations";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, use } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CustomerEditForm({
-  customer,
-  isModal = false,
-  onClose,
+  params,
 }: {
-  customer: CustomerWithRelations;
-  isModal?: boolean;
-  onClose?: () => void;
+  params: Promise<{ id: string }>;
 }) {
   const [state, formAction, pending] = useActionState(updateCustomer, null);
   const { refreshData } = useData();
+  const { customers } = useData();
+  const { id } = use(params);
+  const router = useRouter();
+
+  const customer = customers.find((customer) => customer.id === parseInt(id));
 
   useEffect(() => {
     if (state?.success) {
       const refresh = async () => await refreshData();
-      handleCloseModal();
+      router.push("/customers");
       refresh();
     }
   }, [state]);
-
-  const handleCloseModal = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
 
   const renderForm = () => (
     <div>
       <form action={formAction}>
         <div className="mx-2 flex justify-center">
           <Card
-            className="w-full max-w-sm"
+            className="w-full min-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <CardHeader>
@@ -93,7 +88,7 @@ export default function CustomerEditForm({
                 </div>
 
                 <div className="flex w-full flex-col gap-2">
-                  <Label htmlFor="invoices">Compras</Label>
+                  <Label htmlFor="invoices">Número de compras</Label>
                   <Input
                     id="invoices"
                     name="invoices"
@@ -113,7 +108,7 @@ export default function CustomerEditForm({
                 type="button"
                 variant="outline"
                 className="w-full cursor-pointer"
-                onClick={handleCloseModal}
+                onClick={() => router.push("/customers")}
               >
                 Fechar janela
               </Button>
@@ -126,7 +121,9 @@ export default function CustomerEditForm({
 
   return (
     <>
-      <div className="mx-2 flex justify-center font-sans">{renderForm()}</div>
+      <div className="absolute inset-0 z-50 flex h-full w-full items-center justify-center bg-black/90">
+        {renderForm()}
+      </div>
     </>
   );
 }

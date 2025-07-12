@@ -19,5 +19,15 @@ export default function CustomersClient() {
     return <div>Nenhum cliente encontrado.</div>;
   }
 
-  return <DataTable columns={columns} data={customers} />;
+  const customersWithTotal = customers.map((customer) => {
+    return {
+      ...customer,
+      totalAmount: customer.Invoice.reduce(
+        (acc, invoice) => acc + (invoice.amount || 0),
+        0,
+      ),
+    };
+  });
+
+  return <DataTable columns={columns} data={customersWithTotal} />;
 }

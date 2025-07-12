@@ -1,14 +1,8 @@
+import { Providers } from "@/components/providers";
+import { DataProvider } from "@/contexts/DataContext";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { SiteHeader } from "@/components/site-header";
-import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { Providers } from "@/components/providers";
-import { ChartDataProvider } from "@/contexts/ChartDataContext";
-import { DataProvider } from "@/contexts/DataContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

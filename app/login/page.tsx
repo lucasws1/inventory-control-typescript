@@ -24,7 +24,7 @@ export default function LoginPage() {
         <img
           src="/coins.webp"
           alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.8] dark:grayscale"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.6] dark:grayscale"
         />
       </div>
     </div>

@@ -74,7 +74,6 @@ export async function createStockMovement(prevState: any, formData: FormData) {
 }
 
 export async function updateStockMovement(prevState: any, formData: FormData) {
-  console.log(formData);
   try {
     const data = {
       id: Number(formData.get("id")),
@@ -86,8 +85,6 @@ export async function updateStockMovement(prevState: any, formData: FormData) {
         | "AJUSTE_POSITIVO"
         | "AJUSTE_NEGATIVO",
     };
-
-    console.log(data);
 
     const parseResult = StockMovementUpdateSchema.safeParse(data);
     if (!parseResult.success) {
@@ -157,7 +154,6 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
 };
 
 export async function updateCustomer(prevState: any, formData: FormData) {
-  console.log(formData);
   try {
     const data = {
       id: Number(formData.get("id")),
@@ -389,11 +385,16 @@ export const deleteInvoice = async (invoiceId: number) => {
 
 export const deleteManyInvoices = async (invoiceId: number[]) => {
   try {
-    await prisma.invoice.deleteMany({
+    const deletedInvoices = await prisma.invoice.deleteMany({
       where: {
         id: { in: invoiceId },
       },
     });
+
+    return {
+      success: true,
+      itemsDeleted: deletedInvoices,
+    };
   } catch (error) {
     return {
       success: false,
@@ -407,11 +408,12 @@ export const deleteManyInvoices = async (invoiceId: number[]) => {
 
 export const deleteManyProducts = async (productId: number[]) => {
   try {
-    await prisma.product.deleteMany({
+    const deletedProducts = await prisma.product.deleteMany({
       where: {
         id: { in: productId },
       },
     });
+    return { success: true, itemsDeleted: deletedProducts };
   } catch (error) {
     return {
       success: false,
@@ -425,11 +427,12 @@ export const deleteManyProducts = async (productId: number[]) => {
 
 export const deleteManyCustomers = async (customerId: number[]) => {
   try {
-    await prisma.customer.deleteMany({
+    const deletedCustomers = await prisma.customer.deleteMany({
       where: {
         id: { in: customerId },
       },
     });
+    return { success: true, itemsDeleted: deletedCustomers };
   } catch (error) {
     return {
       success: false,
@@ -443,11 +446,12 @@ export const deleteManyCustomers = async (customerId: number[]) => {
 
 export const deleteManyStockMovements = async (stockMovementId: number[]) => {
   try {
-    await prisma.stockMovement.deleteMany({
+    const deletedStockMovements = await prisma.stockMovement.deleteMany({
       where: {
         id: { in: stockMovementId },
       },
     });
+    return { success: true, itemsDeleted: deletedStockMovements };
   } catch (error) {
     return {
       success: false,

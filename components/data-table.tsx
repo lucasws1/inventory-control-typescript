@@ -26,13 +26,18 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
 import React, { useState } from "react";
 
+import {
+  deleteManyCustomers,
+  deleteManyInvoices,
+  deleteManyProducts,
+  deleteManyStockMovements,
+} from "@/app/lib/actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -51,6 +56,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useData } from "@/contexts/DataContext";
 import { useModal } from "@/contexts/ModalContext";
 import { Customer } from "@/types/customer";
 import { Invoice } from "@/types/invoice";
@@ -66,7 +72,6 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import axios from "axios";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 
@@ -75,13 +80,27 @@ const columnTranslations: Record<string, string> = {
   select: "Seleção",
   date: "Data",
   product: "Produto",
+  products: "Produtos",
   quantity: "Quantidade",
   reason: "Motivo",
   actions: "Ações",
   amount: "Valor",
   customer: "Cliente",
+  customers: "Clientes",
   email: "Email",
   purchaseDate: "Data",
+  createdAt: "Criado em",
+  updatedAt: "Atualizado em",
+  stock: "Estoque",
+  stockMovements: "Movimentações de Estoque",
+  invoice: "Venda",
+  invoices: "Vendas",
+  "stock-movement": "Movimentações de Estoque",
+  pending: "Status",
+  name: "Nome",
+  customer_name: "Cliente",
+  price: "Preço",
+  totalAmount: "Total",
 };
 
 // Ensure table rows carry a unique identifier
@@ -99,7 +118,9 @@ export function DataTable<TData extends RowWithId, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "updatedAt", desc: true },
+  ]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -108,7 +129,7 @@ export function DataTable<TData extends RowWithId, TValue>({
   const [inputValue, setInputValue] = useState<string>("");
 
   const pathname = usePathname();
-
+  const { refreshData } = useData();
   // Adicionar verificação de segurança para o useModal
   let openModal: any;
   try {
@@ -146,14 +167,7 @@ export function DataTable<TData extends RowWithId, TValue>({
     try {
       const result = await openModal("new-invoice");
       if (result?.success) {
-        // Log da estrutura da invoice para debug
-        console.log(
-          "Invoice structure:",
-          JSON.stringify(result.data.invoice, null, 2),
-        );
-
-        // Modal foi cancelado, não precisa fazer nada
-        console.log("Modal cancelled");
+        await refreshData();
       }
     } catch (error) {
       console.error("Error handling new invoice:", error);
@@ -174,83 +188,26 @@ export function DataTable<TData extends RowWithId, TValue>({
     openModal("edit-stock-movement", stockMovement);
 
   const handleDeleteMany = async (selectedIds: number[]) => {
-    try {
-      const response = await axios.delete(`/api/${pathname.slice(1)}`, {
-        data: { ids: selectedIds },
-      });
+    let response: any;
+    if (pathname === "/products") {
+      response = await deleteManyProducts(selectedIds);
+    } else if (pathname === "/customers") {
+      response = await deleteManyCustomers(selectedIds);
+    } else if (pathname === "/invoices") {
+      response = await deleteManyInvoices(selectedIds);
+    } else if (pathname === "/stock-movement") {
+      response = await deleteManyStockMovements(selectedIds);
+    } else {
+      return;
+    }
 
-      // Verificar se a resposta foi bem-sucedida
-      if (response.status >= 200 && response.status < 300) {
-        // Determinar o tipo de item baseado no pathname
-        const itemType =
-          pathname === "/products"
-            ? "produto(s)"
-            : pathname === "/customers"
-              ? "cliente(s)"
-              : pathname === "/invoices"
-                ? "venda(s)"
-                : pathname === "/stock-movement"
-                  ? "movimentação(ões) de estoque"
-                  : "item(s)";
-
-        // Verificar quantos itens foram realmente deletados
-        const deletedCount = response.data?.deletedCount || selectedIds.length;
-
-        // Limpar seleção após deletar
-        setRowSelection({});
-
-        // Exibir toast de sucesso com informações detalhadas
-        toast.success(`${deletedCount} ${itemType} deletado(s) com sucesso!`, {
-          description: `Os itens foram removidos do sistema.`,
-          duration: 5000,
-        });
-
-        console.log(
-          `Successfully deleted ${deletedCount} items from ${pathname}`,
-          response.data,
-        );
-      } else {
-        // Resposta não foi bem-sucedida
-        throw new Error(`Erro HTTP: ${response.status}`);
-      }
-    } catch (error: any) {
-      console.error("Error deleting items:", error);
-
-      // Determinar a mensagem de erro baseada no tipo de erro
-      let errorMessage =
-        "Ocorreu um erro ao tentar deletar os itens selecionados.";
-      let errorDescription = "Tente novamente.";
-
-      if (error.response) {
-        // Erro de resposta da API
-        const status = error.response.status;
-        const errorData = error.response.data;
-
-        if (status === 400) {
-          errorMessage = "Dados inválidos";
-          errorDescription =
-            errorData?.error || "Verifique os itens selecionados.";
-        } else if (status === 404) {
-          errorMessage = "Itens não encontrados";
-          errorDescription = "Os itens podem já ter sido deletados.";
-        } else if (status === 500) {
-          errorMessage = "Erro interno do servidor";
-          errorDescription = errorData?.error || "Tente novamente mais tarde.";
-        } else {
-          errorMessage = `Erro HTTP ${status}`;
-          errorDescription = errorData?.error || "Erro desconhecido.";
-        }
-      } else if (error.request) {
-        // Erro de rede
-        errorMessage = "Erro de conexão";
-        errorDescription = "Verifique sua conexão com a internet.";
-      }
-
-      // Exibir toast de erro
-      toast.error(errorMessage, {
-        description: errorDescription,
-        duration: 5000,
-      });
+    if (response.success) {
+      toast.success(
+        `${response.itemsDeleted.count} ${columnTranslations[pathname.split("/")[1]]} deletado(as)`,
+      );
+      await refreshData();
+    } else {
+      toast.error("Erro ao deletar itens selecionados");
     }
   };
 
@@ -285,16 +242,17 @@ export function DataTable<TData extends RowWithId, TValue>({
   return (
     <>
       <div>
-        <div className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
+        <div className="grid gap-2 py-4 md:flex md:items-center md:justify-between">
+          {/* Mobile: Empilhado verticalmente | Desktop: Flex horizontal */}
+          <div className="grid gap-2 md:flex md:items-center md:gap-2">
             <Input
+              className="w-full md:w-auto"
               placeholder="Filtrar..."
               value={inputValue}
               onChange={handleFilterChange}
             />
-
             <Select value={selectedColumn} onValueChange={setSelectedColumn}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full md:w-auto">
                 <SelectValue placeholder="Selecione uma coluna">
                   {columnTranslations[selectedColumn] || selectedColumn}
                 </SelectValue>
@@ -319,8 +277,11 @@ export function DataTable<TData extends RowWithId, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Botões de ação */}
+          <div className="grid grid-cols-2 gap-2 md:flex md:items-center md:gap-2">
             <Button
+              className="w-full md:w-auto"
               onClick={
                 pathname === "/products"
                   ? handleNewProduct
@@ -346,6 +307,7 @@ export function DataTable<TData extends RowWithId, TValue>({
                       : ""}
             </Button>
             <Button
+              className="w-full md:w-auto"
               variant="outline"
               disabled={table.getFilteredSelectedRowModel().rows.length !== 1}
               onClick={() => {
@@ -368,10 +330,10 @@ export function DataTable<TData extends RowWithId, TValue>({
               <IconEdit />
               Editar
             </Button>
-
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
+                  className="w-full md:w-auto"
                   disabled={
                     table.getFilteredSelectedRowModel().rows.length === 0
                   }
@@ -408,7 +370,7 @@ export function DataTable<TData extends RowWithId, TValue>({
             </AlertDialog>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">
+                <Button className="w-full md:w-auto" variant="outline">
                   <IconLayoutColumns /> Colunas
                 </Button>
               </DropdownMenuTrigger>
@@ -426,7 +388,7 @@ export function DataTable<TData extends RowWithId, TValue>({
                           column.toggleVisibility(!!value)
                         }
                       >
-                        {column.id}
+                        {columnTranslations[column.id] || column.id}
                       </DropdownMenuCheckboxItem>
                     );
                   })}
@@ -434,7 +396,7 @@ export function DataTable<TData extends RowWithId, TValue>({
             </DropdownMenu>
           </div>
         </div>
-        <div className="scrollbar-hidden mx-auto w-full overflow-x-auto rounded-lg">
+        <div className="scrollbar-horizontal mx-auto w-full overflow-x-auto rounded-lg">
           <div className="overflow-hidden rounded-lg border">
             <Table>
               <TableHeader className="bg-muted sticky top-0 z-10">
@@ -485,16 +447,37 @@ export function DataTable<TData extends RowWithId, TValue>({
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="text-muted-foreground flex-1 text-sm">
-              {table.getFilteredSelectedRowModel().rows.length} de{" "}
-              {table.getFilteredRowModel().rows.length} linhas selecionadas.
+          {/* Mobile: Layout compacto empilhado | Desktop: Layout horizontal */}
+          <div className="space-y-4 py-4 md:flex md:items-center md:justify-between md:space-y-0">
+            {/* Informações de seleção - Mobile: Primeira linha | Desktop: Lado esquerdo */}
+            <div className="text-muted-foreground text-center text-sm md:text-left">
+              {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                <span className="font-medium">
+                  {table.getFilteredSelectedRowModel().rows.length} selecionada
+                  {table.getFilteredSelectedRowModel().rows.length !== 1
+                    ? "s"
+                    : ""}
+                </span>
+              )}
+              {table.getFilteredSelectedRowModel().rows.length > 0 &&
+                table.getFilteredRowModel().rows.length > 0 && (
+                  <span className="mx-2">•</span>
+                )}
+              <span>
+                {table.getFilteredRowModel().rows.length} resultado
+                {table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
+              </span>
             </div>
 
-            <div className="flex w-full items-center gap-8 lg:w-fit">
-              <div className="hidden items-center gap-2 lg:flex">
-                <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                  Linhas por página:
+            {/* Controles de paginação - Mobile: Segunda linha | Desktop: Lado direito */}
+            <div className="flex flex-col items-center gap-4 md:flex-row">
+              {/* Seletor de linhas por página - Visível em mobile também */}
+              <div className="flex items-center gap-2">
+                <Label
+                  htmlFor="rows-per-page"
+                  className="text-sm font-medium whitespace-nowrap"
+                >
+                  Por página:
                 </Label>
                 <Select
                   value={`${table.getState().pagination.pageSize}`}
@@ -502,7 +485,7 @@ export function DataTable<TData extends RowWithId, TValue>({
                     table.setPageSize(Number(value));
                   }}
                 >
-                  <SelectTrigger size="sm" className="w-20" id="rows-per-page">
+                  <SelectTrigger size="sm" className="w-fit" id="rows-per-page">
                     <SelectValue
                       placeholder={table.getState().pagination.pageSize}
                     />
@@ -516,50 +499,62 @@ export function DataTable<TData extends RowWithId, TValue>({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex w-fit items-center justify-center text-sm font-medium">
-                Página {table.getState().pagination.pageIndex + 1} de{" "}
-                {table.getPageCount()}
-              </div>
-              <div className="ml-auto flex items-center gap-2 lg:ml-0">
-                <Button
-                  variant="outline"
-                  className="hidden h-8 w-8 p-0 lg:flex"
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <span className="sr-only">Go to first page</span>
-                  <IconChevronsLeft />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="size-8"
-                  size="icon"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <span className="sr-only">Go to previous page</span>
-                  <IconChevronLeft />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="size-8"
-                  size="icon"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <span className="sr-only">Go to next page</span>
-                  <IconChevronRight />
-                </Button>
-                <Button
-                  variant="outline"
-                  className="hidden size-8 lg:flex"
-                  size="icon"
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <span className="sr-only">Go to last page</span>
-                  <IconChevronsRight />
-                </Button>
+
+              {/* Navegação de páginas */}
+              <div className="flex items-center gap-2">
+                {/* Informação da página atual - compacta */}
+                <div className="text-muted-foreground text-sm font-medium whitespace-nowrap">
+                  {table.getPageCount() > 0 ? (
+                    <>
+                      <span className="hidden sm:inline">Página </span>
+                      {table.getState().pagination.pageIndex + 1}
+                      <span className="mx-1">/</span>
+                      {table.getPageCount()}
+                    </>
+                  ) : (
+                    <span>0/0</span>
+                  )}
+                </div>
+
+                {/* Botões de navegação */}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 sm:flex"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <span className="sr-only">Primeira página</span>
+                    <IconChevronsLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    <span className="sr-only">Página anterior</span>
+                    <IconChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <span className="sr-only">Próxima página</span>
+                    <IconChevronRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="hidden h-8 w-8 p-0 sm:flex"
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    <span className="sr-only">Última página</span>
+                    <IconChevronsRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
