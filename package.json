@@ -11,7 +11,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy:check": "./scripts/deploy.sh",
+    "db:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate --no-engine"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
