@@ -4,13 +4,24 @@ import { NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Debug: Log dos cookies para verificar
+  console.log("Middleware - Pathname:", pathname);
+  const cookies = request.cookies.getAll();
+  console.log(
+    "Middleware - Cookies:",
+    cookies.map((c) => `${c.name}=${c.value}`),
+  );
+
   // Verifica se o usuário está autenticado via cookies de sessão
   // Verifica apenas cookies que indicam uma sessão válida
   const hasSession =
     request.cookies.has("next-auth.session-token") ||
     request.cookies.has("__Secure-next-auth.session-token") ||
     request.cookies.has("authjs.session-token") ||
+    request.cookies.has("__Secure-authjs.session-token") ||
     request.cookies.has("__Host-next-auth.session-token");
+
+  console.log("Middleware - Has Session:", hasSession);
 
   // Rotas públicas (acessíveis sem autenticação)
   const publicRoutes = ["/login"];

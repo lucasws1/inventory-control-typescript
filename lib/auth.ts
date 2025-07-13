@@ -10,6 +10,13 @@ const config = {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
   ],
   pages: {
@@ -29,9 +36,30 @@ const config = {
       else if (new URL(url).origin === baseUrl) return url;
       return `${baseUrl}/`;
     },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
   },
   session: {
     strategy: "database",
+  },
+  // Configurações para produção
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-authjs.session-token"
+          : "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 } satisfies NextAuthConfig;
 
