@@ -32,12 +32,21 @@ This is a **Next.js 15+ inventory control system** using TypeScript, Prisma ORM,
 - **Client cache:** `DataContext` holds all data, refreshed on mutations
 - **Relations:** All entities use `*WithRelations` types (see `types/` folder)
 - **Date serialization:** Custom helper for Prisma Date → ISO string conversion
+- **Multi-tenancy:** Every model includes `userId` field for user isolation
 
 **Form Patterns:**
 
 - Each domain has: `{Entity}EditForm.tsx`, `New{Entity}Modal.tsx`
 - Zod validation in `schemas/zodSchemas.ts` with Portuguese error messages
 - Toast notifications via Sonner library
+- Server actions handle form submissions: `app/lib/actions.ts`
+
+**Server Actions Pattern:**
+
+- All CRUD operations in `app/lib/actions.ts` with "use server" directive
+- Bulk operations: `deleteManyProducts()`, `deleteManyCustomers()`, etc.
+- Security-first: Every operation filters by `userId` to prevent cross-user access
+- Form handling: Extract data → Zod validation → Prisma operation → Redirect/return
 
 **Portuguese Localization:**
 
@@ -47,11 +56,12 @@ This is a **Next.js 15+ inventory control system** using TypeScript, Prisma ORM,
 
 ## Authentication Flow
 
-NextAuth v4 setup with database sessions:
+NextAuth v5 setup with database sessions:
 
 - **Login required:** Middleware protects all routes except `/login`
 - **Session storage:** Database-based (not JWT)
 - **User data:** Available via `useSession()` or `auth()` server function
+- **Security:** All database operations include `userId` filter for data isolation
 
 ## Adding New Entities
 
