@@ -23,6 +23,7 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useModal } from "@/contexts/ModalContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -47,6 +48,7 @@ export function NavMain({
   const pathName = usePathname();
   const isMobile = useIsMobile();
   const { openModal } = useModal();
+  const { setOpenMobile } = useSidebar();
 
   const handleNewCustomer = () => {
     openModal("new-customer");
@@ -62,6 +64,13 @@ export function NavMain({
 
   const handleNewInvoice = () => {
     openModal("new-invoice");
+  };
+
+  // Função para fechar sidebar no mobile quando link é clicado
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   return (
@@ -136,7 +145,7 @@ export function NavMain({
                       : ""
                   }
                 >
-                  <Link href={item.url}>
+                  <Link href={item.url} onClick={handleLinkClick}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>
@@ -181,7 +190,7 @@ export function NavMain({
                       asChild
                       className="flex items-center gap-2"
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleLinkClick}>
                         <IconList />
                         <span>Listar</span>
                       </Link>

@@ -8,6 +8,30 @@ const ChartDataQuerySchema = z.object({
   timeRange: z.enum(["7d", "30d", "90d"]).default("90d"),
 });
 
+/**
+ * Calcula o estoque considerando os tipos de movimentação:
+ * - COMPRA e AJUSTE_POSITIVO: soma
+ * - VENDA e AJUSTE_NEGATIVO: subtrai
+ * - OUTRO: soma (comportamento padrão)
+ */
+function calculateStockBalance(
+  stockMovements: Array<{ quantity: number; reason: string }>,
+) {
+  return stockMovements.reduce((balance, movement) => {
+    switch (movement.reason) {
+      case "COMPRA":
+      case "AJUSTE_POSITIVO":
+      case "OUTRO":
+        return balance + movement.quantity;
+      case "VENDA":
+      case "AJUSTE_NEGATIVO":
+        return balance - movement.quantity;
+      default:
+        return balance + movement.quantity; // fallback
+    }
+  }, 0);
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
@@ -142,9 +166,9 @@ export async function GET(request: NextRequest) {
       ).length;
 
       // Current stock balance up to this date
-      const stockBalanceUpToDate = stockMovements
-        .filter((movement) => movement.date <= date)
-        .reduce((sum, movement) => sum + movement.quantity, 0);
+      const stockBalanceUpToDate = calculateStockBalance(
+        stockMovements.filter((movement) => movement.date <= date),
+      );
 
       return {
         date: dateKey,
@@ -282,6 +306,10 @@ export async function GET(request: NextRequest) {
           lte: endDate,
         },
       },
+      select: {
+        quantity: true,
+        reason: true,
+      },
     });
 
     const previousPeriodStockMovements = await prisma.stockMovement.findMany({
@@ -292,15 +320,17 @@ export async function GET(request: NextRequest) {
           lt: previousPeriodEnd,
         },
       },
+      select: {
+        quantity: true,
+        reason: true,
+      },
     });
 
-    const currentPeriodStockChange = currentPeriodStockMovements.reduce(
-      (sum, mov) => sum + mov.quantity,
-      0,
+    const currentPeriodStockChange = calculateStockBalance(
+      currentPeriodStockMovements,
     );
-    const previousPeriodStockChange = previousPeriodStockMovements.reduce(
-      (sum, mov) => sum + mov.quantity,
-      0,
+    const previousPeriodStockChange = calculateStockBalance(
+      previousPeriodStockMovements,
     );
 
     const estoqueChange =
@@ -311,17 +341,20 @@ export async function GET(request: NextRequest) {
         : 0;
 
     // Calculate total current stock
-    const totalEstoque = await prisma.stockMovement.aggregate({
-      _sum: {
-        quantity: true,
-      },
+    const allStockMovements = await prisma.stockMovement.findMany({
       where: {
         userId,
         date: {
           lte: endDate,
         },
       },
+      select: {
+        quantity: true,
+        reason: true,
+      },
     });
+
+    const totalEstoque = calculateStockBalance(allStockMovements);
 
     return NextResponse.json({
       chartData,
@@ -334,7 +367,7 @@ export async function GET(request: NextRequest) {
       novosProdutos,
       previousNovosProdutos,
       produtosChange,
-      totalEstoque: totalEstoque._sum.quantity || 0,
+      totalEstoque: totalEstoque || 0,
       movimentacaoEstoque: currentPeriodStockChange,
       estoqueChange,
     });

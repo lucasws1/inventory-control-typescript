@@ -130,14 +130,14 @@ export default function NewProductModal({
                         }
                       }}
                     />
-                    <input
-                      id="dateValue"
-                      type="hidden"
-                      name="dateValue"
-                      value={dateValue.toISOString()}
-                    />
                   </PopoverContent>
                 </Popover>
+                <input
+                  id="dateValue"
+                  type="hidden"
+                  name="dateValue"
+                  value={dateValue.toISOString()}
+                />
               </div>
               <div className="relative flex flex-col gap-2">
                 <Button

@@ -57,11 +57,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useData } from "@/contexts/DataContext";
+import { useChartData } from "@/contexts/ChartDataContext";
 import { useModal } from "@/contexts/ModalContext";
-import { Customer } from "@/types/customer";
-import { Invoice } from "@/types/invoice";
-import { Product } from "@/types/product";
-import { StockMovement } from "@/types/stockMovement";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -130,6 +127,17 @@ export function DataTable<TData extends RowWithId, TValue>({
 
   const pathname = usePathname();
   const { refreshData } = useData();
+
+  // Adicionar useChartData para sincronizar dados do gráfico
+  let getChartData: any;
+  try {
+    const chartContext = useChartData();
+    getChartData = chartContext.getChartData;
+  } catch (error) {
+    console.warn("Chart context not available:", error);
+    getChartData = () => Promise.resolve();
+  }
+
   // Adicionar verificação de segurança para o useModal
   let openModal: any;
   try {
@@ -163,29 +171,41 @@ export function DataTable<TData extends RowWithId, TValue>({
     onRowSelectionChange: setRowSelection,
   });
 
-  const handleNewInvoice = async () => {
+  const handleNew = async (pathname: string) => {
     try {
-      const result = await openModal("new-invoice");
+      const modalType =
+        pathname.slice(-1) === "s"
+          ? "new-" + pathname.split("/")[1].slice(0, -1)
+          : "new-" + pathname.split("/")[1];
+      const result = await openModal(modalType);
       if (result?.success) {
         await refreshData();
+        await getChartData(); // Atualizar dados do gráfico
+        toast.success(`${pathname.split("/")[1]} adicionado com sucesso`);
       }
     } catch (error) {
-      console.error("Error handling new invoice:", error);
-      toast.error("Erro ao processar nova venda");
+      console.error("Error handling new item:", error);
+      toast.error(`Erro ao processar novo ${pathname.split("/")[1]}`);
     }
   };
 
-  const handleNewProduct = () => openModal("new-product");
-  const handleNewCustomer = () => openModal("new-customer");
-  const handleNewStockMovement = () => openModal("new-stock-movement");
-  const handleEditCustomer = (customer: Customer) =>
-    openModal("edit-customer", customer);
-  const handleEditProduct = (product: Product) =>
-    openModal("edit-product", product);
-  const handleEditInvoice = (invoice: Invoice) =>
-    openModal("edit-invoice", invoice);
-  const handleEditStockMovement = (stockMovement: StockMovement) =>
-    openModal("edit-stock-movement", stockMovement);
+  const handleEdit = async (item: any) => {
+    try {
+      const modalType =
+        pathname.slice(-1) === "s"
+          ? "edit-" + pathname.split("/")[1].slice(0, -1)
+          : "edit-" + pathname.split("/")[1];
+      const result = await openModal(modalType, item);
+      if (result?.success) {
+        await refreshData();
+        await getChartData(); // Atualizar dados do gráfico
+        toast.success(`${pathname.split("/")[1]} editado com sucesso`);
+      }
+    } catch (error) {
+      console.error("Error handling edit item:", error);
+      toast.error(`Erro ao processar edição de ${pathname.split("/")[1]}`);
+    }
+  };
 
   const handleDeleteMany = async (selectedIds: number[]) => {
     let response: any;
@@ -206,6 +226,7 @@ export function DataTable<TData extends RowWithId, TValue>({
         `${response.itemsDeleted.count} ${columnTranslations[pathname.split("/")[1]]} deletado(as)`,
       );
       await refreshData();
+      await getChartData(); // Atualizar dados do gráfico
     } else {
       toast.error("Erro ao deletar itens selecionados");
     }
@@ -282,17 +303,7 @@ export function DataTable<TData extends RowWithId, TValue>({
           <div className="grid grid-cols-2 gap-2 md:flex md:items-center md:gap-2">
             <Button
               className="w-full md:w-auto"
-              onClick={
-                pathname === "/products"
-                  ? handleNewProduct
-                  : pathname === "/customers"
-                    ? handleNewCustomer
-                    : pathname === "/invoices"
-                      ? handleNewInvoice
-                      : pathname === "/stock-movement"
-                        ? handleNewStockMovement
-                        : undefined
-              }
+              onClick={() => handleNew(pathname)}
             >
               <IconPlus />
               Adicionar{" "}
@@ -313,17 +324,7 @@ export function DataTable<TData extends RowWithId, TValue>({
               onClick={() => {
                 const row = table.getFilteredSelectedRowModel().rows[0];
                 if (row) {
-                  if (pathname === "/products") {
-                    handleEditProduct(row.original as unknown as Product);
-                  } else if (pathname === "/customers") {
-                    handleEditCustomer(row.original as unknown as Customer);
-                  } else if (pathname === "/invoices") {
-                    handleEditInvoice(row.original as unknown as Invoice);
-                  } else if (pathname === "/stock-movement") {
-                    handleEditStockMovement(
-                      row.original as unknown as StockMovement,
-                    );
-                  }
+                  handleEdit(row.original);
                 }
               }}
             >

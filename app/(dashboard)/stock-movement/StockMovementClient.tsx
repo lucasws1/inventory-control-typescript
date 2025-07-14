@@ -12,11 +12,11 @@ export default function StockMovementClient() {
   }
 
   if (error) {
-    return <div>Erro ao carregar movimentações de estoque.</div>;
-  }
-
-  if (!stockMovements || stockMovements.length === 0) {
-    return <div>Nenhuma movimentação de estoque encontrada.</div>;
+    return (
+      <div className="flex items-center justify-center p-8 text-red-500">
+        Erro: {error}
+      </div>
+    );
   }
 
   return <DataTable columns={columns} data={stockMovements} />;

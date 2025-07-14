@@ -12,11 +12,11 @@ export default function ProductsClient() {
   }
 
   if (error) {
-    return <div>Erro ao carregar produtos.</div>;
-  }
-
-  if (!products || products.length === 0) {
-    return <div>Nenhum produto encontrado.</div>;
+    return (
+      <div className="flex items-center justify-center p-8 text-red-500">
+        Erro: {error}
+      </div>
+    );
   }
 
   return <DataTable columns={columns} data={products} />;

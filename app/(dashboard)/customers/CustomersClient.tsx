@@ -12,11 +12,11 @@ export default function CustomersClient() {
   }
 
   if (error) {
-    return <div>Erro ao carregar clientes.</div>;
-  }
-
-  if (!customers || customers.length === 0) {
-    return <div>Nenhum cliente encontrado.</div>;
+    return (
+      <div className="flex items-center justify-center p-8 text-red-500">
+        Erro: {error}
+      </div>
+    );
   }
 
   const customersWithTotal = customers.map((customer) => {

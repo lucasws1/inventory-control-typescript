@@ -26,9 +26,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
   const { data: session, status } = useSession();
 
   const handleLogout = () => {
@@ -37,6 +38,13 @@ export function NavUser() {
 
   const handleLogin = () => {
     signIn("google");
+  };
+
+  // Função para fechar sidebar no mobile quando link é clicado
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   const userData = {
@@ -83,7 +91,7 @@ export function NavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -96,7 +104,7 @@ export function NavUser() {
                     alt={userData.name}
                     onError={(e) => {
                       console.error(
-                        "Avatar image failed to load in dropdown:",
+                        "Avatar image failed to load:",
                         userData.avatar,
                       );
                     }}
@@ -109,7 +117,6 @@ export function NavUser() {
                       .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{userData.name}</span>
                   <span className="text-muted-foreground truncate text-xs">
@@ -126,6 +133,7 @@ export function NavUser() {
                     <a
                       href="/accountSettings"
                       className="w-full cursor-pointer"
+                      onClick={handleLinkClick}
                     >
                       <IconUserCircle />
                       Configurações
