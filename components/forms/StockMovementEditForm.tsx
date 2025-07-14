@@ -33,6 +33,7 @@ import { ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function StockMovementEditPage({
   stockMovement,
@@ -71,6 +72,11 @@ export default function StockMovementEditPage({
       const refresh = async () => await refreshData();
       handleCloseModal();
       refresh();
+      toast.success(
+        state.message || "Movimentação de estoque atualizada com sucesso!",
+      );
+    } else if (state?.message) {
+      toast.error(state.message || "Erro ao atualizar movimentação de estoque");
     }
   }, [state]);
 

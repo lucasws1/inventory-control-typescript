@@ -48,7 +48,11 @@ export async function createProduct(prevState: any, formData: FormData) {
       redirect("/products");
     }
 
-    return { success: true, product: newProduct };
+    return {
+      success: true,
+      product: newProduct,
+      message: "Produto criado com sucesso!",
+    };
   } catch (error) {
     console.error("Erro ao criar produto:", error);
     return { success: false, error: "Erro ao criar produto." };
@@ -78,7 +82,11 @@ export async function createStockMovement(prevState: any, formData: FormData) {
       redirect("/stock-movement");
     }
 
-    return { success: true, stockMovement: newStockMovement };
+    return {
+      success: true,
+      stockMovement: newStockMovement,
+      message: "Movimentação de estoque criada com sucesso!",
+    };
   } catch (error) {
     console.error("Erro ao criar movimentação de estoque:", error);
     return { success: false, error: "Erro ao criar movimentação de estoque." };
@@ -112,11 +120,20 @@ export async function updateStockMovement(prevState: any, formData: FormData) {
       data: data,
     });
 
-    return { success: true, stockMovement: data };
+    return {
+      success: true,
+      stockMovement: data,
+      message: "Movimentação de estoque atualizada com sucesso!",
+    };
   } catch (error) {
-    throw new Error("Erro ao atualizar o movimento de estoque.", {
-      cause: error,
-    });
+    return {
+      success: false,
+      message: "Erro ao atualizar o movimento de estoque.",
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao atualizar o movimento de estoque.",
+    };
   }
 }
 
@@ -169,7 +186,11 @@ export const createCustomer = async (prevState: any, formData: FormData) => {
       redirect("/customers");
     }
 
-    return { success: true, customer: newCustomer };
+    return {
+      success: true,
+      customer: newCustomer,
+      message: "Cliente criado com sucesso!",
+    };
   } catch (error) {
     console.error("Erro ao criar cliente:", error);
     return { success: false, error: "Erro ao criar cliente." };
@@ -205,11 +226,20 @@ export async function updateCustomer(prevState: any, formData: FormData) {
       },
     });
 
-    return { success: true, customer: validatedData };
+    return {
+      success: true,
+      customer: validatedData,
+      message: "Cliente atualizado com sucesso!",
+    };
   } catch (error) {
-    throw new Error("Erro ao atualizar o cliente.", {
-      cause: error,
-    });
+    return {
+      success: false,
+      message: "Erro ao atualizar o cliente.",
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao atualizar o cliente.",
+    };
   }
 }
 
@@ -262,9 +292,20 @@ export async function updateInvoice(prevState: any, formData: FormData) {
       },
     });
 
-    return { success: true, invoice: invoiceUpdate };
+    return {
+      success: true,
+      invoice: invoiceUpdate,
+      message: "Venda atualizada com sucesso!",
+    };
   } catch (error) {
-    throw new Error("Erro ao atualizar invoice.");
+    return {
+      success: false,
+      message: "Erro ao atualizar a venda.",
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao atualizar a venda.",
+    };
   }
 }
 
@@ -288,9 +329,20 @@ export async function updateProduct(prevState: any, formData: FormData) {
       },
     });
 
-    return { success: true, product: data };
+    return {
+      success: true,
+      product: data,
+      message: "Produto atualizado com sucesso!",
+    };
   } catch (error) {
-    throw new Error("Erro ao atualizar o produto.");
+    return {
+      success: false,
+      message: "Erro ao atualizar o produto.",
+      error:
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message: string }).message
+          : "Erro ao atualizar o produto.",
+    };
   }
 }
 
@@ -397,9 +449,9 @@ export const createInvoice = async (prevState: any, formData: FormData) => {
 
     return {
       success: true,
-      message: "Venda lançada com sucesso!",
       invoice: newInvoice,
-      newStockMovement,
+      stockMovement: newStockMovement,
+      message: "Venda lançada com sucesso!",
     };
   } catch (error) {
     console.error("Error creating invoice:", error);
@@ -448,14 +500,16 @@ export const deleteManyInvoices = async (invoiceId: number[]) => {
     return {
       success: true,
       itemsDeleted: deletedInvoices,
+      message: "Venda(s) deletada(s) com sucesso!",
     };
   } catch (error) {
     return {
       success: false,
-      message:
+      message: "Erro ao deletar a(s) venda(s).",
+      error:
         typeof error === "object" && error !== null && "message" in error
           ? (error as { message: string }).message
-          : "Erro ao deletar a venda.",
+          : "Erro ao deletar a(s) venda(s).",
     };
   }
 };
@@ -469,14 +523,19 @@ export const deleteManyProducts = async (productId: number[]) => {
         userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
-    return { success: true, itemsDeleted: deletedProducts };
+    return {
+      success: true,
+      itemsDeleted: deletedProducts,
+      message: "Produto(s) deletado(s) com sucesso!",
+    };
   } catch (error) {
     return {
       success: false,
-      message:
+      message: "Erro ao deletar o(s) produto(s).",
+      error:
         typeof error === "object" && error !== null && "message" in error
           ? (error as { message: string }).message
-          : "Erro ao deletar o produto.",
+          : "Erro ao deletar o(s) produto(s).",
     };
   }
 };
@@ -490,14 +549,19 @@ export const deleteManyCustomers = async (customerId: number[]) => {
         userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
-    return { success: true, itemsDeleted: deletedCustomers };
+    return {
+      success: true,
+      itemsDeleted: deletedCustomers,
+      message: "Cliente(s) deletado(s) com sucesso!",
+    };
   } catch (error) {
     return {
       success: false,
-      message:
+      message: "Erro ao deletar o(s) cliente(s).",
+      error:
         typeof error === "object" && error !== null && "message" in error
           ? (error as { message: string }).message
-          : "Erro ao deletar o cliente.",
+          : "Erro ao deletar o(s) cliente(s).",
     };
   }
 };
@@ -511,14 +575,19 @@ export const deleteManyStockMovements = async (stockMovementId: number[]) => {
         userId: userId, // Garantir que só deleta dados do próprio usuário
       },
     });
-    return { success: true, itemsDeleted: deletedStockMovements };
+    return {
+      success: true,
+      itemsDeleted: deletedStockMovements,
+      message: "Movimento(s) de estoque deletado(s) com sucesso!",
+    };
   } catch (error) {
     return {
       success: false,
-      message:
+      message: "Erro ao deletar o(s) movimento(s) de estoque.",
+      error:
         typeof error === "object" && error !== null && "message" in error
           ? (error as { message: string }).message
-          : "Erro ao deletar o movimento de estoque.",
+          : "Erro ao deletar o(s) movimento(s) de estoque.",
     };
   }
 };

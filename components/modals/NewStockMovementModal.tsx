@@ -52,10 +52,12 @@ export default function NewStockMovementModal({
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
-      toast.success("Movimentação de estoque criada com sucesso!");
       onClose?.();
+      toast.success(
+        state.message || "Movimentação de estoque criada com sucesso!",
+      );
     } else if (state?.error) {
-      toast.error(state.error);
+      toast.error(state.message || "Erro ao criar movimentação de estoque");
     }
   }, [state, isModal, onClose]);
 

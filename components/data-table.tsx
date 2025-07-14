@@ -181,11 +181,9 @@ export function DataTable<TData extends RowWithId, TValue>({
       if (result?.success) {
         await refreshData();
         await getChartData(); // Atualizar dados do gráfico
-        toast.success(`${pathname.split("/")[1]} adicionado com sucesso`);
       }
     } catch (error) {
       console.error("Error handling new item:", error);
-      toast.error(`Erro ao processar novo ${pathname.split("/")[1]}`);
     }
   };
 
@@ -199,11 +197,9 @@ export function DataTable<TData extends RowWithId, TValue>({
       if (result?.success) {
         await refreshData();
         await getChartData(); // Atualizar dados do gráfico
-        toast.success(`${pathname.split("/")[1]} editado com sucesso`);
       }
     } catch (error) {
       console.error("Error handling edit item:", error);
-      toast.error(`Erro ao processar edição de ${pathname.split("/")[1]}`);
     }
   };
 
@@ -222,13 +218,11 @@ export function DataTable<TData extends RowWithId, TValue>({
     }
 
     if (response.success) {
-      toast.success(
-        `${response.itemsDeleted.count} ${columnTranslations[pathname.split("/")[1]]} deletado(as)`,
-      );
       await refreshData();
       await getChartData(); // Atualizar dados do gráfico
+      toast.success(response.message || "Item(s) deletado(s) com sucesso!");
     } else {
-      toast.error("Erro ao deletar itens selecionados");
+      toast.error(response.message || "Erro ao deletar item(s) selecionado(s)");
     }
   };
 
@@ -263,9 +257,9 @@ export function DataTable<TData extends RowWithId, TValue>({
   return (
     <>
       <div>
-        <div className="grid gap-2 py-4 md:flex md:items-center md:justify-between">
+        <div className="grid gap-2 py-4 lg:flex lg:items-center lg:justify-between">
           {/* Mobile: Empilhado verticalmente | Desktop: Flex horizontal */}
-          <div className="grid gap-2 md:flex md:items-center md:gap-2">
+          <div className="grid gap-2 lg:flex lg:items-center lg:gap-2">
             <Input
               className="w-full md:w-auto"
               placeholder="Filtrar..."
@@ -300,7 +294,7 @@ export function DataTable<TData extends RowWithId, TValue>({
           </div>
 
           {/* Botões de ação */}
-          <div className="grid grid-cols-2 gap-2 md:flex md:items-center md:gap-2">
+          <div className="grid grid-cols-2 gap-2 lg:flex lg:items-center lg:gap-2">
             <Button
               className="w-full md:w-auto"
               onClick={() => handleNew(pathname)}

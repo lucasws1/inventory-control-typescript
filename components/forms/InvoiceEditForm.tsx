@@ -49,6 +49,7 @@ import { AlertCircleIcon, ChevronDownIcon } from "lucide-react";
 import Form from "next/form";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type NewInvoiceItem = {
   productId: number;
@@ -118,6 +119,14 @@ export default function InvoiceEditForm({
     )?.unitPrice;
     setUnitPrice(getUnitPrice !== undefined ? getUnitPrice.toString() : "");
   }, [productId]);
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state.message || "Venda atualizada com sucesso!");
+    } else if (state?.message) {
+      toast.error(state.message || "Erro ao atualizar venda");
+    }
+  }, [state]);
 
   const handleAddProduct = () => {
     if (!productId || !productQuantity || !unitPrice) return;

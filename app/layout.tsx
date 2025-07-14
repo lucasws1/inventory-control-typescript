@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scrollbar-hidden dark">
-      <body className="dark scrollbar-hidden">
+    <html lang="en" className="scrollbar-hidden" suppressHydrationWarning>
+      <body className="scrollbar-hidden">
         <DataProvider>
           <Providers>{children}</Providers>
         </DataProvider>

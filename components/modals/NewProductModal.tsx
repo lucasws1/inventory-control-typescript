@@ -40,10 +40,11 @@ export default function NewProductModal({
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
-      toast.success("Produto criado com sucesso!");
       onClose?.();
+      toast.success(state.message || "Produto criado com sucesso!");
     } else if (state?.error) {
       toast.error(state.error);
+      toast.error(state.message || "Erro ao criar produto");
     }
   }, [state, isModal, onClose]);
 

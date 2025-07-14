@@ -17,6 +17,7 @@ import { useDraggable } from "@/hooks/useDraggable";
 import { ProductWithRelations } from "@/types/ProductWithRelations";
 import Form from "next/form";
 import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function ProductEditForm({
   product,
@@ -40,6 +41,9 @@ export default function ProductEditForm({
       const refresh = async () => await refreshData();
       handleCloseModal();
       refresh();
+      toast.success(state.message || "Produto atualizado com sucesso!");
+    } else if (state?.error) {
+      toast.error(state.error || "Erro ao atualizar produto");
     }
   }, [state]);
 

@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogin,
   IconLogout,
-  IconNotification,
   IconUserCircle,
 } from "@tabler/icons-react";
 
@@ -26,7 +24,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export function NavUser() {
   const { isMobile, setOpenMobile } = useSidebar();

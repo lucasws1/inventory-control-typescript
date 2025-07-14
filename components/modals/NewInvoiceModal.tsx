@@ -91,10 +91,10 @@ export default function NewInvoiceModal({
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
-      toast.success(state.message || "Venda lançada com sucesso!");
       onClose?.({ success: true, data: state });
+      toast.success(state.message || "Venda lançada com sucesso!");
     } else if (state?.error) {
-      toast.error(state.error);
+      toast.error(state.message || "Erro ao lançar venda");
     }
   }, [state, isModal, onClose]);
 

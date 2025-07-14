@@ -18,6 +18,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSidebar } from "./ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SearchResult {
   type: "customer" | "product" | "invoice" | "stockMovement";
@@ -40,6 +42,9 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const { setOpenMobile } = useSidebar();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (open) {
@@ -66,7 +71,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
       } else {
         setResults([]);
       }
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(searchTimeout);
   }, [query]);
@@ -86,6 +91,10 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
         onOpenChange(false);
         setQuery("");
         setResults([]);
+        // Fechar sidebar no mobile após navegação
+        if (isMobile) {
+          setOpenMobile(false);
+        }
       }
     } else if (e.key === "Escape") {
       onOpenChange(false);
@@ -97,6 +106,10 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
     onOpenChange(false);
     setQuery("");
     setResults([]);
+    // Fechar sidebar no mobile após navegação
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   };
 
   const getIcon = (icon: string) => {

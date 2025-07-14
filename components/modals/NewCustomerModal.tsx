@@ -30,10 +30,10 @@ export default function NewCustomerModal({
   // Fechar modal quando a operação for bem-sucedida
   useEffect(() => {
     if (state?.success && isModal) {
-      toast.success("Cliente criado com sucesso!");
       onClose?.();
+      toast.success(state.message || "Cliente criado com sucesso!");
     } else if (state?.error) {
-      toast.error(state.error);
+      toast.error(state.message || "Erro ao criar cliente");
     }
   }, [state, isModal, onClose]);
 

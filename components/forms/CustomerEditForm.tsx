@@ -15,6 +15,7 @@ import { useData } from "@/contexts/DataContext";
 import { useDraggable } from "@/hooks/useDraggable";
 import { CustomerWithRelations } from "@/types/CustomerWithRelations";
 import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
 export default function CustomerEditForm({
   customer,
@@ -34,6 +35,9 @@ export default function CustomerEditForm({
       const refresh = async () => await refreshData();
       handleCloseModal();
       refresh();
+      toast.success(state.message || "Cliente atualizado com sucesso!");
+    } else if (state?.message) {
+      toast.error(state.message || "Erro ao atualizar cliente");
     }
   }, [state]);
 
