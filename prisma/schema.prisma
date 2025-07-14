@@ -1,17 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Customer {
@@ -34,11 +29,11 @@ model Invoice {
   amount       Float
   pending      Boolean       @default(true)
   purchaseDate DateTime
+  customerId   Int
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  customerId   Int
-  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   userId       String
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   InvoiceItem  InvoiceItem[]
 
@@ -49,13 +44,13 @@ model InvoiceItem {
   id        Int      @id @default(autoincrement())
   quantity  Int
   unitPrice Float
+  productId Int
+  invoiceId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  productId Int
-  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  invoiceId Int
-  Invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   userId    String
+  Invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -68,52 +63,42 @@ model Product {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   userId        String
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   InvoiceItem   InvoiceItem[]
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   StockMovement StockMovement[]
 
   @@index([userId])
 }
 
-enum StockReason {
-  COMPRA
-  VENDA
-  AJUSTE_POSITIVO
-  AJUSTE_NEGATIVO
-  OUTRO
-}
-
 model StockMovement {
   id        Int         @id @default(autoincrement())
   productId Int
-  Product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int
   date      DateTime
+  reason    StockReason
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  reason    StockReason
   userId    String
+  Product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// NextAuth v5 models
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -133,12 +118,12 @@ model User {
   emailVerified DateTime?
   image         String?
   accounts      Account[]
-  sessions      Session[]
   Customer      Customer[]
   Invoice       Invoice[]
-  Product       Product[]
-  StockMovement StockMovement[]
   InvoiceItem   InvoiceItem[]
+  Product       Product[]
+  sessions      Session[]
+  StockMovement StockMovement[]
 }
 
 model VerificationToken {
@@ -147,4 +132,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum StockReason {
+  COMPRA
+  VENDA
+  AJUSTE_POSITIVO
+  AJUSTE_NEGATIVO
+  OUTRO
 }

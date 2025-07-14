@@ -1,7 +1,6 @@
 import { PrismaClient, StockReason } from "../app/generated/prisma";
-import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient().$extends(withAccelerate());
+const prisma = new PrismaClient();
 
 // Helper function to generate random date within a range
 function randomDateBetween(start: Date, end: Date): Date {

@@ -123,6 +123,7 @@ export default function InvoiceEditForm({
   useEffect(() => {
     if (state?.success) {
       toast.success(state.message || "Venda atualizada com sucesso!");
+      onClose?.();
     } else if (state?.message) {
       toast.error(state.message || "Erro ao atualizar venda");
     }
