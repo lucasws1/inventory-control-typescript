@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -32,36 +32,19 @@ import { Loader } from "./Loader/Loader";
 export const description = "An interactive area chart";
 
 const chartConfig = {
-  revenue: {
-    label: "Faturamento",
+  stockPurchases: {
+    label: "Entradas",
     color: "var(--primary)",
   },
-  customers: {
-    label: "Clientes",
-    color: "var(--primary)",
-  },
-  products: {
-    label: "Produtos",
-    color: "var(--primary)",
-  },
-  stockBalance: {
-    label: "Estoque",
+  stockSales: {
+    label: "Saídas",
     color: "var(--primary)",
   },
 } satisfies ChartConfig;
 
-const indicators = [
-  { value: "revenue", label: "Faturamento" },
-  { value: "customers", label: "Clientes" },
-  { value: "products", label: "Produtos" },
-  { value: "stockBalance", label: "Estoque" },
-] as const;
-
 export function ChartAreaInteractive() {
   const isMobile = useIsMobile();
   const { chartData, loading, timeRange, setTimeRange } = useChartData();
-  const [selectedIndicator, setSelectedIndicator] =
-    React.useState<keyof typeof chartConfig>("revenue");
 
   React.useEffect(() => {
     if (isMobile) {
@@ -94,23 +77,6 @@ export function ChartAreaInteractive() {
           </span>
         </CardDescription>
         <CardAction className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Select
-            value={selectedIndicator}
-            onValueChange={(value) =>
-              setSelectedIndicator(value as keyof typeof chartConfig)
-            }
-          >
-            <SelectTrigger className="w-full sm:w-40" size="sm">
-              <SelectValue placeholder="Selecionar indicador" />
-            </SelectTrigger>
-            <SelectContent>
-              {indicators.map((indicator) => (
-                <SelectItem key={indicator.value} value={indicator.value}>
-                  {indicator.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <ToggleGroup
             type="single"
             value={timeRange}
@@ -148,8 +114,6 @@ export function ChartAreaInteractive() {
         {loading ? (
           <div className="flex h-[250px] items-center justify-center">
             <div className="text-muted-foreground">
-              {/* <IconLoader className="size-10 animate-spin" />
-               */}
               <Loader variant="dots" size="lg" />
             </div>
           </div>
@@ -160,44 +124,8 @@ export function ChartAreaInteractive() {
           >
             <AreaChart data={filteredData}>
               <defs>
-                <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-revenue)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-revenue)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillCustomers" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-customers)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-customers)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillProducts" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-products)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-products)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
                 <linearGradient
-                  id="fillStockBalance"
+                  id="fillStockPurchases"
                   x1="0"
                   y1="0"
                   x2="0"
@@ -205,12 +133,24 @@ export function ChartAreaInteractive() {
                 >
                   <stop
                     offset="5%"
-                    stopColor="var(--color-stockBalance)"
+                    stopColor="var(--color-stockPurchases)"
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor="var(--color-stockBalance)"
+                    stopColor="var(--color-stockPurchases)"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillStockSales" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="var(--color-stockSales)"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--color-stockSales)"
                     stopOpacity={0.1}
                   />
                 </linearGradient>
@@ -230,6 +170,7 @@ export function ChartAreaInteractive() {
                   });
                 }}
               />
+              <YAxis domain={[0, "dataMax"]} />
               <ChartTooltip
                 cursor={false}
                 defaultIndex={isMobile ? -1 : 10}
@@ -245,13 +186,20 @@ export function ChartAreaInteractive() {
                   />
                 }
               />
+
               <Area
-                dataKey={selectedIndicator}
+                dataKey="stockPurchases"
                 type="monotone"
-                fill={`url(#fill${selectedIndicator.charAt(0).toUpperCase() + selectedIndicator.slice(1)})`}
-                stroke={`var(--color-${selectedIndicator})`}
+                fill="url(#fillStockPurchases)"
+                stroke="var(--color-stockPurchases)"
                 strokeWidth={2}
-                stackId="1"
+              />
+              <Area
+                dataKey="stockSales"
+                type="monotone"
+                fill="url(#fillStockSales)"
+                stroke="var(--color-stockSales)"
+                strokeWidth={2}
               />
             </AreaChart>
           </ChartContainer>

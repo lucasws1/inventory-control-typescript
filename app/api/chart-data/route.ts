@@ -32,6 +32,36 @@ function calculateStockBalance(
   }, 0);
 }
 
+function isSameDay(date1: Date, date2: Date) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+const calculateStockPurchases = (
+  stockMovements: Array<{ quantity: number; reason: string }>,
+) => {
+  return stockMovements.reduce((balance, movement) => {
+    if (movement.reason === "COMPRA" || movement.reason === "AJUSTE_POSITIVO") {
+      return balance + movement.quantity;
+    }
+    return balance;
+  }, 0);
+};
+
+const calculateStockSales = (
+  stockMovements: Array<{ quantity: number; reason: string }>,
+) => {
+  return stockMovements.reduce((balance, movement) => {
+    if (movement.reason === "VENDA" || movement.reason === "AJUSTE_NEGATIVO") {
+      return balance - movement.quantity;
+    }
+    return balance;
+  }, 0);
+};
+
 export async function GET(request: NextRequest) {
   try {
     // Verificar autenticação
@@ -167,7 +197,15 @@ export async function GET(request: NextRequest) {
 
       // Current stock balance up to this date
       const stockBalanceUpToDate = calculateStockBalance(
-        stockMovements.filter((movement) => movement.date <= date),
+        stockMovements.filter((movement) => isSameDay(movement.date, date)),
+      );
+
+      const stockPurchasesUpToDate = calculateStockPurchases(
+        stockMovements.filter((movement) => isSameDay(movement.date, date)),
+      );
+
+      const stockSalesUpToDate = calculateStockSales(
+        stockMovements.filter((movement) => isSameDay(movement.date, date)),
       );
 
       return {
@@ -176,6 +214,8 @@ export async function GET(request: NextRequest) {
         customers: customersUpToDate,
         products: productsUpToDate,
         stockBalance: stockBalanceUpToDate,
+        stockPurchases: stockPurchasesUpToDate,
+        stockSales: stockSalesUpToDate,
       };
     });
 
@@ -253,6 +293,9 @@ export async function GET(request: NextRequest) {
     const novosClientes = customers.length;
     const previousNovosClientes = previousCustomers;
 
+    const vendasRealizadas = invoices.length;
+    const previousVendasRealizadas = previousInvoices.length;
+
     // Calculate growth based on total customer base growth
     const clientesChange =
       totalCustomersAtEndOfPreviousPeriod > 0
@@ -285,6 +328,36 @@ export async function GET(request: NextRequest) {
 
     const novosProdutos = products.length;
     const previousNovosProdutos = previousProducts;
+
+    // Calculate total sales at end of each period for comparison
+    const vendasRealizadasAtEndOfCurrentPeriod = await prisma.invoice.count({
+      where: {
+        userId,
+        purchaseDate: {
+          lte: endDate,
+        },
+      },
+    });
+
+    const vendasRealizadasAtEndOfPreviousPeriod = await prisma.invoice.count({
+      where: {
+        userId,
+        purchaseDate: {
+          lte: previousPeriodEnd,
+        },
+      },
+    });
+
+    // Calculate growth based on total sales growth
+    const vendasChange =
+      vendasRealizadasAtEndOfPreviousPeriod > 0
+        ? ((vendasRealizadasAtEndOfCurrentPeriod -
+            vendasRealizadasAtEndOfPreviousPeriod) /
+            vendasRealizadasAtEndOfPreviousPeriod) *
+          100
+        : vendasRealizadasAtEndOfCurrentPeriod > 0
+          ? 100
+          : 0;
 
     // Calculate growth based on total product catalog growth
     const produtosChange =
@@ -370,6 +443,10 @@ export async function GET(request: NextRequest) {
       totalEstoque: totalEstoque || 0,
       movimentacaoEstoque: currentPeriodStockChange,
       estoqueChange,
+      currentPeriodStockChange,
+      vendasRealizadas,
+      previousVendasRealizadas,
+      vendasChange,
     });
   } catch (error) {
     console.error("Erro ao buscar dados do gráfico:", error);

@@ -21,6 +21,11 @@ interface ChartDataContextType {
   produtosChange: number;
   totalEstoque: number;
   estoqueChange: number;
+  vendasRealizadas: number;
+  vendasChange: number;
+  currentPeriodStockChange: number;
+  stockPurchases: number;
+  stockSales: number;
   getChartData: () => Promise<void>;
 }
 
@@ -40,7 +45,11 @@ export function ChartDataProvider({ children }: { children: React.ReactNode }) {
   const [produtosChange, setProdutosChange] = useState(0);
   const [totalEstoque, setTotalEstoque] = useState(0);
   const [estoqueChange, setEstoqueChange] = useState(0);
-
+  const [vendasRealizadas, setVendasRealizadas] = useState(0);
+  const [vendasChange, setVendasChange] = useState(0);
+  const [currentPeriodStockChange, setCurrentPeriodStockChange] = useState(0);
+  const [stockPurchases, setStockPurchases] = useState(0);
+  const [stockSales, setStockSales] = useState(0);
   const getChartData = async () => {
     setLoading(true);
     try {
@@ -61,6 +70,11 @@ export function ChartDataProvider({ children }: { children: React.ReactNode }) {
       setProdutosChange(data.produtosChange || 0);
       setTotalEstoque(data.totalEstoque || 0);
       setEstoqueChange(data.estoqueChange || 0);
+      setVendasRealizadas(data.vendasRealizadas || 0);
+      setVendasChange(data.vendasChange || 0);
+      setCurrentPeriodStockChange(data.currentPeriodStockChange || 0);
+      setStockPurchases(data.stockPurchases || 0);
+      setStockSales(data.stockSales || 0);
     } catch (error) {
       console.error("Erro ao buscar dados do gráfico:", error);
       if (axios.isAxiosError(error)) {
@@ -76,6 +90,11 @@ export function ChartDataProvider({ children }: { children: React.ReactNode }) {
       setProdutosChange(0);
       setTotalEstoque(0);
       setEstoqueChange(0);
+      setVendasRealizadas(0);
+      setVendasChange(0);
+      setCurrentPeriodStockChange(0);
+      setStockPurchases(0);
+      setStockSales(0);
     } finally {
       setLoading(false);
     }
@@ -100,7 +119,12 @@ export function ChartDataProvider({ children }: { children: React.ReactNode }) {
     produtosChange,
     totalEstoque,
     estoqueChange,
+    vendasRealizadas,
+    vendasChange,
+    currentPeriodStockChange,
     getChartData,
+    stockPurchases,
+    stockSales,
   };
 
   return (

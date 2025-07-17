@@ -34,6 +34,9 @@ export function SectionCards() {
     produtosChange,
     totalEstoque,
     estoqueChange,
+    vendasRealizadas,
+    vendasChange,
+    currentPeriodStockChange,
   } = useChartData();
 
   return (
@@ -105,40 +108,38 @@ export function SectionCards() {
       {/* Novos Produtos */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Novos Produtos</CardDescription>
+          <CardDescription>Vendas</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? <Spinner /> : novosProdutos}
+            {loading ? <Spinner /> : vendasRealizadas}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              {produtosChange >= 0 ? <IconTrendingUp /> : <IconTrendingDown />}
-              {produtosChange >= 0 ? "+" : ""}
-              {produtosChange.toFixed(1)}%
+              {vendasChange >= 0 ? <IconTrendingUp /> : <IconTrendingDown />}
+              {vendasChange >= 0 ? "+" : ""}
+              {vendasChange.toFixed(1)}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            {produtosChange >= 0
-              ? "Catálogo em expansão"
-              : "Oportunidade de crescimento"}{" "}
-            {produtosChange >= 0 ? (
+            {vendasChange >= 0 ? "Vendas em alta" : "Vendas em baixa"}{" "}
+            {vendasChange >= 0 ? (
               <IconTrendingUp className="size-4" />
             ) : (
               <IconTrendingDown className="size-4" />
             )}
           </div>
           <div className="text-muted-foreground">
-            Novos produtos no período selecionado
+            Vendas realizadas no período selecionado
           </div>
         </CardFooter>
       </Card>
       {/* Estoque Total */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Estoque Total</CardDescription>
+          <CardDescription>Estoque</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {loading ? <Spinner /> : totalEstoque}
+            {loading ? <Spinner /> : currentPeriodStockChange}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -160,7 +161,7 @@ export function SectionCards() {
             )}
           </div>
           <div className="text-muted-foreground">
-            Taxa de expansão no período selecionado
+            Estoque no período selecionado
           </div>
         </CardFooter>
       </Card>
