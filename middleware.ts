@@ -5,13 +5,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Verifica se o usuário está autenticado via cookies de sessão
-  // Verifica apenas cookies que indicam uma sessão válida
+  // Foca apenas nos cookies que o NextAuth v5 realmente usa
   const hasSession =
-    request.cookies.has("next-auth.session-token") ||
-    request.cookies.has("__Secure-next-auth.session-token") ||
     request.cookies.has("authjs.session-token") ||
-    request.cookies.has("__Secure-authjs.session-token") ||
-    request.cookies.has("__Host-next-auth.session-token");
+    request.cookies.has("__Secure-authjs.session-token");
 
   // Rotas públicas (acessíveis sem autenticação)
   const publicRoutes = ["/login"];
