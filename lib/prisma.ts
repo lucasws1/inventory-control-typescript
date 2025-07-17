@@ -4,10 +4,7 @@ const globalForPrisma = global as unknown as {
   prisma: PrismaClient;
 };
 
-// Force new client creation for Neon database
-const prisma = globalForPrisma.prisma || new PrismaClient({
-  log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
-});
+const prisma = globalForPrisma.prisma || new PrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

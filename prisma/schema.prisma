@@ -1,4 +1,3 @@
-// Migrated to Neon database - 2025-07-17
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
