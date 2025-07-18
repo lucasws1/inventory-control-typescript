@@ -121,6 +121,12 @@ export function ChartAreaInteractive() {
           <ChartContainer
             config={chartConfig}
             className="aspect-auto h-[250px] w-full"
+            style={{ "--color-stockSales": "#6366f1" } as React.CSSProperties}
+            // style={
+            //   {
+            //     "--color-stockPurchases": "oklch(0.81 0.17 75.35)",
+            //   } as React.CSSProperties
+            // }
           >
             <AreaChart data={filteredData}>
               <defs>
