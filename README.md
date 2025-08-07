@@ -20,24 +20,6 @@ Sistema completo de controle de estoque desenvolvido com Next.js 15, TypeScript,
 - ✅ **Multi-tenant**: Dados isolados por usuário
 - ✅ **Interface Responsiva**: Mobile-first design
 
-## 📁 Estrutura do Projeto
-
-```
-├── app/                    # Next.js App Router
-│   ├── (dashboard)/       # Rotas protegidas
-│   ├── api/               # API Routes
-│   └── lib/               # Server actions
-├── components/            # Componentes React
-│   ├── ui/                # Componentes base (Shadcn)
-│   ├── forms/             # Formulários
-│   └── modals/            # Modais
-├── contexts/              # React Contexts
-├── lib/                   # Configurações (auth, prisma)
-├── prisma/                # Schema e migrations
-├── types/                 # Tipos TypeScript
-└── utils/                 # Utilitários
-```
-
 ## 🏗️ Arquitetura
 
 ### Padrões Principais
@@ -52,23 +34,6 @@ Sistema completo de controle de estoque desenvolvido com Next.js 15, TypeScript,
 1. `DataContext` carrega todos os dados via `/api/data`
 2. Cache client-side para performance
 3. Mutações via Server Actions → `refreshData()` → UI atualizada
-
-## 📊 Banco de Dados
-
-### Modelos Principais
-
-- **User**: Dados do usuário (NextAuth)
-- **Customer**: Clientes
-- **Product**: Produtos
-- **Invoice**: Vendas
-- **InvoiceItem**: Itens das vendas
-- **StockMovement**: Movimentações de estoque
-
-### Relacionamentos
-
-- Todos modelos incluem `userId` para isolamento
-- Relações configuradas com CASCADE para data integrity
-- Tipos `*WithRelations` para dados pré-carregados
 
 ## 🔐 Segurança
 
