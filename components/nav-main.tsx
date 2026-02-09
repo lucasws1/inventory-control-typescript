@@ -2,14 +2,11 @@
 
 import {
   IconBox,
-  IconCurrencyDollar,
   IconDots,
-  IconEdit,
   IconList,
   IconMail,
   IconPlus,
   IconShoppingCart,
-  IconTrash,
   IconUser,
   type Icon,
 } from "@tabler/icons-react";
@@ -32,7 +29,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
@@ -125,7 +121,7 @@ export function NavMain({
               </SidebarMenuButton>
               <Button
                 size="icon"
-                className="size-8 flex-shrink-0 group-data-[collapsible=icon]:opacity-0"
+                className="size-8 shrink-0 group-data-[collapsible=icon]:opacity-0"
                 variant="outline"
               >
                 <IconMail />

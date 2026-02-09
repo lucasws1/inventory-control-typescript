@@ -53,7 +53,7 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
         ref={cardRef}
         className={cn(
           "relative mx-4 w-full max-w-2xl overflow-hidden rounded-3xl p-1",
-          "bg-gradient-to-r from-slate-700 via-slate-800 to-gray-800",
+          "bg-linear-to-r from-slate-700 via-slate-800 to-gray-800",
           "animate-gradient-x shadow-2xl shadow-slate-800/25",
           className,
         )}
@@ -63,7 +63,7 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
           {/* Efeitos de fundo animados */}
           <div className="absolute inset-0">
             {/* Gradiente principal */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 via-slate-800/20 to-gray-800/20" />
+            <div className="absolute inset-0 bg-linear-to-br from-slate-700/20 via-slate-800/20 to-gray-800/20" />
 
             {/* Orbs flutuantes */}
             <div className="absolute -top-10 -left-10 h-40 w-40 animate-pulse rounded-full bg-slate-600/30 blur-3xl" />
@@ -81,7 +81,7 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
               <div className="relative">
                 {/* Ring animado ao redor do avatar */}
                 <div
-                  className="absolute -inset-2 animate-spin rounded-full bg-gradient-to-r from-slate-600 via-slate-700 to-gray-600"
+                  className="absolute -inset-2 animate-spin rounded-full bg-linear-to-r from-slate-600 via-slate-700 to-gray-600"
                   style={{ animationDuration: "2s" }}
                 />
                 <div className="relative overflow-hidden rounded-full bg-black p-1">
@@ -97,7 +97,7 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
             </div>
 
             {/* Título principal */}
-            <h1 className="mb-4 bg-gradient-to-r from-white via-slate-200 to-gray-200 bg-clip-text text-4xl font-bold text-transparent md:text-2xl">
+            <h1 className="mb-4 bg-linear-to-r from-white via-slate-200 to-gray-200 bg-clip-text text-4xl font-bold text-transparent md:text-2xl">
               {isAuthenticated ? `Bem-vindo, ${userName}!` : "Bem-vindo!"}
             </h1>
 
@@ -115,24 +115,24 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
                   <Button
                     onClick={handleLogout}
                     size="lg"
-                    className="group relative overflow-hidden bg-gradient-to-r from-slate-700 to-slate-800 text-white shadow-lg transition-all duration-300 hover:from-slate-600 hover:to-slate-700 hover:shadow-slate-700/25"
+                    className="group relative overflow-hidden bg-linear-to-r from-slate-700 to-slate-800 text-white shadow-lg transition-all duration-300 hover:from-slate-600 hover:to-slate-700 hover:shadow-slate-700/25"
                   >
                     <IconLogin className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
                     Fazer Logout
                     {/* Efeito shimmer */}
-                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+                    <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
                   </Button>
                 </>
               ) : (
                 <Button
                   onClick={handleLogin}
                   size="lg"
-                  className="group relative overflow-hidden bg-gradient-to-r from-slate-700 to-slate-800 text-white shadow-lg transition-all duration-300 hover:from-slate-600 hover:to-slate-700 hover:shadow-slate-700/25"
+                  className="group relative overflow-hidden bg-linear-to-r from-slate-700 to-slate-800 text-white shadow-lg transition-all duration-300 hover:from-slate-600 hover:to-slate-700 hover:shadow-slate-700/25"
                 >
                   <IconLogin className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
                   Entrar com Google
                   {/* Efeito shimmer */}
-                  <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
+                  <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
                 </Button>
               )}
             </div>
@@ -141,7 +141,7 @@ export const WelcomeCard = ({ className }: WelcomeCardProps) => {
           </div>
 
           {/* Shine effect */}
-          <div className="animate-shimmer absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+          <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/5 to-transparent" />
         </div>
       </div>
     </div>

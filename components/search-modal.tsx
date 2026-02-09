@@ -176,9 +176,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                     onClick={() => handleResultClick(result)}
                   >
                     <div className="flex w-full items-center space-x-3">
-                      <div className="flex-shrink-0">
-                        {getIcon(result.icon)}
-                      </div>
+                      <div className="shrink-0">{getIcon(result.icon)}</div>
                       <div className="min-w-0 flex-1 text-left">
                         <div className="truncate font-medium">
                           {result.title}
@@ -187,7 +185,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                           {result.subtitle}
                         </div>
                       </div>
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <span className="text-muted-foreground bg-muted rounded px-2 py-1 text-xs">
                           {getTypeLabel(result.type)}
                         </span>
