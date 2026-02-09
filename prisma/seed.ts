@@ -1,7 +1,22 @@
+import "dotenv/config";
 import { PrismaClient, StockReason } from "../app/generated/prisma";
 
-const prisma = new PrismaClient();
-const USER_ID = "cmcyvm61e000lxl0vgc2mplxx";
+/**
+ * Seed que gera dados relativos à data de execução.
+ * Execute com: pnpm prisma db seed
+ * Os dados cobrem os últimos 180 dias até HOJE, garantindo que
+ * faturamento, clientes, vendas e estoque apareçam nos filtros
+ * de 7, 30 e 90 dias do dashboard.
+ */
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+
+const connectionString = process.env.DATABASE_URL!;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+// const USER_ID = "cmcyvm61e000lxl0vgc2mplxx";
+const USER_ID = "cmd8qh1rc0000iwp2b7qoh5hh";
+const prisma = new PrismaClient({ adapter });
 
 // Função para gerar nomes aleatórios de clientes
 function generateCustomerName(i: number) {
@@ -76,9 +91,10 @@ function salesWave(day: number, totalDays: number) {
 
 async function main() {
   const now = new Date();
-  const start = new Date();
+  const start = new Date(now);
   start.setDate(start.getDate() - 180);
-  const totalDays = 180;
+  start.setHours(0, 0, 0, 0);
+  const totalDays = 181; // 180 dias atrás + hoje
 
   // Limpar dados antigos
   await prisma.invoiceItem.deleteMany();
