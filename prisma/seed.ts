@@ -1,5 +1,7 @@
 import "dotenv/config";
 import { PrismaClient, StockReason } from "../app/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 /**
  * Seed que gera dados relativos à data de execução.
@@ -8,14 +10,14 @@ import { PrismaClient, StockReason } from "../app/generated/prisma";
  * faturamento, clientes, vendas e estoque apareçam nos filtros
  * de 7, 30 e 90 dias do dashboard.
  */
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-
-const connectionString = process.env.DATABASE_URL!;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-// const USER_ID = "cmcyvm61e000lxl0vgc2mplxx";
 const USER_ID = "cmd8qh1rc0000iwp2b7qoh5hh";
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const adapter = new PrismaPg(pool);
+
 const prisma = new PrismaClient({ adapter });
 
 // Função para gerar nomes aleatórios de clientes

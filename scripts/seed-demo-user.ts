@@ -1,6 +1,14 @@
 import { PrismaClient, StockReason } from "../app/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
-const prisma = new PrismaClient();
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const adapter = new PrismaPg(pool);
+
+const prisma = new PrismaClient({ adapter });
 
 // Função para gerar dados de estoque com volumes menores
 function generateStockData(day: number, totalDays: number) {
