@@ -1,5 +1,5 @@
 "use client";
-import { StockReason } from "@/app/generated/prisma";
+import { StockReason } from "@prisma/client";
 import { createStockMovement } from "@/app/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";

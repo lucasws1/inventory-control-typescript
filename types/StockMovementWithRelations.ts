@@ -1,4 +1,4 @@
-import { Prisma } from "@/app/generated/prisma";
+import { Prisma } from "@prisma/client";
 
 export type StockMovementWithRelations = Prisma.StockMovementGetPayload<{
   include: {
